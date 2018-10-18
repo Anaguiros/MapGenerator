@@ -1,6 +1,6 @@
 var width = 960,
     height = 500,
-    numberPoints = 200;
+    numberPoints = 1000;
 
 d3.select("canvas").attr("width", width).attr("height", height);
 
@@ -10,8 +10,9 @@ var sites = Array.from({length: numberPoints}, () => [Math.random() * width, Mat
 var delaunay = new d3.Delaunay.from(sites);
 var voronoi = delaunay.voronoi([0.5, 0.5, width - 0.5, height - 0.5]);
 
-show();
 relax();
+console.log(voronoi);
+console.log(delaunay);
 
 function relax(){
     iteration.value = +iteration.value + 1;
@@ -20,7 +21,9 @@ function relax(){
     for (let polygon of voronoi.cellPolygons()) { 
         relaxedSites.push(d3.polygonCentroid(polygon));
     }
-    delaunay = new d3.Delaunay.from(relaxedSites);
+
+    sites=relaxedSites
+    delaunay = new d3.Delaunay.from(sites);
     voronoi = delaunay.voronoi([0.5, 0.5, width - 0.5, height - 0.5]);
     show();
 }
@@ -51,15 +54,26 @@ function showVoronoi(){
     context.strokeStyle = "#000";
     context.stroke();
 
-    context.beginPath();
-    voronoi.render(context);
-    context.strokeStyle = "#555";
-    context.stroke();
+    for (let i = 0; i < sites.length; i++) {
+        console.log(i);
+        const site = sites[i];
+        context.beginPath();
+        voronoi.renderCell(i, context);
+        context.fillStyle = getRandomColor();
+        context.fill();
+    }
 }
 
 function clearCanvas(){
     context.clearRect(0,0,width,height);
 }
 
-var randomColor = Math.floor(Math.random()*16777215).toString(16);
+function getRandomColor(){
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 3; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
