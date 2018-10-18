@@ -1,6 +1,7 @@
-var heightmap = new Array();
+var heightmap;
 
-function generateHeights() {
+function initHeights(){
+    heightmap = new Array();
     for (let i = 0; i < sites.length; i++) {
         heightmap.splice( i, 0, 0);
     }

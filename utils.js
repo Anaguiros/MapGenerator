@@ -17,12 +17,33 @@ var voronoi;
 
 generate();
 
-function generate(){
-    sites = Array.from({length: numberPoints}, () => [Math.random() * width_canvas, Math.random() * height_canvas]);
+function generate(count){
+    sites = Array.from({length: sizeInput.valueAsNumber}, () => [Math.random() * width_canvas, Math.random() * height_canvas]);
 
     delaunay = new d3.Delaunay.from(sites);
     voronoi = delaunay.voronoi([0.5, 0.5, width_canvas - 0.5, height_canvas - 0.5]);
     relax();
+    
+    //Random Blobs
+    for (c = 0; c < count; c++) {
+        if(c==0){
+            var randomPolygonID = delaunay.find(Math.random() * width_canvas / 4 + width_canvas / 2, Math.random() * height_canvas / 6 + height_canvas / 2);
+            add(randomPolygonID, "island");
+        } else {
+            var limit_random = 50, iteration = 0;
+            while (iteration < limit_random) {
+                var randomPolygonID = Math.floor(Math.random() * sites.length);
+                iteration++;
+                if(heightmap[randomPolygonID] > 0.25){
+                    add(randomPolygonID, "hill");
+                }
+            }
+            
+            
+
+        }
+    }
+
 }
 
 function relax(){
@@ -35,8 +56,7 @@ function relax(){
     delaunay = new d3.Delaunay.from(sites);
     voronoi = delaunay.voronoi([0.5, 0.5, width_canvas - 0.5, height_canvas - 0.5]);
 
-    generateHeights();
-
+    initHeights();
     show();
 }
 
@@ -91,14 +111,14 @@ function clicked(){
     nearestId = delaunay.find(point[0], point[1]);
 
     if(heightmap.findIndex(function(element) {return element > 0}) != -1){
+        add(nearestId, 'hill');
+        //highInput.value = Math.random() * 0.4 + 0.1;
+    } else {
         //premier ajout
         add(nearestId, 'island');
-        highOutput.value = 0.2;
-        radiusInput.value = 0.99;
-        radiusOutput.value = 0.99;
-    } else {
-        add(nearestId, 'hill');
-        highInput.value = Math.random() * 0.4 + 0.1;
+        //highOutput.value = 0.2;
+        //radiusInput.value = 0.91;
+        //radiusOutput.value = 0.91;
     }
 }
 
