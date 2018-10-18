@@ -6,13 +6,29 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="d3-delaunay.min.js"></script> 
     <style type="text/css">
+        canvas {
+            background-color: rgb(52, 71, 180);
+        }
+
+        .radius {
+            fill: none;
+            stroke: grey;
+        }
+
 
     </style>
 </head>
 <body>
     <canvas id="chart"></canvas>
-    <button onclick="relax()">Relax</button>
-    Iteration: <input id="iteration" value="0">
+    <div>
+        <button onclick="generate()">Generation Graph</button>
+        Cliquer pour ajouter une île. Cell: <span id="cell">0</span>; Altitude: <span id="high">0</span><br>
+
+        <label>Graph Size:</label><input id="sizeInput" value="8000" type="range" min="100" max="10000" step="100" oninput="sizeOutput.value = sizeInput.valueAsNumber"><output id="sizeOutput">8000</output><br>
+        <label>Max High:</label><input id="highInput" value="0.6" type="range" min="0.1" max="1" step="0.1" oninput="highOutput.value = highInput.valueAsNumber"><output id="highOutput">0.6</output><br>
+        <label>Radius:</label><input id="radiusInput" value="0.98" type="range" min="0.95" max="0.99" step="0.001" oninput="radiusOutput.value = radiusInput.valueAsNumber"><output id="radiusOutput">0.98</output><br>
+    </div>
 </body>
+    <script type="text/javascript" src="heightmap.js"></script>
     <script type="text/javascript" src="utils.js"></script>
 </html>

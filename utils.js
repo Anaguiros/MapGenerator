@@ -1,22 +1,32 @@
 var width = 960,
     height = 500,
-    numberPoints = 1000;
+    numberPoints = 10;
 
-d3.select("canvas").attr("width", width).attr("height", height);
+var canvas = d3.select("canvas").attr("width", width).attr("height", height);
+canvas.on("touchmove mousemove", moved);
+const context = document.getElementById('chart').getContext('2d');
+var color = d3.scaleSequential(d3.interpolateSpectral);
 
-const context = document.getElementById('chart').getContext('2d')
-var sites = Array.from({length: numberPoints}, () => [Math.random() * width, Math.random() * height]);
+var sites;
 
-var delaunay = new d3.Delaunay.from(sites);
-var voronoi = delaunay.voronoi([0.5, 0.5, width - 0.5, height - 0.5]);
+var delaunay;
+var voronoi;
 
-relax();
+generate();
+
 console.log(voronoi);
 console.log(delaunay);
 
-function relax(){
-    iteration.value = +iteration.value + 1;
+function generate(){
+    console.log("generate !");
+    sites = Array.from({length: numberPoints}, () => [Math.random() * width, Math.random() * height]);
 
+    delaunay = new d3.Delaunay.from(sites);
+    voronoi = delaunay.voronoi([0.5, 0.5, width - 0.5, height - 0.5]);
+    relax();
+}
+
+function relax(){
     var relaxedSites = new Array();
     for (let polygon of voronoi.cellPolygons()) { 
         relaxedSites.push(d3.polygonCentroid(polygon));
@@ -25,6 +35,9 @@ function relax(){
     sites=relaxedSites
     delaunay = new d3.Delaunay.from(sites);
     voronoi = delaunay.voronoi([0.5, 0.5, width - 0.5, height - 0.5]);
+
+    generateHeights();
+
     show();
 }
 
@@ -55,11 +68,9 @@ function showVoronoi(){
     context.stroke();
 
     for (let i = 0; i < sites.length; i++) {
-        console.log(i);
-        const site = sites[i];
         context.beginPath();
         voronoi.renderCell(i, context);
-        context.fillStyle = getRandomColor();
+        context.fillStyle = color(1-heightmap[i]);
         context.fill();
     }
 }
@@ -68,12 +79,11 @@ function clearCanvas(){
     context.clearRect(0,0,width,height);
 }
 
-function getRandomColor(){
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 3; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+function moved(){
+    var point = d3.mouse(this),
+    nearestId = delaunay.find(point[0], point[1]),
+
+    d3.select("#cell").text(nearestId);
+    d3.select("#high").text(heightmap[nearestId])
 }
 
