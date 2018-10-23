@@ -1,6 +1,5 @@
-var width_canvas = 960,
-    height_canvas = 500,
-    numberPoints = 8000;
+var width_canvas = 1228,
+    height_canvas = 640;
 
 var canvas = d3.select("canvas")
     .attr("width", width_canvas)
@@ -10,16 +9,23 @@ var canvas = d3.select("canvas")
 const context = document.getElementById('chart').getContext('2d');
 var color = d3.scaleSequential(d3.interpolateSpectral);
 
-var sites;
+var sampler,
+    sites,
+    sample;
 
 var delaunay;
 var voronoi;
 
-generate();
+generate(3);
 
 function generate(count){
-    sites = Array.from({length: sizeInput.valueAsNumber}, () => [Math.random() * width_canvas, Math.random() * height_canvas]);
 
+    sampler = poissonDiscSampler(width_canvas, height_canvas, sizeInput.valueAsNumber);
+    sites = new Array();
+
+    while (sample = sampler()){
+        sites.push(sample);
+    } 
     delaunay = new d3.Delaunay.from(sites);
     voronoi = delaunay.voronoi([0.5, 0.5, width_canvas - 0.5, height_canvas - 0.5]);
     relax();
@@ -28,13 +34,22 @@ function generate(count){
     for (c = 0; c < count; c++) {
         if(c==0){
             var randomPolygonID = delaunay.find(Math.random() * width_canvas / 4 + width_canvas / 2, Math.random() * height_canvas / 6 + height_canvas / 2);
+            highInput.value = 0.3;
+            highOutput.value = 0.3;
+            radiusInput.value = 0.98;
+            radiusOutput.value = 0.98;
             add(randomPolygonID, "island");
         } else {
-            var limit_random = 50, iteration = 0;
+            var limit_random = 10, iteration = 0;
             while (iteration < limit_random) {
                 var randomPolygonID = Math.floor(Math.random() * sites.length);
                 iteration++;
-                if(heightmap[randomPolygonID] > 0.25){
+                var site = sites[randomPolygonID];
+
+                if(heightmap[randomPolygonID] > 0.25 || site[0] > width_canvas*0.25 || site[0] < width_canvas*0.75 || site[1] > height_canvas*0.25 || site[1] < height_canvas*0.75){
+                    var randomHeight = (Math.random() * 0.4 + 0.1).toFixed(2);
+                    highInput.value = randomHeight;
+                    highOutput.value = randomHeight;
                     add(randomPolygonID, "hill");
                 }
             }
@@ -112,13 +127,8 @@ function clicked(){
 
     if(heightmap.findIndex(function(element) {return element > 0}) != -1){
         add(nearestId, 'hill');
-        //highInput.value = Math.random() * 0.4 + 0.1;
     } else {
-        //premier ajout
         add(nearestId, 'island');
-        //highOutput.value = 0.2;
-        //radiusInput.value = 0.91;
-        //radiusOutput.value = 0.91;
     }
 }
 

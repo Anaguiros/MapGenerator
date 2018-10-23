@@ -9,7 +9,7 @@ function initHeights(){
 
 function add(polygonStartID, type){
     var explorationQueue = new Array(),
-    exploredPolygon = new Array(sites.length-1);
+    exploredPolygon = new Array(sites.length);
 
     for (let i = 0; i < exploredPolygon.length; i++) {
         exploredPolygon[i] = false;
@@ -26,7 +26,7 @@ function add(polygonStartID, type){
         if(type == "island"){
             height = heightmap[explorationQueue[i]] * radius;
         } else {
-            height *= radius;
+            height = height * radius;
         }
         for (let neighborID of delaunay.neighbors(explorationQueue[i])) {
             if(!exploredPolygon[neighborID]){
