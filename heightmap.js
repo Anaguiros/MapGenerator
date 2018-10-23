@@ -1,9 +1,6 @@
-var heightmap;
-
 function initHeights(){
-    heightmap = new Array();
     for (let i = 0; i < sites.length; i++) {
-        heightmap.splice( i, 0, 0);
+        sites[i].height = 0;
     }
 }
 
@@ -19,12 +16,12 @@ function add(polygonStartID, type){
     radius = radiusInput.valueAsNumber,
     sharpness = sharpnessInput.valueAsNumber;
 
-    heightmap[polygonStartID] += height;
+    sites[polygonStartID].height += height;
     exploredPolygon[polygonStartID] = true;
     explorationQueue.push(polygonStartID);
     for (let i = 0; i < explorationQueue.length && height > 0.01; i++) {
         if(type == "island"){
-            height = heightmap[explorationQueue[i]] * radius;
+            height = sites[explorationQueue[i]].height * radius;
         } else {
             height = height * radius;
         }
@@ -34,9 +31,9 @@ function add(polygonStartID, type){
                 if(sharpness == 0){
                     noise = 1;
                 }
-                heightmap[neighborID] += height * noise;
-                if(heightmap[neighborID] > 1){
-                    heightmap[neighborID] = 1;
+                sites[neighborID].height += height * noise;
+                if(sites[neighborID].height > 1){
+                    sites[neighborID].height = 1;
                 }
                 exploredPolygon[neighborID] = true;
                 explorationQueue.push(neighborID);

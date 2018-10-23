@@ -16,7 +16,7 @@ var sampler,
 var delaunay;
 var voronoi;
 
-generate(3);
+generate(9);
 
 function generate(count){
 
@@ -40,13 +40,13 @@ function generate(count){
             radiusOutput.value = 0.98;
             add(randomPolygonID, "island");
         } else {
-            var limit_random = 10, iteration = 0;
+            var limit_random = 20, iteration = 0;
             while (iteration < limit_random) {
                 var randomPolygonID = Math.floor(Math.random() * sites.length);
                 iteration++;
-                var site = sites[randomPolygonID];
+                var site = voronoi.cellPolygon(randomPolygonID)[0];
 
-                if(heightmap[randomPolygonID] > 0.25 || site[0] > width_canvas*0.25 || site[0] < width_canvas*0.75 || site[1] > height_canvas*0.25 || site[1] < height_canvas*0.75){
+                if(site[0] > width_canvas*0.25 && site[0] < width_canvas*0.75 && site[1] > height_canvas*0.25 && site[1] < height_canvas*0.75){
                     var randomHeight = (Math.random() * 0.4 + 0.1).toFixed(2);
                     highInput.value = randomHeight;
                     highOutput.value = randomHeight;
@@ -104,7 +104,7 @@ function showVoronoi(){
     for (let i = 0; i < sites.length; i++) {
         context.beginPath();
         voronoi.renderCell(i, context);
-        context.fillStyle = color(1-heightmap[i]);
+        context.fillStyle = color(1-sites[i].height);
         context.fill();
     }
 }
@@ -118,17 +118,13 @@ function moved(){
     nearestId = delaunay.find(point[0], point[1]);
 
     d3.select("#cell").text(nearestId);
-    d3.select("#high").text(heightmap[nearestId])
+    d3.select("#high").text(sites[nearestId].height)
 }
 
 function clicked(){
     var point = d3.mouse(this),
     nearestId = delaunay.find(point[0], point[1]);
 
-    if(heightmap.findIndex(function(element) {return element > 0}) != -1){
-        add(nearestId, 'hill');
-    } else {
-        add(nearestId, 'island');
-    }
+    add(nearestId, 'hill');
 }
 
