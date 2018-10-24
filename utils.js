@@ -59,6 +59,9 @@ function generate(count){
         }
     }
 
+    //Drawn coastlines
+    drawnCoastLine();
+
 }
 
 function relax(){
