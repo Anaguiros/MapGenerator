@@ -1,7 +1,7 @@
 function show(){
     clearCanvas();
-    showSite();
     showVoronoi();
+    drawnCoastLine();
 }
 
 function showTriangles(){
@@ -116,4 +116,12 @@ function edgesAroundPoint(start) {
         incoming = delaunay.halfedges[outgoing];
     } while (incoming !== -1 && incoming !== start);
     return result;
+}
+
+function uniqueBy(array, key) {
+    var seen = {};
+    return array.filter(function(item) {
+        var k = key(item);
+        return seen.hasOwnProperty(k) ? false : (seen[k] = true);
+    })
 }

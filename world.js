@@ -1,13 +1,13 @@
-var width_canvas = 1228,
+const width_canvas = 1228,
     height_canvas = 640;
 
-var canvas = d3.select("canvas")
+const canvas = d3.select("canvas")
     .attr("width", width_canvas)
     .attr("height", height_canvas)
     .on("touchmove mousemove", moved)
     .on("click", clicked);
 const context = document.getElementById('chart').getContext('2d');
-var color = d3.scaleSequential(d3.interpolateSpectral);
+const color = d3.scaleSequential(d3.interpolateSpectral);
 
 var sampler,
     sites,
@@ -34,10 +34,10 @@ function generate(count){
     for (c = 0; c < count; c++) {
         if(c==0){
             var randomPolygonID = delaunay.find(Math.random() * width_canvas / 4 + width_canvas / 2, Math.random() * height_canvas / 6 + height_canvas / 2);
-            highInput.value = 0.3;
-            highOutput.value = 0.3;
-            radiusInput.value = 0.98;
-            radiusOutput.value = 0.98;
+            //highInput.value = 0.3;
+            //highOutput.value = 0.3;
+            //radiusInput.value = 0.98;
+            //radiusOutput.value = 0.98;
             add(randomPolygonID, "island");
         } else {
             let limit_random = 20, iteration = 0;
@@ -48,8 +48,8 @@ function generate(count){
 
                 if(site[0] > width_canvas*0.25 && site[0] < width_canvas*0.75 && site[1] > height_canvas*0.25 && site[1] < height_canvas*0.75){
                     let randomHeight = (Math.random() * 0.4 + 0.1).toFixed(2);
-                    highInput.value = randomHeight;
-                    highOutput.value = randomHeight;
+                    //highInput.value = randomHeight;
+                    //highOutput.value = randomHeight;
                     add(randomPolygonID, "hill");
                 }
             }
