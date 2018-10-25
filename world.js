@@ -40,14 +40,14 @@ function generate(count){
             radiusOutput.value = 0.98;
             add(randomPolygonID, "island");
         } else {
-            var limit_random = 20, iteration = 0;
+            let limit_random = 20, iteration = 0;
             while (iteration < limit_random) {
-                var randomPolygonID = Math.floor(Math.random() * sites.length);
+                let randomPolygonID = Math.floor(Math.random() * sites.length);
                 iteration++;
-                var site = voronoi.cellPolygon(randomPolygonID)[0];
+                let site = voronoi.cellPolygon(randomPolygonID)[0];
 
                 if(site[0] > width_canvas*0.25 && site[0] < width_canvas*0.75 && site[1] > height_canvas*0.25 && site[1] < height_canvas*0.75){
-                    var randomHeight = (Math.random() * 0.4 + 0.1).toFixed(2);
+                    let randomHeight = (Math.random() * 0.4 + 0.1).toFixed(2);
                     highInput.value = randomHeight;
                     highOutput.value = randomHeight;
                     add(randomPolygonID, "hill");
@@ -65,7 +65,7 @@ function generate(count){
 }
 
 function relax(){
-    var relaxedSites = new Array();
+    let relaxedSites = new Array();
     for (let polygon of voronoi.cellPolygons()) { 
         relaxedSites.push(d3.polygonCentroid(polygon));
     }

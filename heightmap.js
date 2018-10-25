@@ -5,14 +5,14 @@ function initHeights(){
 }
 
 function add(polygonStartID, type){
-    var explorationQueue = new Array(),
+    let explorationQueue = new Array(),
     exploredPolygon = new Array(sites.length);
 
     for (let i = 0; i < exploredPolygon.length; i++) {
         exploredPolygon[i] = false;
     }
 
-    var height = highInput.valueAsNumber,
+    let height = highInput.valueAsNumber,
     radius = radiusInput.valueAsNumber,
     sharpness = sharpnessInput.valueAsNumber;
 
@@ -27,7 +27,7 @@ function add(polygonStartID, type){
         }
         for (let neighborID of delaunay.neighbors(explorationQueue[i])) {
             if(!exploredPolygon[neighborID]){
-                var noise = Math.random()*sharpness + 1.1 - sharpness;
+                let noise = Math.random()*sharpness + 1.1 - sharpness;
                 if(sharpness == 0){
                     noise = 1;
                 }
@@ -46,11 +46,24 @@ function add(polygonStartID, type){
 }
 
 function drawnCoastLine(){
+    showTriangles();
 
+/*    for (let trianglePolygon of delaunay.trianglePolygons()){
+        console.log(trianglePolygon);
+    }
+*/
+console.log(delaunay.trianglePolygon(0));
+
+/*
     for (let i = 0; i < sites.length; i++) {
         if(sites[i].height >= 0.2){
             console.log(i);
+            for (let neighborID of delaunay.neighbors(i)) {
+                console.log(neighborID);
+            }
+            
+        }
     }
-
+*/
 
 }

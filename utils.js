@@ -41,7 +41,7 @@ function clearCanvas(){
 }
 
 function moved(){
-    var point = d3.mouse(this),
+    let point = d3.mouse(this),
     nearestId = delaunay.find(point[0], point[1]);
 
     d3.select("#cell").text(nearestId);
@@ -49,14 +49,10 @@ function moved(){
 }
 
 function clicked(){
-    var point = d3.mouse(this),
+    let point = d3.mouse(this),
     nearestId = delaunay.find(point[0], point[1]);
 
     add(nearestId, 'hill');
-}
-
-function edgesOfTriangle(t){
-    return [3 * t, 3 * t + 1, 3 * t + 2]; 
 }
 
 function triangleOfEdge(e) {
@@ -71,7 +67,47 @@ function prevHalfedge(e){
     return (e % 3 === 0) ? e + 2 : e - 1;
 }
 
-function edgesAroundPoint(delaunay, start) {
+function forEachTriangleEdge(callback){
+    for (let e = 0; e < delaunay.triangles.length; e++) {
+        if (e > delaunay.halfedges[e]) {
+            const p = delaunay.points[delaunay.triangles[e]];
+            const q = delaunay.points[delaunay.triangles[nextHalfedge(e)]];
+            callback(e, p, q);
+        }
+    }
+}
+
+function edgesOfTriangle(triangleID){ 
+    return [3 * triangleID, 3 * triangleID + 1, 3 * triangleID + 2];
+}
+
+function pointsOfTriangle(triangleID) {
+    return edgesOfTriangle(triangleID)
+        .map(e => delaunay.triangles[e]);
+}
+
+function forEachTriangle(callback) {
+    for (let triangleID = 0; triangleID < delaunay.triangles.length / 3; triangleID++) {
+        callback(triangleID, pointsOfTriangle(triangleID).map(p => [delaunay.points[p*2],delaunay.points[p*2+1]]));
+    }
+}
+
+function triangleOfEdge(e){
+    return Math.floor(e / 3);
+}
+
+function trianglesAdjacentToTriangle(t){
+    const adjacentTriangles = [];
+    for (const e of edgesOfTriangle(t)) {
+        const opposite = delaunay.halfedges[e];
+        if (opposite >= 0) {
+            adjacentTriangles.push(triangleOfEdge(opposite));
+        }
+    }
+    return adjacentTriangles;
+}
+
+function edgesAroundPoint(start) {
     const result = [];
     let incoming = start;
     do {
