@@ -46,13 +46,11 @@ function add(polygonStartID, type){
 }
 
 function drawnCoastLine(){
-    console.log(delaunay.halfedges);
-    console.log(delaunay.triangles);
-    console.log(delaunay.points);
 
     for (let i = 0; i < sites.length; i++) {
         if(sites[i].height >= 0.2){
-            console.log(voronoi.cellPolygon(i));
-        }
+            console.log(i);
     }
+
+
 }
