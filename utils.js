@@ -1,6 +1,7 @@
 function show(){
     clearCanvas();
     showVoronoi();
+    markFeatures();
     drawnCoastLine();
 }
 
@@ -45,7 +46,12 @@ function moved(){
     nearestId = delaunay.find(point[0], point[1]);
 
     d3.select("#cell").text(nearestId);
-    d3.select("#high").text(sites[nearestId].height)
+    d3.select("#high").text(sites[nearestId].height);
+    if(sites[nearestId].type){
+        d3.select("#feature").text(sites[nearestId].description + " " + sites[nearestId].type);
+    } else {
+        d3.select("#feature").text("Aucun signe distinctif");
+    }
 }
 
 function clicked(){
@@ -53,6 +59,7 @@ function clicked(){
     nearestId = delaunay.find(point[0], point[1]);
 
     add(nearestId, 'hill');
+    show();
 }
 
 function triangleOfEdge(e) {
