@@ -44,6 +44,16 @@ function add(polygonStartID, type){
     }
 }
 
+function downcutCoastLine(){
+    let downcut = downcuttingInput.valueAsNumber;
+    for (let i = 0; i < sites.length; i++) {
+        if(sites[i].height >= 0.2){
+            sites[i].height -= downcut;
+        }
+        
+    }
+}
+
 function generateCoastLine(){
     lines = new Array();
 

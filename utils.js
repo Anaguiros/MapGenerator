@@ -1,5 +1,7 @@
 function show(){
     clearCanvas();
+    downcutCoastLine();
+    generatePrecipitation();
     generateFeatures();
     generateCoastLine();
     drawPolygons();
@@ -147,3 +149,8 @@ function uniqueBy(array, key) {
         return seen.hasOwnProperty(k) ? false : (seen[k] = true);
     })
 }
+
+function fade(id) {
+    let element = document.getElementById(id);
+    element.style.display = (element.style.display == 'none') ? 'block' : 'none';
+  }
