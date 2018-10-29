@@ -1,25 +1,8 @@
-function initFeatures(){
-    if(sites[0].type){
-        let newSites = new Array();
-        for (let i = 0; i < sites.length; i++) {
-            let tmpSite = new Array();
-            tmpSite.push(sites[i][0]);
-            tmpSite.push(sites[i][1]);
-            tmpSite.height = sites[i].height;
-            newSites.push(tmpSite);
-        }
-        sites = newSites;
-    }
-    
-}
-
 /**
  * Principe d'innondation pour déterminer la coastline.
  * On part d'un coin (très faible proba d'être dans un lac), puis on innonde les voisins pour définir le type (ocean, lac)
  */
-function markFeatures(){
-    console.log("mark Features");
-    //initFeatures();
+function generateFeatures(){
 
     let initPoints =[[0,0],[width_canvas,0],[0,height_canvas],[width_canvas,height_canvas]],
     startPoint = [0,0];
@@ -32,13 +15,13 @@ function markFeatures(){
     let explorationPolygonIDQueue = new Array(),
     exploredPolygonID = new Array(),
     startpolygonID = delaunay.find(startPoint[0],startPoint[1]),
-    type = 'ocean',
+    type = 'Ocean',
     description;
 
     explorationPolygonIDQueue.push(startpolygonID);
     exploredPolygonID.push(startpolygonID);
 
-    if(sites[startpolygonID].type === 'ocean'){
+    if(sites[startpolygonID].type === 'Ocean'){
         description = sites[startpolygonID].description;
     } else {
         description = adjectifs[Math.floor(Math.random() * adjectifs.length)];

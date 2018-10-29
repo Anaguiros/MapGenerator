@@ -1,3 +1,5 @@
+var lines;
+
 function initHeights(){
     for (let i = 0; i < sites.length; i++) {
         sites[i].height = 0;
@@ -42,41 +44,67 @@ function add(polygonStartID, type){
     }
 }
 
-function drawnCoastLine(){
-    console.log("CoastLine");
+function generateCoastLine(){
+    lines = new Array();
 
     for (let i = 0; i < sites.length; i++) {
         if(sites[i].height >= 0.2){
             for (let neighborID of delaunay.neighbors(i)) {
-                if(sites[neighborID].height < 0.20){
-                    let polygon = voronoi.cellPolygon(i);
-                    let polygonNeighbor = voronoi.cellPolygon(neighborID);
-                    let commonPoints = new Array();
+                if(sites[neighborID].height < 0.2){
+                    let polygon = voronoi.cellPolygon(i),
+                    polygonNeighbor = voronoi.cellPolygon(neighborID),
+                    commonPoints = new Array(),
+                    start,end,
+                    type = '',
+                    number = 0;
 
                     polygon.forEach(point => {
                         polygonNeighbor.forEach(pointCommun => {
                             if (point[0] == pointCommun[0] && point[1] == pointCommun[1]){
                                 commonPoints.push(pointCommun);
+
                             }
                         })
                     });
 
                     commonPoints = uniqueBy(commonPoints, JSON.stringify);
-                    
-                    context.beginPath();
-                    context.moveTo(commonPoints[0][0], commonPoints[0][1]);
-                    context.lineTo(commonPoints[1][0], commonPoints[1][1]);
-                    context.closePath();
-                    context.strokeStyle = "#000";
-                    context.lineWidth = 2;
-                    context.stroke();
 
+                    start = commonPoints[0].join(' ');
+                    end = commonPoints[1].join(' ');
+
+                    if(sites[neighborID].type === 'Ocean' || sites[neighborID].type === 'Recif'){
+                        sites[neighborID].type = 'Recif';
+                        type = 'Ocean';
+                        number = sites[i].number;
+                    } else {
+                        type = 'Lake';
+                        number = sites[neighborID].number;
+                    }
+
+                    lines.push({start, end, type, number});
                 }
                 
             }
             
         }
     }
+}
 
+function drawnCoastLine(){
+    lines.forEach(border => {
+        let start_point = border.start.split(" "),
+        end_point = border.end.split(" ");
 
+        context.beginPath();
+        context.moveTo(start_point[0], start_point[1]);
+        context.lineTo(end_point[0], end_point[1]);
+        context.closePath();
+        if(border.type === 'Ocean'){
+            context.strokeStyle = "#000";
+            context.lineWidth = 2;
+        } else {
+            context.strokeStyle = "#296F92";
+        }
+        context.stroke();
+    });
 }
