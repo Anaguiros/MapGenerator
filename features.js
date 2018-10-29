@@ -73,8 +73,9 @@ function markFeatures(){
     }
 
     while (unmarked.length > 0) {
-        colorPolygon(unmarked[0], '#F00');
-        if(sites[unmarked[0]].height >= 0.2){
+        startpolygonID = unmarked[0];
+
+        if(sites[startpolygonID].height >= 0.2){
             type = "Island";
             numberID = islandCounter;
             islandCounter += 1;
@@ -87,8 +88,13 @@ function markFeatures(){
             minHeight = -10;
             maxHeight = 0.2;
         }
-        description = adjectifs[Math.floor(Math.random() * adjectifs.length)];
-        startpolygonID = unmarked[0];
+
+        if(sites[startpolygonID].description && sites[startpolygonID].type == type){
+            description = sites[startpolygonID].description;
+        }
+        else {
+            description = adjectifs[Math.floor(Math.random() * adjectifs.length)];
+        }
         sites[startpolygonID].type = type;
         sites[startpolygonID].description = description;
         sites[startpolygonID].number = numberID;
@@ -109,7 +115,7 @@ function markFeatures(){
         }
         unmarked = new Array();
         for (let i = 0; i < sites.length; i++) {
-            if(exploredPolygonID.indexOf(i) < 0 && typeof sites[i].type === "undefined"){
+            if(exploredPolygonID.indexOf(i) < 0 && (typeof sites[i].type === "undefined" || true)){
                 unmarked.push(i);
             }
         }
