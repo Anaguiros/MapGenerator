@@ -100,7 +100,7 @@ function generateCoastLine(){
     }
 }
 
-function drawnCoastLine(){
+function drawCoastLine(){
     lines.forEach(border => {
         let start_point = border.start.split(" "),
         end_point = border.end.split(" ");

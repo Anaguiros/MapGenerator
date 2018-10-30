@@ -7,7 +7,8 @@ const canvas = d3.select("canvas")
     .on("touchmove mousemove", moved)
     .on("click", clicked);
 const context = document.getElementById('chart').getContext('2d');
-const color = d3.scaleSequential(d3.interpolateSpectral);
+const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
+const colorWeather = d3.scaleSequential(d3.interpolateBlues);
 
 var sampler,
     sites,
@@ -91,4 +92,5 @@ function relax(){
     voronoi = delaunay.voronoi([0.5, 0.5, width_canvas - 0.5, height_canvas - 0.5]);
 
     initHeights();
+    initPrecipitation();
 }

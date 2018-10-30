@@ -1,11 +1,20 @@
 function show(){
     clearCanvas();
     downcutCoastLine();
-    generatePrecipitation();
     generateFeatures();
     generateCoastLine();
-    drawPolygons();
-    drawnCoastLine();
+    generatePrecipitation();
+
+    if(document.getElementById('mapData').value === 'elevation'){
+        drawElevationPolygons();
+    } else if(document.getElementById('mapData').value === 'precipitation'){
+        drawWeatherPolygons();
+        drawPrecipitation();
+    } else {
+
+    }
+
+    drawCoastLine();
 }
 
 function drawTriangles(){
@@ -22,15 +31,28 @@ function drawSite(){
     context.fill();
 }
 
-function drawPolygons(){
-    context.beginPath();
-    voronoi.renderBounds(context);
-    context.strokeStyle = "#000";
-    context.stroke();
-
+function drawElevationPolygons(){
     for (let i = 0; i < sites.length; i++) {
         if(sites[i].height >= 0.2){
-            colorPolygon(i, color(1-sites[i].height));
+            colorPolygon(i, colorNatural(1-sites[i].height));
+        } else {
+            if(sites[i].type === 'Lake'){
+                colorPolygon(i, '#3C8CBC');
+            } else if(sites[i].type === 'Recif') {
+                colorPolygon(i, '#646B9A');
+            } else {
+                colorPolygon(i, '#604E99');
+            }
+            
+        }
+        
+    }
+}
+
+function drawWeatherPolygons(){
+    for (let i = 0; i < sites.length; i++) {
+        if(sites[i].height >= 0.2){
+            colorPolygon(i, colorWeather(sites[i].precipitation));
         } else {
             if(sites[i].type === 'Lake'){
                 colorPolygon(i, '#3C8CBC');
@@ -69,6 +91,9 @@ function moved(){
         d3.select("#feature").text("Aucun signe distinctif");
         d3.select("#number").text("inconnue");
     }
+
+    //if()
+
 }
 
 function clicked(){
@@ -78,6 +103,12 @@ function clicked(){
     add(nearestId, 'hill');
     show();
 }
+
+function changeMap(event){
+    show();
+}
+
+document.getElementById('mapData').onchange = changeMap;
 
 function triangleOfEdge(e) {
     return Math.floor(e / 3);
@@ -154,3 +185,18 @@ function fade(id) {
     let element = document.getElementById(id);
     element.style.display = (element.style.display == 'none') ? 'block' : 'none';
   }
+
+function drawCircle(x,y,radius,colorFill,colorStroke){
+
+    if(typeof colorStroke === "undefined") {
+        colorStroke = colorFill;
+    }
+
+    context.beginPath();
+    context.arc(x, y, radius, 0, 2 * Math.PI, false);
+    context.fillStyle = colorFill;
+    context.fill();
+    context.lineWidth = 1;
+    context.strokeStyle = colorStroke;
+    context.stroke();
+}
