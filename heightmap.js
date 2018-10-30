@@ -72,3 +72,7 @@ function drawCoastLine(){
         context.stroke();
     });
 }
+
+function resolveDepression(){
+    
+}

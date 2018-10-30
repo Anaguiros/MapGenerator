@@ -1,9 +1,13 @@
-function show(){
-    clearCanvas();
+function processWorld(){
+    initPrecipitation();
     downcutCoastLine();
     generateFeatures();
     generatePrecipitation();
+}
 
+function showWorld(){
+    clearCanvas();
+    
     if(document.getElementById('mapData').value === 'elevation'){
         drawElevationPolygons();
     } else if(document.getElementById('mapData').value === 'precipitation'){
@@ -12,7 +16,6 @@ function show(){
     } else {
 
     }
-
     drawCoastLine();
 }
 
@@ -91,7 +94,13 @@ function moved(){
         d3.select("#number").text("inconnue");
     }
 
-    //if()
+    if (sites[nearestId].flux) {
+        d3.select("#flux").text((sites[nearestId].flux).toFixed(2));
+        d3.select("#precipitation").text((sites[nearestId].precipitation).toFixed(2));
+    } else {
+        d3.select("#flux").text("no!");
+        d3.select("#precipitation").text("no!");
+    }
 
 }
 
@@ -100,11 +109,12 @@ function clicked(){
     nearestId = delaunay.find(point[0], point[1]);
 
     add(nearestId, 'hill');
-    show();
+    processWorld();
+    showWorld();
 }
 
 function changeMap(event){
-    show();
+    showWorld();
 }
 
 document.getElementById('mapData').onchange = changeMap;

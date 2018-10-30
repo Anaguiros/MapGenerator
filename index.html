@@ -20,8 +20,8 @@
 <body>
     <canvas id="chart"></canvas>
     <div>
-        <button onclick="generate(0)">Reset</button>
-        <button onclick="generate(9)">Random map</button>
+        <button onclick="randomWorld(0)">Reset</button>
+        <button onclick="randomWorld(9)">Random map</button>
         <button onclick="fade('options')">Options</button>
         Cliquer pour ajouter une île.<br>
         Cell: <span id="cell">0</span>; Altitude: <span id="high">0</span>; Entité <span id="number">inconnue</span> : <span id="feature">Aucun signe distinctif</span>; </span> Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River: <span id="river">no</span>;<br>
@@ -35,7 +35,7 @@
             </select></label><br>
         </div>
         <div>
-            <label>Sector Size:</label><input id="sizeInput" value="20" type="range" min="1" max="20" step="1" oninput="sizeOutput.value = sizeInput.valueAsNumber"><output id="sizeOutput">20</output><br>
+            <label>Sector Size:</label><input id="sizeInput" value="19" type="range" min="1" max="20" step="1" oninput="sizeOutput.value = sizeInput.valueAsNumber"><output id="sizeOutput">20</output><br>
             <label>Max High:</label><input id="highInput" value="0.2" type="range" min="0.1" max="1" step="0.1" oninput="highOutput.value = highInput.valueAsNumber"><output id="highOutput">0.2</output><br>
             <label>Blob Radius:</label><input id="radiusInput" value="0.78" type="range" min="0.75" max="0.99" step="0.001" oninput="radiusOutput.value = radiusInput.valueAsNumber"><output id="radiusOutput">0.78</output><br>
             <label>Blob Sharpness:</label><input id="sharpnessInput" value="0.2" type="range" min="0" max="0.5" step="0.1" oninput="sharpnessOutput.value = sharpnessInput.valueAsNumber"><output id="sharpnessOutput">0.2</output><br>

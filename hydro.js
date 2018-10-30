@@ -66,8 +66,8 @@ function generatePrecipitation(){
                         precipitation -= rain;
                         sites[nearestID].precipitation += rain;
                     } else {
-                        precipitation = 0;
                         sites[nearestID].precipitation += precipitation;
+                        precipitation = 0;
                     }
                     raining.push([x,y])
                 }
@@ -100,8 +100,8 @@ function generatePrecipitation(){
                         precipitation -= rain;
                         sites[nearestID].precipitation += rain;
                     } else {
-                        precipitation = 0;
                         sites[nearestID].precipitation += precipitation;
+                        precipitation = 0;
                     }
                     raining.push([x,y])
                 }
@@ -133,8 +133,8 @@ function generatePrecipitation(){
                         precipitation -= rain;
                         sites[nearestID].precipitation += rain;
                     } else {
-                        precipitation = 0;
                         sites[nearestID].precipitation += precipitation;
+                        precipitation = 0;
                     }
                     raining.push([x,y])
                 }
@@ -166,8 +166,8 @@ function generatePrecipitation(){
                         precipitation -= rain;
                         sites[nearestID].precipitation += rain;
                     } else {
-                        precipitation = 0;
                         sites[nearestID].precipitation += precipitation;
+                        precipitation = 0;
                     }
                     raining.push([x,y])
                 }

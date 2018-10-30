@@ -90,7 +90,7 @@ function generateFeatures(){
             for (let neighborID of delaunay.neighbors(exploredID)) {
 
                 //Generation CoastLine
-                if(sites[neighborID].height < 0.2){
+                if(sites[neighborID].height < 0.2 && type === 'Island'){
                     let polygon = voronoi.cellPolygon(exploredID),
                     polygonPoints = new Array(),
                     polygonNeighbor = voronoi.cellPolygon(neighborID),

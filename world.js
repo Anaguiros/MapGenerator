@@ -36,9 +36,9 @@ var adjectifs = [
     "Wan", "Warm", "Washed-Out", "Waxen", "Wild"
 ];
 
-generate(9);
+randomWorld(9);
 
-function generate(count){
+function randomWorld(count){
 
     sampler = poissonDiscSampler(width_canvas, height_canvas, sizeInput.valueAsNumber);
     sites = new Array();
@@ -78,7 +78,8 @@ function generate(count){
 
         }
     }
-    show();
+    processWorld();
+    showWorld();
 }
 
 function relax(){
@@ -92,5 +93,4 @@ function relax(){
     voronoi = delaunay.voronoi([0.5, 0.5, width_canvas - 0.5, height_canvas - 0.5]);
 
     initHeights();
-    initPrecipitation();
 }
