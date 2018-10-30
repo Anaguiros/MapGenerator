@@ -54,52 +54,6 @@ function downcutCoastLine(){
     }
 }
 
-function generateCoastLine(){
-    lines = new Array();
-
-    for (let i = 0; i < sites.length; i++) {
-        if(sites[i].height >= 0.2){
-            for (let neighborID of delaunay.neighbors(i)) {
-                if(sites[neighborID].height < 0.2){
-                    let polygon = voronoi.cellPolygon(i),
-                    polygonNeighbor = voronoi.cellPolygon(neighborID),
-                    commonPoints = new Array(),
-                    start,end,
-                    type = '',
-                    number = 0;
-
-                    polygon.forEach(point => {
-                        polygonNeighbor.forEach(pointCommun => {
-                            if (point[0] == pointCommun[0] && point[1] == pointCommun[1]){
-                                commonPoints.push(pointCommun);
-
-                            }
-                        })
-                    });
-
-                    commonPoints = uniqueBy(commonPoints, JSON.stringify);
-
-                    start = commonPoints[0].join(' ');
-                    end = commonPoints[1].join(' ');
-
-                    if(sites[neighborID].type === 'Ocean' || sites[neighborID].type === 'Recif'){
-                        sites[neighborID].type = 'Recif';
-                        type = 'Ocean';
-                        number = sites[i].number;
-                    } else {
-                        type = 'Lake';
-                        number = sites[neighborID].number;
-                    }
-
-                    lines.push({start, end, type, number});
-                }
-                
-            }
-            
-        }
-    }
-}
-
 function drawCoastLine(){
     lines.forEach(border => {
         let start_point = border.start.split(" "),

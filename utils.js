@@ -2,7 +2,6 @@ function show(){
     clearCanvas();
     downcutCoastLine();
     generateFeatures();
-    generateCoastLine();
     generatePrecipitation();
 
     if(document.getElementById('mapData').value === 'elevation'){

@@ -3,6 +3,7 @@
  * On part d'un coin (très faible proba d'être dans un lac), puis on innonde les voisins pour définir le type (ocean, lac)
  */
 function generateFeatures(){
+    lines = new Array();
 
     let initPoints =[[0,0],[width_canvas,0],[0,height_canvas],[width_canvas,height_canvas]],
     startPoint = [0,0];
@@ -87,6 +88,48 @@ function generateFeatures(){
         while (explorationPolygonIDQueue.length > 0) {
             let exploredID = explorationPolygonIDQueue.shift();
             for (let neighborID of delaunay.neighbors(exploredID)) {
+
+                //Generation CoastLine
+                if(sites[neighborID].height < 0.2){
+                    let polygon = voronoi.cellPolygon(exploredID),
+                    polygonPoints = new Array(),
+                    polygonNeighbor = voronoi.cellPolygon(neighborID),
+                    polygonNeighborPoints = new Array(),
+                    commonPoints = new Array(),
+                    start, end, type, number;
+    
+                    for (let i = 0; i < polygon.length -1; i++) {
+                        polygonPoints.push(polygon[i][0] + ' ' + polygon[i][1]);
+                    }
+                    commonPoints.push(polygonPoints);
+    
+                    for (let i = 0; i < polygonNeighbor.length -1; i++) {
+                        polygonNeighborPoints.push(polygonNeighbor[i][0] + ' ' + polygonNeighbor[i][1]);
+                    }
+                    commonPoints.push(polygonNeighborPoints);
+    
+                    commonPoints = commonPoints.shift().filter(function(v) {
+                        return commonPoints.every(function(a) {
+                            return a.indexOf(v) !== -1;
+                        });
+                    });
+    
+                    start = commonPoints[0];
+                    end = commonPoints[1];
+    
+                    if(sites[neighborID].type === 'Ocean' || sites[neighborID].type === 'Recif'){
+                        sites[neighborID].type = 'Recif';
+                        type = 'Ocean';
+                        number = sites[exploredID].number;
+                    } else {
+                        type = 'Lake';
+                        number = sites[neighborID].number;
+                    }
+    
+                    lines.push({start, end, type, number});
+                }
+
+
                 if(exploredPolygonID.indexOf(neighborID) < 0 && sites[neighborID].height < maxHeight && sites[neighborID].height >= minHeight){
                     sites[neighborID].type = type;
                     sites[neighborID].description = description;
