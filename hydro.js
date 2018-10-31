@@ -4,6 +4,7 @@ south = document.getElementById('south'),
 west = document.getElementById('west');
 
 var winds_buffer, raining;
+var riversData;
 
 function randomizeWinds(){
     north.checked = Math.random() >= 0.75;
@@ -14,7 +15,8 @@ function randomizeWinds(){
 
 function initPrecipitation(){
     for (let i = 0; i < sites.length; i++) {
-        sites[i].precipitation = 0;
+        sites[i].precipitation = 0.01;
+        sites[i].flux = 0.01;
     }
 }
 
@@ -197,4 +199,127 @@ function drawPrecipitation(){
     raining.forEach(rain => {
         drawCircle(rain[0],rain[1], 0.3, 'blue');
     });
+}
+
+function generateFlux(){
+    riversData = new Array();
+    let riverID = 0,
+    aval = new Array();
+
+    for (let i = 0; i < landPolygonID.length; i++) {
+        let neighborsPolygons = new Array(),
+        localMinID,
+        sommetsLocaux = new Array(),
+        idCellLand = landPolygonID[i],
+        xDiff,
+        yDiff;
+
+        for (const neighborID of delaunay.neighbors(idCellLand)) {
+            neighborsPolygons.push(neighborID);
+            sommetsLocaux.push(sites[neighborID].height);
+            if(sites[neighborID].height < 0.2){
+                xDiff = (sites[idCellLand][0] + sites[neighborID][0])/2;
+                yDiff = (sites[idCellLand][1] + sites[neighborID][1])/2;
+                aval.push({
+                    x:      xDiff,
+                    y:      yDiff,
+                    cell:   neighborID
+                });
+            }
+        }
+
+        localMinID = neighborsPolygons[sommetsLocaux.indexOf(Math.min(...sommetsLocaux))];
+
+        if(sites[idCellLand].flux > 0.6){
+            if(!sites[idCellLand].river){
+                sites[idCellLand].river = riverID;
+                riverID++;
+                riversData.push({
+                    river:  sites[idCellLand].river,
+                    cell:   idCellLand,
+                    x:      sites[idCellLand][0],
+                    y:      sites[idCellLand][1],
+                    type:   "source"
+                });
+            }
+
+            if(!sites[localMinID].river){
+                sites[localMinID].river = sites[idCellLand].river;
+            } else {
+                const iRiver      = riversData.filter(element => element.river == sites[idCellLand].river);
+                const minRiver    = riversData.filter(element => element.river == sites[localMinID].river);
+                if(iRiver.length >= minRiver.length){
+                    sites[localMinID].river = sites[idCellLand].river;
+                }
+            }
+        }
+
+        sites[localMinID].flux += sites[idCellLand].flux;
+        if(sites[idCellLand].precipitation * 0.9 > sites[localMinID].precipitation){
+            sites[localMinID].precipitation = sites[idCellLand].precipitation * 0.9;
+        }
+        if(sites[localMinID].height < 0.2 && sites[idCellLand].river){
+            //Deverse riviere dans ocean
+            if(sites[idCellLand].flux > 15 && aval.length > 1){
+                //Delta de la riviere
+                for (let c = 0; c < aval.length; c++) {
+                    if(c==0){
+                        riversData.push({
+                            river:  sites[idCellLand].river,
+                            cell:   idCellLand,
+                            x:      sites[idCellLand][0],
+                            y:      sites[idCellLand][1],
+                            type:   "delta",
+                            aval:   aval[0].cell
+                        });
+                    } else {
+                        riversData.push({
+                            river:  riverID,
+                            cell:   idCellLand,
+                            x:      sites[idCellLand][0],
+                            y:      sites[idCellLand][1],
+                            type:   "course"
+                        });
+                        riversData.push({
+                            river:  riverID,
+                            cell:   idCellLand,
+                            x:      aval[c].x,
+                            y:      aval[c].y,
+                            type:   "delta"
+                        });
+                    }
+                    riverID++;
+                }
+            } else {
+                //Estuaire de la riviere
+                let x = aval[0].x + ((aval[0].x - sites[idCellLand][0])/10);
+                let y = aval[0].y + ((aval[0].y - sites[idCellLand][1])/10);
+                riversData.push({
+                    river:  sites[idCellLand].river,
+                    cell:   idCellLand,
+                    x:      x,
+                    y:      y,
+                    type:   'estuary',
+                    aval:   aval[0].cell
+                });
+            }
+        } else {
+            //Segment de la rivière
+            riversData.push({
+                river:  sites[idCellLand].river,
+                cell:   localMinID,
+                x:      sites[localMinID][0],
+                y:      sites[localMinID][1],
+            type:       "course"
+            });
+        }
+    }
+console.log("GenerateFluxEnd");
+}
+
+function drawnFlux(){
+    let riverData,
+    x,
+    y,
+    line;
 }

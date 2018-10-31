@@ -4,8 +4,9 @@ function processWorld(){
     //Generate Height
     downcutCoastLine();
     resolveDepression();
-    //Generate Precipitation
+    //Generate Precipitation + rivers
     generatePrecipitation();
+    generateFlux();
     //Generate Features + Coastline
     generateFeatures();
 }
@@ -187,12 +188,30 @@ function edgesAroundPoint(start) {
     return result;
 }
 
-function uniqueBy(array, key) {
-    var seen = {};
-    return array.filter(function(item) {
-        var k = key(item);
-        return seen.hasOwnProperty(k) ? false : (seen[k] = true);
-    })
+function getCommonPoints(polygonID, neighborPolygonID){
+    const polygon = voronoi.cellPolygon(polygonID),
+    polygonNeighbor = voronoi.cellPolygon(neighborPolygonID);
+    let polygonPoints = new Array(),
+    polygonNeighborPoints = new Array(),
+    commonPoints = new Array();
+
+    for (let i = 0; i < polygon.length -1; i++) {
+        polygonPoints.push(polygon[i][0] + ' ' + polygon[i][1]);
+    }
+    commonPoints.push(polygonPoints);
+
+    for (let i = 0; i < polygonNeighbor.length -1; i++) {
+        polygonNeighborPoints.push(polygonNeighbor[i][0] + ' ' + polygonNeighbor[i][1]);
+    }
+    commonPoints.push(polygonNeighborPoints);
+
+    commonPoints = commonPoints.shift().filter(function(v) {
+        return commonPoints.every(function(a) {
+            return a.indexOf(v) !== -1;
+        });
+    });
+
+    return commonPoints;
 }
 
 function fade(id) {

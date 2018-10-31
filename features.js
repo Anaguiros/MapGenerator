@@ -91,28 +91,10 @@ function generateFeatures(){
 
                 //Generation CoastLine
                 if(sites[neighborID].height < 0.2 && type === 'Island'){
-                    const polygon = voronoi.cellPolygon(exploredID),
-                    polygonNeighbor = voronoi.cellPolygon(neighborID);
-                    let polygonPoints = new Array(),
-                    polygonNeighborPoints = new Array(),
-                    commonPoints = new Array(),
+                    let commonPoints = new Array(),
                     start, end, type, number;
     
-                    for (let i = 0; i < polygon.length -1; i++) {
-                        polygonPoints.push(polygon[i][0] + ' ' + polygon[i][1]);
-                    }
-                    commonPoints.push(polygonPoints);
-    
-                    for (let i = 0; i < polygonNeighbor.length -1; i++) {
-                        polygonNeighborPoints.push(polygonNeighbor[i][0] + ' ' + polygonNeighbor[i][1]);
-                    }
-                    commonPoints.push(polygonNeighborPoints);
-    
-                    commonPoints = commonPoints.shift().filter(function(v) {
-                        return commonPoints.every(function(a) {
-                            return a.indexOf(v) !== -1;
-                        });
-                    });
+                    commonPoints = getCommonPoints(exploredID, neighborID);
     
                     start = commonPoints[0];
                     end = commonPoints[1];

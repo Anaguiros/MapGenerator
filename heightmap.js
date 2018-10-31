@@ -1,4 +1,4 @@
-var lines;
+var lines, landPolygonID;
 
 function initHeights(){
     for (let i = 0; i < sites.length; i++) {
@@ -74,11 +74,10 @@ function drawCoastLine(){
 }
 
 function resolveDepression(){
-
-    let land = new Array();
+    landPolygonID = new Array();
     for (let i = 0; i < sites.length; i++) {
         if(sites[i].height >= 0.2){
-            land.push(i);
+            landPolygonID.push(i);
         }
     }
 
@@ -88,21 +87,21 @@ function resolveDepression(){
 
     while (depression > 0) {
         depression = 0;
-        for (let i = 0; i < land.length; i++) {
+        for (let i = 0; i < landPolygonID.length; i++) {
             minHigh = 10;
-            for (const neighborID of delaunay.neighbors(land[i])) {
+            for (const neighborID of delaunay.neighbors(landPolygonID[i])) {
                 if(sites[neighborID].height < minHigh){
                     minHigh = sites[neighborID].height;
                     minCell = neighborID
                 }
             }
-            if(sites[land[i]].height <= sites[minCell].height){
+            if(sites[landPolygonID[i]].height <= sites[minCell].height){
                 depression += 1;
-                sites[land[i]].height = sites[minCell].height + 0.01;
+                sites[landPolygonID[i]].height = sites[minCell].height + 0.01;
             }
         }
     }
-    land.sort(function (a,b) {
+    landPolygonID.sort(function (a,b) {
         if (sites[a].height < sites[b].height){
             return 1;
         } else if (sites[a].height > sites[b].height){
