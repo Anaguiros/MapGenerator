@@ -14,8 +14,8 @@ function add(polygonStartID, type){
         exploredPolygon[i] = false;
     }
 
-    let height = highInput.valueAsNumber,
-    radius = radiusInput.valueAsNumber,
+    let height = highInput.valueAsNumber;
+    const radius = radiusInput.valueAsNumber,
     sharpness = sharpnessInput.valueAsNumber;
 
     sites[polygonStartID].height += height;
@@ -27,9 +27,9 @@ function add(polygonStartID, type){
         } else {
             height = height * radius;
         }
-        for (let neighborID of delaunay.neighbors(explorationQueue[i])) {
+        for (const neighborID of delaunay.neighbors(explorationQueue[i])) {
             if(!exploredPolygon[neighborID]){
-                let noise = Math.random()*sharpness + 1.1 - sharpness;
+                const noise = Math.random()*sharpness + 1.1 - sharpness;
                 if(sharpness == 0){
                     noise = 1;
                 }
@@ -45,7 +45,7 @@ function add(polygonStartID, type){
 }
 
 function downcutCoastLine(){
-    let downcut = downcuttingInput.valueAsNumber;
+    const downcut = downcuttingInput.valueAsNumber;
     for (let i = 0; i < sites.length; i++) {
         if(sites[i].height >= 0.2){
             sites[i].height -= downcut;
@@ -56,7 +56,7 @@ function downcutCoastLine(){
 
 function drawCoastLine(){
     lines.forEach(border => {
-        let start_point = border.start.split(" "),
+        const start_point = border.start.split(" "),
         end_point = border.end.split(" ");
 
         context.beginPath();
@@ -74,5 +74,42 @@ function drawCoastLine(){
 }
 
 function resolveDepression(){
-    
+
+    let land = new Array();
+    for (let i = 0; i < sites.length; i++) {
+        if(sites[i].height >= 0.2){
+            land.push(i);
+        }
+    }
+
+    let depression = 1,
+    minCell,
+    minHigh;
+
+    while (depression > 0) {
+        depression = 0;
+        for (let i = 0; i < land.length; i++) {
+            minHigh = 10;
+            for (const neighborID of delaunay.neighbors(land[i])) {
+                if(sites[neighborID].height < minHigh){
+                    minHigh = sites[neighborID].height;
+                    minCell = neighborID
+                }
+            }
+            if(sites[land[i]].height <= sites[minCell].height){
+                depression += 1;
+                sites[land[i]].height = sites[minCell].height + 0.01;
+            }
+        }
+    }
+    land.sort(function (a,b) {
+        if (sites[a].height < sites[b].height){
+            return 1;
+        } else if (sites[a].height > sites[b].height){
+            return -1;
+        } else {
+            return 0;
+        }
+    });
+
 }

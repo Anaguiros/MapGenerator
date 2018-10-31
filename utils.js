@@ -1,8 +1,13 @@
 function processWorld(){
+    //Init
     initPrecipitation();
+    //Generate Height
     downcutCoastLine();
-    generateFeatures();
+    resolveDepression();
+    //Generate Precipitation
     generatePrecipitation();
+    //Generate Features + Coastline
+    generateFeatures();
 }
 
 function showWorld(){
@@ -81,7 +86,7 @@ function clearCanvas(){
 }
 
 function moved(){
-    let point = d3.mouse(this),
+    const point = d3.mouse(this),
     nearestId = delaunay.find(point[0], point[1]);
 
     d3.select("#cell").text(nearestId);
@@ -105,7 +110,7 @@ function moved(){
 }
 
 function clicked(){
-    let point = d3.mouse(this),
+    const point = d3.mouse(this),
     nearestId = delaunay.find(point[0], point[1]);
 
     add(nearestId, 'hill');
@@ -191,7 +196,7 @@ function uniqueBy(array, key) {
 }
 
 function fade(id) {
-    let element = document.getElementById(id);
+    const element = document.getElementById(id);
     element.style.display = (element.style.display == 'none') ? 'block' : 'none';
   }
 

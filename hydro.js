@@ -178,7 +178,7 @@ function generatePrecipitation(){
     for (let i = 0; i < sites.length; i++) {
         if(sites[i].height >= 0.2){
             let precipMoyenne = [sites[i].precipitation];
-            for (let neighborID of delaunay.neighbors(i)){
+            for (const neighborID of delaunay.neighbors(i)){
                 precipMoyenne.push(sites[neighborID].precipitation);
             }
             let moyenne = d3.mean(precipMoyenne);

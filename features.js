@@ -5,8 +5,8 @@
 function generateFeatures(){
     lines = new Array();
 
-    let initPoints =[[0,0],[width_canvas,0],[0,height_canvas],[width_canvas,height_canvas]],
-    startPoint = [0,0];
+    const initPoints =[[0,0],[width_canvas,0],[0,height_canvas],[width_canvas,height_canvas]];
+    let startPoint = [0,0];
     initPoints.forEach(coord => {
         if(sites[delaunay.find(coord[0],coord[1])].height < 0.2){
             startPoint = [coord[0],coord[1]];
@@ -31,8 +31,8 @@ function generateFeatures(){
     sites[startpolygonID].description = description;
 
     while (explorationPolygonIDQueue.length > 0) {
-        let exploredID = explorationPolygonIDQueue.shift();
-        for (let neighborID of delaunay.neighbors(exploredID)) {
+        const exploredID = explorationPolygonIDQueue.shift();
+        for (const neighborID of delaunay.neighbors(exploredID)) {
             if(exploredPolygonID.indexOf(neighborID) < 0 && sites[neighborID].height < 0.2){
                 sites[neighborID].type = type;
                 sites[neighborID].description = description;
@@ -86,14 +86,14 @@ function generateFeatures(){
         explorationPolygonIDQueue.push(startpolygonID);
         exploredPolygonID.push(startpolygonID);
         while (explorationPolygonIDQueue.length > 0) {
-            let exploredID = explorationPolygonIDQueue.shift();
-            for (let neighborID of delaunay.neighbors(exploredID)) {
+            const exploredID = explorationPolygonIDQueue.shift();
+            for (const neighborID of delaunay.neighbors(exploredID)) {
 
                 //Generation CoastLine
                 if(sites[neighborID].height < 0.2 && type === 'Island'){
-                    let polygon = voronoi.cellPolygon(exploredID),
-                    polygonPoints = new Array(),
-                    polygonNeighbor = voronoi.cellPolygon(neighborID),
+                    const polygon = voronoi.cellPolygon(exploredID),
+                    polygonNeighbor = voronoi.cellPolygon(neighborID);
+                    let polygonPoints = new Array(),
                     polygonNeighborPoints = new Array(),
                     commonPoints = new Array(),
                     start, end, type, number;
