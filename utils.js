@@ -23,6 +23,8 @@ function showWorld(){
 
     }
     drawCoastLine();
+
+    drawnFlux();
 }
 
 function drawTriangles(){
@@ -89,6 +91,9 @@ function clearCanvas(){
 function moved(){
     const point = d3.mouse(this),
     nearestId = delaunay.find(point[0], point[1]);
+
+    d3.select("#coordX").text(point[0]);
+    d3.select("#coordY").text(point[1]);
 
     d3.select("#cell").text(nearestId);
     d3.select("#high").text(sites[nearestId].height);

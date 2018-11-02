@@ -4,7 +4,7 @@ south = document.getElementById('south'),
 west = document.getElementById('west');
 
 var winds_buffer, raining;
-var riversData;
+var riversData, riverID;
 
 function randomizeWinds(){
     north.checked = Math.random() >= 0.75;
@@ -203,11 +203,11 @@ function drawPrecipitation(){
 
 function generateFlux(){
     riversData = new Array();
-    let riverID = 0,
-    aval = new Array();
+    riverID = 0;
 
     for (let i = 0; i < landPolygonID.length; i++) {
         let neighborsPolygons = new Array(),
+        aval = new Array(),
         localMinID,
         sommetsLocaux = new Array(),
         idCellLand = landPolygonID[i],
@@ -319,7 +319,61 @@ console.log("GenerateFluxEnd");
 
 function drawnFlux(){
     let riverData,
-    x,
-    y,
-    line;
+    xLinear = d3.scaleLinear().domain([0, width_canvas]).range([0, width_canvas]),
+	yLinear = d3.scaleLinear().domain([0, height_canvas]).range([0, height_canvas]),
+    line = d3.line()
+    .x(function(d){return xLinear(d.x);})
+    .y(function(d){return yLinear(d.y);})
+    .context(context)
+    ;
+
+    console.log(riversData);
+
+    for (let i = 0; i < riverID; i++) {
+        let flux = 0;
+        riverData = riversData.filter(element => element.river == i);
+
+        console.log(riverData);
+
+        if(riverData.length > 1){
+            let riverAmended = new Array();
+            if(riverData.length > 2){
+                for (let r = 0; r < riverData.length; r++) {
+                    riverAmended.push({x: riverData[r].x, y: riverData[r].y});
+                    if(r+2 < riverData.length){
+                        let dX = riverData[r].x,
+                        dY = riverData[r].y,
+                        mean = 0.4 + Math.random() * 0.3,
+                        firstThirdX = (dX * 2 + riverData[r+1].x) / 3,
+                        firstThirdY = (dY * 2 + riverData[r+1].y) / 3,
+                        secondThirdX = (dX + riverData[r+1].x * 2) / 3,
+                        secondThirdY = (dY + riverData[r+1].y * 2) / 3;
+                        if (Math.random() > 0.5) {
+                            firstThirdX += mean;
+                            secondThirdX -= mean;
+                        } else {
+                            firstThirdY += mean;
+                            secondThirdY -= mean;
+                        }
+                        riverAmended.push({x:firstThirdX,y:firstThirdY});
+                        riverAmended.push({x:secondThirdX,y:secondThirdY});
+                    }
+                }
+
+                console.log(riverAmended);
+
+                context.beginPath();
+                line(riverAmended);
+                console.log(line(riverAmended));
+                context.lineWidth = 1;
+                context.strokeStyle = "steelblue";
+                context.stroke();
+                
+                let river
+
+            } else {
+
+            }
+        }
+    }
 }
