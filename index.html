@@ -40,10 +40,11 @@
             <label>Blob Radius:</label><input id="radiusInput" value="0.78" type="range" min="0.75" max="0.99" step="0.001" oninput="radiusOutput.value = radiusInput.valueAsNumber"><output id="radiusOutput">0.78</output><br>
             <label>Blob Sharpness:</label><input id="sharpnessInput" value="0.2" type="range" min="0" max="0.5" step="0.1" oninput="sharpnessOutput.value = sharpnessInput.valueAsNumber"><output id="sharpnessOutput">0.2</output><br>
             <label>Winds: </label>
-                <label>N<input type="radio" name="wind" id="north" value="north"></label>
-                <label>E<input type="radio" name="wind" id="east" value="east"></label>
-                <label>S<input type="radio" name="wind" id="south" value="south"></label>
-                <label>W<input type="radio" name="wind" id="west" value="west"></label>
+                <label>Random<input type="checkbox" id="randomWinds" checked></label>|
+                <label>N<input type="checkbox" id="north"></label>
+                <label>E<input type="checkbox" id="east" ></label>
+                <label>S<input type="checkbox" id="south" ></label>
+                <label>W<input type="checkbox" id="west" ></label>
             <br>
             <label>Downcutting:</label><input id="downcuttingInput" value="0" type="range" min="0" max="0.5" step="0.01" oninput="downcuttingOutput.value = downcuttingInput.valueAsNumber"><output id="downcuttingOutput">0</output><br>
             <label>Precipitation:</label><input id="precipitationInput" value="7" type="range" min="0" max="10" step="0.1" oninput="precipitationOutput.value = precipitationInput.valueAsNumber"><output id="precipitationOutput">7</output><br>
