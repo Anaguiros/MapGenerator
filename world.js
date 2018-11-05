@@ -49,6 +49,7 @@ function randomWorld(count){
     delaunay = new d3.Delaunay.from(sites);
     voronoi = delaunay.voronoi([0.5, 0.5, width_canvas - 0.5, height_canvas - 0.5]);
     relax();
+    initHeights();
     
     //Random Blobs
     for (c = 0; c < count; c++) {
@@ -92,6 +93,4 @@ function relax(){
     sites=relaxedSites
     delaunay = new d3.Delaunay.from(sites);
     voronoi = delaunay.voronoi([0.5, 0.5, width_canvas - 0.5, height_canvas - 0.5]);
-
-    initHeights();
 }

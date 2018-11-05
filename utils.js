@@ -6,7 +6,7 @@ function processWorld(){
     resolveDepression();
     //Generate Precipitation + rivers
     generatePrecipitation();
-    generateFlux();
+    generateRiver();
     //Generate Features + Coastline
     generateFeatures();
 }
@@ -24,7 +24,7 @@ function showWorld(){
     }
     drawCoastLine();
 
-    drawnFlux();
+    drawnRiver();
 }
 
 function drawTriangles(){
@@ -79,9 +79,9 @@ function drawWeatherPolygons(){
 
 function colorPolygon(polygonID, color){
     context.beginPath();
-        voronoi.renderCell(polygonID, context);
-        context.fillStyle = color;
-        context.fill();
+    voronoi.renderCell(polygonID, context);
+    context.fillStyle = color;
+    context.fill();
 }
 
 function clearCanvas(){

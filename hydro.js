@@ -24,8 +24,15 @@ function generatePrecipitation(){
 
     winds_buffer = new Array();
     raining = new Array();
-    
-    if (north.checked + east.checked + south.checked + west.checked === 0) {
+
+    if (randomWinds.checked) {
+        randomizeWinds();
+    }
+
+    let sides = north.checked + east.checked + south.checked + west.checked;
+
+    if(sides == 0){
+        sides = 1;
         let side = Math.random();
         if (side >= 0.25 && side < 0.5) {
             north.checked = true;
@@ -38,10 +45,8 @@ function generatePrecipitation(){
         }
     }
 
-    let sides = north.checked + east.checked + south.checked + west.checked,
-    precipInit = precipitationInput.value / sides,
+    let precipInit = precipitationInput.value / Math.sqrt(sides),
     selection = 30 / sides;
-
 
     if (north.checked){
         let frontier = new Array();
@@ -201,7 +206,7 @@ function drawPrecipitation(){
     });
 }
 
-function generateFlux(){
+function generateRiver(){
     riversData = new Array();
     riverID = 0;
 
@@ -314,26 +319,22 @@ function generateFlux(){
             });
         }
     }
-console.log("GenerateFluxEnd");
 }
 
-function drawnFlux(){
+function drawnRiver(){
     let riverData,
     xLinear = d3.scaleLinear().domain([0, width_canvas]).range([0, width_canvas]),
 	yLinear = d3.scaleLinear().domain([0, height_canvas]).range([0, height_canvas]),
     line = d3.line()
     .x(function(d){return xLinear(d.x);})
     .y(function(d){return yLinear(d.y);})
+    .curve(d3.curveCatmullRom.alpha(0))
     .context(context)
     ;
-
-    console.log(riversData);
 
     for (let i = 0; i < riverID; i++) {
         let flux = 0;
         riverData = riversData.filter(element => element.river == i);
-
-        console.log(riverData);
 
         if(riverData.length > 1){
             let riverAmended = new Array();
@@ -360,19 +361,55 @@ function drawnFlux(){
                     }
                 }
 
-                console.log(riverAmended);
+                for (let s = 0; s < riverAmended.length/3; s++) {
+                    let riverArray = new Array(),
+                    riverWidth = 0;
+
+                    if(s === Math.floor(riverAmended.length/3)){
+                        let start = riverAmended[3*s],
+                        end = riverAmended[3*s + 1];
+                        
+                        riverWidth = (s/30 + (sites[delaunay.find(end.x, end.y)].flux /15));
+
+                        riverArray.push(start);
+                        riverArray.push(end);
+                    } else {
+                        let start = riverAmended[3*s],
+                        firstThird = riverAmended[3*s + 1],
+                        secondThird = riverAmended[3*s + 2],
+                        next = riverAmended[3*s + 3];
+
+                        riverWidth = (s/30 + (sites[delaunay.find(start.x, start.y)].flux /15));
+
+                        riverArray.push(start);
+                        riverArray.push(firstThird);
+                        riverArray.push(secondThird);
+                        riverArray.push(next);
+                    }
+
+                    if(riverWidth > 0.5){
+                        riverWidth *= 0.9;
+                    }
+
+                    context.beginPath();
+                    line(riverArray);
+                    context.lineWidth = riverWidth;
+                    context.strokeStyle = "steelblue";
+                    context.stroke();
+                }
+            } else if(riverData[1].type == 'delta'){
+                let middleX = (riverData[0].x + riverData[1].x) / 2 + (0.2 + Math.random*0.1),
+                middleY = (riverData[0].y + riverData[1].y) / 2 + (0.2 + Math.random*0.1);
+                
+                riverAmended.push({x: riverData[0].x, y: riverData[0].y});
+                riverAmended.push({x: middleX, y: middleY});
+                riverAmended.push({x: riverData[1].x, y: riversData[1].y});
 
                 context.beginPath();
                 line(riverAmended);
-                console.log(line(riverAmended));
-                context.lineWidth = 1;
+                context.lineWidth = 0.6;
                 context.strokeStyle = "steelblue";
                 context.stroke();
-                
-                let river
-
-            } else {
-
             }
         }
     }
