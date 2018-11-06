@@ -322,29 +322,34 @@ function generateRiver(){
 }
 
 function drawnRiver(){
-    let riverData,
-    xLinear = d3.scaleLinear().domain([0, width_canvas]).range([0, width_canvas]),
+    let xLinear = d3.scaleLinear().domain([0, width_canvas]).range([0, width_canvas]),
 	yLinear = d3.scaleLinear().domain([0, height_canvas]).range([0, height_canvas]),
     line = d3.line()
-    .x(function(d){return xLinear(d.x);})
-    .y(function(d){return yLinear(d.y);})
+    .x(function(d){return d.x;})
+    .y(function(d){return d.y;})
     .curve(d3.curveCatmullRom.alpha(0))
     .context(context)
     ;
 
+/*    let  lineGenerator = d3.line()
+    .x(function(d){return d.x;})
+    .y(function(d){return d.y;})
+    .curve(d3.curveCatmullRom.alpha(1))
+    .context(context);
+*/
     for (let i = 0; i < riverID; i++) {
-        let flux = 0;
-        riverData = riversData.filter(element => element.river == i);
+        let riverData = riversData.filter(element => element.river == i);
 
         if(riverData.length > 1){
-            let riverAmended = new Array();
+            let riverAmended = new Array(),
+            riverRendered = new Array();
             if(riverData.length > 2){
                 for (let r = 0; r < riverData.length; r++) {
                     riverAmended.push({x: riverData[r].x, y: riverData[r].y});
                     if(r+2 < riverData.length){
                         let dX = riverData[r].x,
                         dY = riverData[r].y,
-                        mean = 0.4 + Math.random() * 0.3,
+                        mean = (sizeInput.valueAsNumber / 10) + Math.random() * (sizeInput.valueAsNumber / 10),
                         firstThirdX = (dX * 2 + riverData[r+1].x) / 3,
                         firstThirdY = (dY * 2 + riverData[r+1].y) / 3,
                         secondThirdX = (dX + riverData[r+1].x * 2) / 3,
@@ -353,8 +358,15 @@ function drawnRiver(){
                             firstThirdX += mean;
                             secondThirdX -= mean;
                         } else {
+                            firstThirdX -= mean;
+                            secondThirdX += mean;
+                        }
+                        if (Math.random() > 0.5) {
                             firstThirdY += mean;
                             secondThirdY -= mean;
+                        } else {
+                            firstThirdY -= mean;
+                            secondThirdY += mean;
                         }
                         riverAmended.push({x:firstThirdX,y:firstThirdY});
                         riverAmended.push({x:secondThirdX,y:secondThirdY});
@@ -369,27 +381,35 @@ function drawnRiver(){
                         let start = riverAmended[3*s],
                         end = riverAmended[3*s + 1];
                         
-                        riverWidth = (s/30 + (sites[delaunay.find(end.x, end.y)].flux /15));
+                        riverWidth = Math.sqrt((s/sizeInput.valueAsNumber) + (sites[delaunay.find(end.x, end.y)].flux /(sizeInput.valueAsNumber/2)));
 
                         riverArray.push(start);
                         riverArray.push(end);
+
+                        riverRendered.push(start);
+                        riverRendered.push(end);
                     } else {
                         let start = riverAmended[3*s],
                         firstThird = riverAmended[3*s + 1],
                         secondThird = riverAmended[3*s + 2],
                         next = riverAmended[3*s + 3];
 
-                        riverWidth = (s/30 + (sites[delaunay.find(start.x, start.y)].flux /15));
+                        riverWidth = Math.sqrt((s/sizeInput.valueAsNumber) + (sites[delaunay.find(start.x, start.y)].flux /(sizeInput.valueAsNumber/2)));
 
                         riverArray.push(start);
                         riverArray.push(firstThird);
                         riverArray.push(secondThird);
                         riverArray.push(next);
+
+                        riverRendered.push(start);
+                        riverRendered.push(firstThird);
+                        riverRendered.push(secondThird);
+                        riverRendered.push(next);
                     }
 
-                    if(riverWidth > 0.5){
-                        riverWidth *= 0.9;
-                    }
+                    //if(riverWidth > 0.5){
+                    //    riverWidth *= 0.9;
+                    //}
 
                     context.beginPath();
                     line(riverArray);
@@ -405,12 +425,24 @@ function drawnRiver(){
                 riverAmended.push({x: middleX, y: middleY});
                 riverAmended.push({x: riverData[1].x, y: riversData[1].y});
 
+                riverRendered.push({x: riverData[0].x, y: riverData[0].y});
+                riverRendered.push({x: middleX, y: middleY});
+                riverRendered.push({x: riverData[1].x, y: riversData[1].y});
+
                 context.beginPath();
                 line(riverAmended);
                 context.lineWidth = 0.6;
                 context.strokeStyle = "steelblue";
                 context.stroke();
             }
+            //console.log(riverRendered);
+
+/*            context.strokeStyle = '#999';
+            context.lineWidth = 1;
+            context.beginPath();
+            lineGenerator(riverRendered);
+            context.stroke();
+*/
         }
     }
 }

@@ -6,7 +6,7 @@ const canvas = d3.select("canvas")
     .attr("height", height_canvas)
     .on("touchmove mousemove", moved)
     .on("click", clicked);
-const context = document.getElementById('chart').getContext('2d');
+const context = d3.select('canvas').node().getContext('2d');
 const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
 const colorWeather = d3.scaleSequential(d3.interpolateBlues);
 

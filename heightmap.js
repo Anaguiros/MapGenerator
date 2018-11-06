@@ -23,7 +23,7 @@ function add(polygonStartID, type){
     explorationQueue.push(polygonStartID);
     for (let i = 0; i < explorationQueue.length && height > 0.01; i++) {
         if(type == "island"){
-            height = sites[explorationQueue[i]].height * radius;
+            height = sites[explorationQueue[i]].height * radius - height/100;
         } else {
             height = height * radius;
         }
@@ -37,6 +37,7 @@ function add(polygonStartID, type){
                 if(sites[neighborID].height > 1){
                     sites[neighborID].height = 1;
                 }
+                sites[neighborID].type = undefined;
                 exploredPolygon[neighborID] = true;
                 explorationQueue.push(neighborID);
             }
