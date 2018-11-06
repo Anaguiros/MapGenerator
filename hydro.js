@@ -437,7 +437,6 @@ function drawnRiver(){
             } else {
                 let count =1,
                 width = 0;
-                console.log(riverAmended);
                 for (let s = 0; s < riverAmended.length/3; s++) {
                     let start, middle, end;
                     
@@ -453,17 +452,17 @@ function drawnRiver(){
                     let cellDestinationID = delaunay.find(end.x, end.y),
                     xNode = end.x,
                     yNode = end.y,
-                    riverWidth = (count + width * 3) / 5;
+                    riverWidth = (count + width * 3) / 50;
                     count++;
                     if(cellDestinationID){
                         if(sites[cellDestinationID].confluence){
                             let confluenceData = confluence.filter(element => element.id == cellDestinationID),
                             angle;
-                            if(s+1 !== Math.floor(riverAmended.length/3)){
+                            if(s+1 !== Math.floor(riverAmended.length/3) && middle){
                                 angle = Math.atan2(end.y - middle.y, end.x - middle.x);
                                 confAngles[cellDestinationID] = angle;
-                                let midX = (start.x + middle.x) / 2,
-                                midY = (start.y + middle.y) / 2;
+                                //let midX = (start.x + middle.x) / 2,
+                                //midY = (start.y + middle.y) / 2;
                                 if(angle == undefined){
                                     angle = Math.atan2(end.y - middle.y, end.x - middle.x);
                                 }
@@ -471,7 +470,7 @@ function drawnRiver(){
                             }
                             count = 0;
                             width = Math.pow(sites[cellDestinationID].flux, 0.9);
-                            let df = (width * 3 / 20 - riverWidth) /2,
+                            let df = (width * 3 / 50 - riverWidth) /2,
                             cellControle1 = confluenceData[0].s,
                             cellControle2 = confluenceData[1].s,
                             baseX = (sites[cellControle1][0] + sites[cellControle2][0]) / 2,
