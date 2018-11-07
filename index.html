@@ -7,7 +7,7 @@
     <script src="d3-delaunay.min.js"></script> 
     <style type="text/css">
         canvas {
-            background-color: rgb(52, 71, 180);
+            background-color: #604E99;
         }
 
         .radius {
@@ -24,7 +24,7 @@
         <button onclick="randomWorld(9)">Random map</button>
         <button onclick="fade('options')">Options</button>
         Cliquer pour ajouter une île.<br>
-        [<span id="coordX">0</span> ; <span id="coordY">0</span>] Cell: <span id="cell">0</span>; Altitude: <span id="high">0</span>; Entité <span id="number">inconnue</span> : <span id="feature">Aucun signe distinctif</span>; </span> Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River: <span id="river">no</span>;<br>
+        [<span id="coordX">0</span> ; <span id="coordY">0</span>] Cell: <span id="cell">0</span>; Altitude: <span id="high">0</span>; Entité <span id="number">inconnue</span> : <span id="feature">Aucun signe distinctif</span>; </span> Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River[<span id="riverType"></span>]: <span id="river">no</span>;<br>
         
     </div>
     <div id="options" style="display:none;">
@@ -52,6 +52,7 @@
     </div>
 </body>
     <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="renderer.js"></script>
     <script type="text/javascript" src="poissonDiscSampler.js"></script>
     <script type="text/javascript" src="heightmap.js"></script>
     <script type="text/javascript" src="features.js"></script>
