@@ -5,7 +5,10 @@ const canvas = d3.select("canvas")
     .attr("width", width_canvas)
     .attr("height", height_canvas)
     .on("touchmove mousemove", moved)
-    .on("click", clicked);
+    .on("click", clicked)
+    //.call(d3.zoom().translateExtent([[0,0],[width_canvas, height_canvas]]).scaleExtent([1, 40]).on("zoom", zoom))
+    ; 
+
 const context = d3.select('canvas').node().getContext('2d');
 const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
 const colorWeather = d3.scaleSequential(d3.interpolateBlues);

@@ -5,7 +5,7 @@
 function generateFeatures(){
     lines = new Array();
 
-    const initPoints =[[0,0],[width_canvas,0],[0,height_canvas],[width_canvas,height_canvas]];
+    const initPoints =[[0,0],[width_canvas-1,0],[0,height_canvas-1],[width_canvas-1,height_canvas-1]];
     let startPoint = [0,0];
     initPoints.forEach(coord => {
         if(sites[delaunay.find(coord[0],coord[1])].height < 0.2){

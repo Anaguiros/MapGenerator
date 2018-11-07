@@ -33,7 +33,7 @@ function generatePrecipitation(){
 
     if(sides == 0){
         sides = 1;
-        let side = Math.random();
+        const side = Math.random();
         if (side >= 0.25 && side < 0.5) {
             north.checked = true;
         } else if (side >= 0.5 && side < 0.75) {
@@ -45,19 +45,25 @@ function generatePrecipitation(){
         }
     }
 
-    let precipInit = precipitationInput.value / Math.sqrt(sides),
+    const precipInit = precipitationInput.value / Math.sqrt(sides),
     selection = 30 / sides;
 
+    let frontier,
+    x,y,
+    precipitation,
+    nearestID,height,
+    rain;
+
     if (north.checked){
-        let frontier = new Array();
+        frontier = new Array();
         for (let i = 0; i < sites.length; i++) {
             if(sites[i][1] < selection && sites[i][0] > width_canvas*0.1 && sites[i][0] < width_canvas*0.9){
                 frontier.push(i);
             }
         }
         frontier.forEach(startPolygonID => {
-            let x = sites[startPolygonID][0],
-            y = sites[startPolygonID][1],
+            x = sites[startPolygonID][0];
+            y = sites[startPolygonID][1];
             precipitation = precipInit;
 
             winds_buffer.push([x,y]);
@@ -65,11 +71,11 @@ function generatePrecipitation(){
             while (y < height_canvas && precipitation > 0) {
                 y += 5;
                 x += Math.random() * 10 - 5;
-                let nearestID = delaunay.find(x,y),
+                nearestID = delaunay.find(x,y);
                 height = sites[nearestID].height;
                 if(height >= 0.2){
                     if(height < 0.6){
-                        let rain = Math.random() * height;
+                        rain = Math.random() * height;
                         precipitation -= rain;
                         sites[nearestID].precipitation += rain;
                     } else {
@@ -83,15 +89,15 @@ function generatePrecipitation(){
 
     }
     if (east.checked){
-        let frontier = new Array();
+        frontier = new Array();
         for (let i = 0; i < sites.length; i++) {
             if(sites[i][0] > width_canvas - selection && sites[i][1] > height_canvas*0.1 && sites[i][1] < height_canvas*0.9){
                 frontier.push(i);
             }
         }
         frontier.forEach(startPolygonID => {
-            let x = sites[startPolygonID][0],
-            y = sites[startPolygonID][1],
+            x = sites[startPolygonID][0];
+            y = sites[startPolygonID][1];
             precipitation = precipInit;
 
             winds_buffer.push([x,y]);
@@ -99,11 +105,11 @@ function generatePrecipitation(){
             while (x > 0 && precipitation > 0) {
                 x -= 5
                 y += Math.random() * 10 - 5;  
-                let nearestID = delaunay.find(x,y),
+                nearestID = delaunay.find(x,y);
                 height = sites[nearestID].height;
                 if(height >= 0.2){
                     if(height < 0.6){
-                        let rain = Math.random() * height;
+                        rain = Math.random() * height;
                         precipitation -= rain;
                         sites[nearestID].precipitation += rain;
                     } else {
@@ -116,15 +122,15 @@ function generatePrecipitation(){
         });
     }
     if(south.checked){
-        let frontier = new Array();
+        frontier = new Array();
         for (let i = 0; i < sites.length; i++) {
             if(sites[i][1] > height_canvas - selection && sites[i][0] > width_canvas*0.1 && sites[i][0] < width_canvas*0.9){
                 frontier.push(i);
             }
         }
         frontier.forEach(startPolygonID => {
-            let x = sites[startPolygonID][0],
-            y = sites[startPolygonID][1],
+            x = sites[startPolygonID][0];
+            y = sites[startPolygonID][1];
             precipitation = precipInit;
 
             winds_buffer.push([x,y]);
@@ -132,11 +138,11 @@ function generatePrecipitation(){
             while (y > 0 && precipitation > 0) {
                 y -= 5;
                 x += Math.random() * 10 - 5;
-                let nearestID = delaunay.find(x,y),
+                nearestID = delaunay.find(x,y);
                 height = sites[nearestID].height;
                 if(height >= 0.2){
                     if(height < 0.6){
-                        let rain = Math.random() * height;
+                        rain = Math.random() * height;
                         precipitation -= rain;
                         sites[nearestID].precipitation += rain;
                     } else {
@@ -149,15 +155,15 @@ function generatePrecipitation(){
         });
     }
     if(west.checked){
-        let frontier = new Array();
+        frontier = new Array();
         for (let i = 0; i < sites.length; i++) {
             if(sites[i][0] < selection && sites[i][1] > height_canvas*0.1 && sites[i][1] < height_canvas*0.9){
                 frontier.push(i);
             }
         }
         frontier.forEach(startPolygonID => {
-            let x = sites[startPolygonID][0],
-            y = sites[startPolygonID][1],
+            x = sites[startPolygonID][0];
+            y = sites[startPolygonID][1];
             precipitation = precipInit;
 
             winds_buffer.push([x,y]);
@@ -165,11 +171,11 @@ function generatePrecipitation(){
             while (x < width_canvas && precipitation > 0) {
                 x += 5;
                 y += Math.random() * 10 -5;
-                let nearestID = delaunay.find(x,y),
+                nearestID = delaunay.find(x,y);
                 height = sites[nearestID].height;
                 if(height >= 0.2){
                     if(height < 0.6){
-                        let rain = Math.random() * height;
+                        rain = Math.random() * height;
                         precipitation -= rain;
                         sites[nearestID].precipitation += rain;
                     } else {
@@ -242,8 +248,7 @@ function generateRiver(){
                 //Nouvelle river
                 sites[idCellLand].river = riverID;
                 riverID++;
-                let rnd = Math.random / 1000;
-                riversOrder.push({r: sites[idCellLand].river, order: rnd});
+                riversOrder.push({r: sites[idCellLand].river, order: Math.random / 1000});
                 riversData.push({
                     river:  sites[idCellLand].river,
                     cell:   idCellLand,
@@ -385,9 +390,19 @@ function drawnRiver(){
     let confAngles = new Array(),
     side = 1;
 
+    for (let i = 0; i < riversData.length; i++) {
+        if(riversData[i].type == "delta"){
+            colorPolygon(riversData[i].cell, '#F00');
+        } else if(riversData[i].type == "estuary"){
+            colorPolygon(riversData[i].cell, '#00F');
+        } else if(riversData[i].type == "source"){
+            colorPolygon(riversData[i].cell, '#0F0');
+        }
+        
+    }
+
     for (let i = 0; i < riversOrder.length; i++) {
-        let dataRiver = riversData.filter(element => element.river == riversOrder[i].r),
-        order = riversOrder[i].r;
+        let dataRiver = riversData.filter(element => element.river == riversOrder[i].r);
 
         if(dataRiver.length > 1){
             let riverAmended = new Array();
@@ -438,7 +453,7 @@ function drawnRiver(){
                 let count =1,
                 width = 0;
                 for (let s = 0; s < riverAmended.length/3; s++) {
-                    let start, middle, end;
+                    let start, middle, end, next;
                     
                     if(s === Math.floor(riverAmended.length/3)){
                         start = riverAmended[s*3 - 1],
@@ -447,14 +462,19 @@ function drawnRiver(){
                         start = riverAmended[s*3],
                         middle = riverAmended[s*3 + 1],
                         end = riverAmended[s*3 + 2];
+                        if(s != riverAmended.length/3){
+                            next = riverAmended[s*3 + 3];
+                        }
+                        
                     }
 
                     let cellDestinationID = delaunay.find(end.x, end.y),
                     xNode = end.x,
                     yNode = end.y,
-                    riverWidth = (count + width * 3) / 50;
+                    //riverWidth = ((count + width) * 3) / (50 - sizeInput.valueAsNumber * 2);
+                    riverWidth = Math.sqrt((count + width));
                     count++;
-                    if(cellDestinationID){
+                    /*if(cellDestinationID){
                         if(sites[cellDestinationID].confluence){
                             let confluenceData = confluence.filter(element => element.id == cellDestinationID),
                             angle;
@@ -470,7 +490,7 @@ function drawnRiver(){
                             }
                             count = 0;
                             width = Math.pow(sites[cellDestinationID].flux, 0.9);
-                            let df = (width * 3 / 50 - riverWidth) /2,
+                            let df = (width * 3 / (50 - sizeInput.valueAsNumber * 2) - riverWidth) /2,
                             cellControle1 = confluenceData[0].s,
                             cellControle2 = confluenceData[1].s,
                             baseX = (sites[cellControle1][0] + sites[cellControle2][0]) / 2,
@@ -489,10 +509,14 @@ function drawnRiver(){
                                 yNode = yCurve;
                             }
                         }
-                    }
+                    }*/
 
                     context.beginPath();
-                    line(riverAmended);
+                    if(middle != undefined && next != undefined){
+                        line([start, middle, end, next]);
+                    } else {
+                        line([start, end]);
+                    }
                     context.lineWidth = riverWidth;
                     context.strokeStyle = "steelblue";
                     context.stroke();
