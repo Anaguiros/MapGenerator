@@ -319,8 +319,8 @@ function generateRiver(){
                             riversData.push({
                                 river:  sites[idCellLand].river,
                                 cell:   idCellLand,
-                                x:      sites[idCellLand][0],
-                                y:      sites[idCellLand][1],
+                                x:      aval[0].x,
+                                y:      aval[0].y,
                                 type:   "delta",
                                 aval:   aval[0].cell
                             });
@@ -390,7 +390,8 @@ function drawnRiver(){
     let confAngles = new Array(),
     side = 1;
 
-    for (let i = 0; i < riversData.length; i++) {
+    //DEBUG COLORATION
+    /*for (let i = 0; i < riversData.length; i++) {
         if(riversData[i].type == "delta"){
             colorPolygon(riversData[i].cell, '#F00');
         } else if(riversData[i].type == "estuary"){
@@ -399,7 +400,7 @@ function drawnRiver(){
             colorPolygon(riversData[i].cell, '#0F0');
         }
         
-    }
+    }*/
 
     for (let i = 0; i < riversOrder.length; i++) {
         let dataRiver = riversData.filter(element => element.river == riversOrder[i].r);
