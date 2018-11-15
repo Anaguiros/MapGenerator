@@ -21,7 +21,7 @@ function moved(){
     d3.select("#cell").text(nearestId);
     d3.select("#high").text(sites[nearestId].height);
     if(sites[nearestId].type){
-        d3.select("#feature").text(sites[nearestId].description + " " + sites[nearestId].type);
+        d3.select("#feature").text(sites[nearestId].description);
         d3.select("#number").text(sites[nearestId].number);
     } else {
         d3.select("#feature").text("Aucun signe distinctif");

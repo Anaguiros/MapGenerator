@@ -30,7 +30,7 @@
     <div id="options" style="display:none;">
         <div>
             <label>Enable RNG<input type="checkbox" id="rngEnabled"></label>
-            <label>RNG Seed:</label><input id="rngSeed" ><br>
+            <label>RNG Seed:</label><input id="rngSeed" >
             <button onclick="document.getElementById('rngSeed').value = generator$places$islands()">Generate readable seed</button>
         </div>
         <div style="width: 50%;float: right;">
@@ -57,6 +57,12 @@
     </div>
 </body>
     <script type="text/javascript" src="seedrandom.js"></script>
+
+    <script type="text/javascript" src="descriptors/fantasy-islands-names-generator.js"></script>
+    <script type="text/javascript" src="descriptors/fantasy-waters-names-generator.js"></script>
+    <script type="text/javascript" src="descriptors/fantasy-lakes-names-generator.js"></script>
+    <script type="text/javascript" src="descriptors/fantasy-forests-names-generator.js"></script>
+
     <script type="text/javascript" src="utils.js"></script>
     <script type="text/javascript" src="renderer.js"></script>
     <script type="text/javascript" src="poissonDiscSampler.js"></script>
@@ -64,6 +70,6 @@
     <script type="text/javascript" src="features.js"></script>
     <script type="text/javascript" src="hydro.js"></script>
     <script type="text/javascript" src="world.js"></script>
-    <script type="text/javascript" src="fantasy-islands-names-generator.js"></script>
+    
     
 </html>

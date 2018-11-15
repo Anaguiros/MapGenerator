@@ -25,7 +25,7 @@ function generateFeatures(){
     if(sites[startpolygonID].type === 'Ocean'){
         description = sites[startpolygonID].description;
     } else {
-        description = adjectifs[Math.floor(Math.random() * adjectifs.length)];
+        description = generator$places$waters();
     }
     sites[startpolygonID].type = type;
     sites[startpolygonID].description = description;
@@ -65,20 +65,20 @@ function generateFeatures(){
             islandCounter += 1;
             minHeight = 0.2;
             maxHeight = 10;
+            description = generator$places$forests();
         } else {
             type = "Lake";
             numberID = lakeCounter;
             lakeCounter += 1;
             minHeight = -10;
             maxHeight = 0.2;
+            description = generator$places$lakes();
         }
 
         if(sites[startpolygonID].description && sites[startpolygonID].type == type){
             description = sites[startpolygonID].description;
         }
-        else {
-            description = adjectifs[Math.floor(Math.random() * adjectifs.length)];
-        }
+
         sites[startpolygonID].type = type;
         sites[startpolygonID].description = description;
         sites[startpolygonID].number = numberID;
