@@ -41,7 +41,12 @@ var adjectifs = [
 
 randomWorld(9);
 
-function randomWorld(count){
+function randomWorld(count) {
+    if (document.getElementById('rngEnabled').checked) { // on initialise le RNG avec la seed fournie
+        Math.seedrandom(document.getElementById('rngSeed').value);
+    } else { // on affiche la seed pour pouvoir regénérer une map identique si besoin
+        document.getElementById('rngSeed').value = Math.seedrandom();
+    }
 
     sampler = poissonDiscSampler(width_canvas, height_canvas, sizeInput.valueAsNumber);
     sites = new Array();
