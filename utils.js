@@ -1,96 +1,92 @@
-function processWorld(){
-    //Init
+function processWorld() {
+    // Init
     initPrecipitation();
-    //Generate Height
+    // Generate Height
     downcutCoastLine();
     resolveDepression();
-    //Generate Precipitation + rivers
+    // Generate Precipitation + rivers
     generatePrecipitation();
     generateRiver();
-    //Generate Features + Coastline
+    // Generate Features + Coastline
     generateFeatures();
 }
 
-function moved(){
-    const point = d3.mouse(this),
-    nearestId = delaunay.find(point[0], point[1]);
+function moved() {
+    const point = d3.mouse(this);
+    const nearestId = delaunay.find(point[0], point[1]);
 
-    d3.select("#coordX").text(point[0]);
-    d3.select("#coordY").text(point[1]);
+    d3.select('#coordX').text(point[0]);
+    d3.select('#coordY').text(point[1]);
 
-    d3.select("#cell").text(nearestId);
-    d3.select("#high").text(sites[nearestId].height);
-    if(sites[nearestId].type){
-        d3.select("#feature").text(sites[nearestId].description);
-        d3.select("#number").text(sites[nearestId].number);
+    d3.select('#cell').text(nearestId);
+    d3.select('#high').text(sites[nearestId].height);
+    if (sites[nearestId].type) {
+        d3.select('#feature').text(sites[nearestId].description);
+        d3.select('#number').text(sites[nearestId].number);
     } else {
-        d3.select("#feature").text("Aucun signe distinctif");
-        d3.select("#number").text("inconnue");
+        d3.select('#feature').text('Aucun signe distinctif');
+        d3.select('#number').text('inconnue');
     }
 
     if (sites[nearestId].flux) {
-        d3.select("#flux").text((sites[nearestId].flux).toFixed(2));
-        d3.select("#precipitation").text((sites[nearestId].precipitation).toFixed(2));
+        d3.select('#flux').text((sites[nearestId].flux).toFixed(2));
+        d3.select('#precipitation').text((sites[nearestId].precipitation).toFixed(2));
     } else {
-        d3.select("#flux").text("no!");
-        d3.select("#precipitation").text("no!");
+        d3.select('#flux').text('no!');
+        d3.select('#precipitation').text('no!');
     }
 
-    let river = riversData.find(function(element) {
-        if(element.cell == nearestId){
+    const river = riversData.find(function (element) {
+        if (element.cell === nearestId) {
             return true;
         }
         return false;
-      });
-    if(river != undefined){
-        d3.select("#riverType").text(river.type);
-        d3.select("#river").text(river.river);
+    });
+    if (river !== undefined) {
+        d3.select('#riverType').text(river.type);
+        d3.select('#river').text(river.river);
     }
 }
 
-function clicked(){
-    const point = d3.mouse(this),
-    nearestId = delaunay.find(point[0], point[1]);
+function clicked() {
+    const point = d3.mouse(this);
+    const nearestId = delaunay.find(point[0], point[1]);
 
     add(nearestId, 'hill');
     processWorld();
     showWorld();
 }
 
-function zoom(){
-    let transform = d3.event.transform;
-    context.save();
+function zoom() {
+    const transform = d3.event.transform;
+    contextCanvas.save();
     clearCanvas();
-    context.translate(transform.x, transform.y);
-    context.scale(transform.k, transform.k);
+    contextCanvas.translate(transform.x, transform.y);
+    contextCanvas.scale(transform.k, transform.k);
     showWorld();
-    context.restore();
+    contextCanvas.restore();
 }
 
-function changeMap(event){
+function changeMap(event) {
     showWorld();
 }
 
 document.getElementById('mapData').onchange = changeMap;
 
-function triangleOfEdge(e) {
-    return Math.floor(e / 3);
+function nextHalfedge(edge) {
+    return (edge % 3 === 2) ? edge - 2 : edge + 1;
 }
 
-function nextHalfedge(e){
-    return (e % 3 === 2) ? e - 2 : e + 1;
+function prevHalfedge(edge) {
+    return (edge % 3 === 0) ? edge + 2 : edge - 1;
 }
 
-function prevHalfedge(e){
-    return (e % 3 === 0) ? e + 2 : e - 1;
-}
-
-function forEachTriangleEdge(callback){
+function forEachTriangleEdge(callbackFunction) {
     for (let e = 0; e < delaunay.triangles.length; e++) {
         if (e > delaunay.halfedges[e]) {
             const p = delaunay.points[delaunay.triangles[e]];
             const q = delaunay.points[delaunay.triangles[nextHalfedge(e)]];
-            callback(e, p, q);
+            callbackFunction(e, p, q);
         }
     }
 }
@@ -114,7 +110,7 @@ function triangleOfEdge(e){
     return Math.floor(e / 3);
 }
 
-function trianglesAdjacentToTriangle(t){
+function trianglesAdjacentToTriangle(t) {
     const adjacentTriangles = [];
     for (const e of edgesOfTriangle(t)) {
         const opposite = delaunay.halfedges[e];
@@ -136,25 +132,25 @@ function edgesAroundPoint(start) {
     return result;
 }
 
-function getCommonPoints(polygonID, neighborPolygonID){
-    const polygon = voronoi.cellPolygon(polygonID),
-    polygonNeighbor = voronoi.cellPolygon(neighborPolygonID);
-    let polygonPoints = new Array(),
-    polygonNeighborPoints = new Array(),
-    commonPoints = new Array();
+function getCommonPoints(polygonID, neighborPolygonID) {
+    const polygon = voronoi.cellPolygon(polygonID);
+    const polygonNeighbor = voronoi.cellPolygon(neighborPolygonID);
+    const polygonPoints = [];
+    const polygonNeighborPoints = [];
+    let commonPoints = [];
 
-    for (let i = 0; i < polygon.length -1; i++) {
+    for (let i = 0; i < polygon.length - 1; i++) {
         polygonPoints.push(polygon[i][0] + ' ' + polygon[i][1]);
     }
     commonPoints.push(polygonPoints);
 
-    for (let i = 0; i < polygonNeighbor.length -1; i++) {
+    for (let i = 0; i < polygonNeighbor.length - 1; i++) {
         polygonNeighborPoints.push(polygonNeighbor[i][0] + ' ' + polygonNeighbor[i][1]);
     }
     commonPoints.push(polygonNeighborPoints);
 
-    commonPoints = commonPoints.shift().filter(function(v) {
-        return commonPoints.every(function(a) {
+    commonPoints = commonPoints.shift().filter(function (v) {
+        return commonPoints.every(function (a) {
             return a.indexOf(v) !== -1;
         });
     });
@@ -164,20 +160,19 @@ function getCommonPoints(polygonID, neighborPolygonID){
 
 function fade(id) {
     const element = document.getElementById(id);
-    element.style.display = (element.style.display == 'none') ? 'block' : 'none';
-  }
+    element.style.display = (element.style.display === 'none') ? 'block' : 'none';
+}
 
-function drawCircle(x,y,radius,colorFill,colorStroke){
-
-    if(typeof colorStroke === "undefined") {
+function drawCircle(x, y, radius, colorFill, colorStroke) {
+    if (typeof colorStroke === 'undefined') {
         colorStroke = colorFill;
     }
 
-    context.beginPath();
-    context.arc(x, y, radius, 0, 2 * Math.PI, false);
-    context.fillStyle = colorFill;
-    context.fill();
-    context.lineWidth = 1;
-    context.strokeStyle = colorStroke;
-    context.stroke();
+    contextCanvas.beginPath();
+    contextCanvas.arc(x, y, radius, 0, 2 * Math.PI, false);
+    contextCanvas.fillStyle = colorFill;
+    contextCanvas.fill();
+    contextCanvas.lineWidth = 1;
+    contextCanvas.strokeStyle = colorStroke;
+    contextCanvas.stroke();
 }
