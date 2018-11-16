@@ -1,3 +1,5 @@
+/* global document d3 delaunay voronoi poissonDiscSampler sizeInput initHeights moved clicked add showWorld processWorld*/
+
 const widthCanvas = 1228;
 const heightCanvas = 640;
 
@@ -5,15 +7,12 @@ const canvas = d3.select('canvas')
     .attr('width', widthCanvas)
     .attr('height', heightCanvas)
     .on('touchmove mousemove', moved)
-    .on('click', clicked)
-    // .call(d3.zoom().translateExtent([[0,0],[width_canvas, height_canvas]]).scaleExtent([1, 40]).on('zoom', zoom))
-    ;
+    .on('click', clicked);
 
 const contextCanvas = d3.select('canvas').node().getContext('2d');
 const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
 const colorWeather = d3.scaleSequential(d3.interpolateBlues);
 
-let sampler;
 let sites;
 let sample;
 
@@ -39,7 +38,16 @@ const adjectifs = [
     'Wan', 'Warm', 'Washed-Out', 'Waxen', 'Wild',
 ];
 
-randomWorld(9);
+function relax() {
+    const relaxedSites = [];
+    for (const polygon of voronoi.cellPolygons()) {
+        relaxedSites.push(d3.polygonCentroid(polygon));
+    }
+
+    sites = relaxedSites;
+    delaunay = new d3.Delaunay.from(sites);
+    voronoi = delaunay.voronoi([ 0.5, 0.5, widthCanvas - 0.5, heightCanvas - 0.5 ]);
+}
 
 function randomWorld(count) {
     if (document.getElementById('rngEnabled').checked) {
@@ -50,7 +58,7 @@ function randomWorld(count) {
         document.getElementById('rngSeed').value = Math.seedrandom();
     }
 
-    sampler = poissonDiscSampler(widthCanvas, heightCanvas, sizeInput.valueAsNumber);
+    const sampler = poissonDiscSampler(widthCanvas, heightCanvas, sizeInput.valueAsNumber);
     sites = [];
 
     while (sample = sampler()) {
@@ -65,8 +73,8 @@ function randomWorld(count) {
     for (let blob = 0; blob < count; blob++) {
         if (blob === 0) {
             const randomPolygonID = delaunay.find(
-                (Math.random() * widthCanvas) / (4 + (widthCanvas / 2)),
-                (Math.random() * heightCanvas) / (6 + (heightCanvas / 2))
+                (Math.random() * widthCanvas / 4) + (widthCanvas / 2),
+                (Math.random() * heightCanvas / 6) + (heightCanvas / 2)
             );
             // highInput.value = 0.3;
             // highOutput.value = 0.3;
@@ -94,13 +102,4 @@ function randomWorld(count) {
     showWorld();
 }
 
-function relax() {
-    const relaxedSites = [];
-    for (const polygon of voronoi.cellPolygons()) {
-        relaxedSites.push(d3.polygonCentroid(polygon));
-    }
-
-    sites = relaxedSites;
-    delaunay = new d3.Delaunay.from(sites);
-    voronoi = delaunay.voronoi([ 0.5, 0.5, widthCanvas - 0.5, heightCanvas - 0.5 ]);
-}
+randomWorld(9);
