@@ -1,29 +1,221 @@
-var north = document.getElementById('north'),
-east = document.getElementById('east'),
-south = document.getElementById('south'),
-west = document.getElementById('west');
+/* globals document d3 delaunay*/
+/* globals sites widthCanvas heightCanvas*/
 
-var winds_buffer, raining;
-var riversData, riverID, riversOrder, confluence
+const north = document.getElementById('north');
+const east = document.getElementById('east');
+const south = document.getElementById('south');
+const west = document.getElementById('west');
 
-function randomizeWinds(){
+let windsBuffer;
+let raining;
+
+let riversData;
+let riverID;
+let riversOrder;
+let confluence;
+
+function randomizeWinds() {
     north.checked = Math.random() >= 0.75;
     east.checked = Math.random() >= 0.75;
     south.checked = Math.random() >= 0.75;
     west.checked = Math.random() >= 0.75;
 }
 
-function initPrecipitation(){
+function randomizeWindsDefault() {
+    const side = Math.random();
+    if (side >= 0.25 && side < 0.5) {
+        north.checked = true;
+    } else if (side >= 0.5 && side < 0.75) {
+        east.checked = true;
+    } else if (side >= 0.75) {
+        south.checked = true;
+    } else {
+        west.checked = true;
+    }
+}
+
+function initPrecipitation() {
     for (let i = 0; i < sites.length; i++) {
         sites[i].precipitation = 0.01;
         sites[i].flux = 0.01;
     }
 }
 
-function generatePrecipitation(){
+function generateNorth(selection, precipInit) {
+    const frontier = [];
+    const localRaining = [];
+    let x = -1;
+    let y = -1;
+    let precipitation = 0;
+    let nearestID = 0;
+    let height = 0;
+    let rain = 0;
 
-    winds_buffer = new Array();
-    raining = new Array();
+    for (let i = 0; i < sites.length; i++) {
+        if (sites[i][1] < selection && sites[i][0] > widthCanvas * 0.1 && sites[i][0] < widthCanvas * 0.9) {
+            frontier.push(i);
+        }
+    }
+    frontier.forEach((startPolygonID) => {
+        x = sites[startPolygonID][0];
+        y = sites[startPolygonID][1];
+        precipitation = precipInit;
+
+        windsBuffer.push([ x, y ]);
+
+        while (y < heightCanvas && precipitation > 0) {
+            y += 5;
+            x += (Math.random() * 10) - 5;
+            nearestID = delaunay.find(x, y);
+            height = sites[nearestID].height;
+            if (height >= 0.2) {
+                if (height < 0.6) {
+                    rain = Math.random() * height;
+                    precipitation -= rain;
+                    sites[nearestID].precipitation += rain;
+                } else {
+                    sites[nearestID].precipitation += precipitation;
+                    precipitation = 0;
+                }
+                localRaining.push([ x, y ]);
+            }
+        }
+    });
+    return localRaining;
+}
+
+function generateEast(selection, precipInit) {
+    const frontier = [];
+    const localRaining = [];
+    let x = -1;
+    let y = -1;
+    let precipitation = 0;
+    let nearestID = 0;
+    let height = 0;
+    let rain = 0;
+
+    for (let i = 0; i < sites.length; i++) {
+        if (sites[i][0] > widthCanvas - selection && sites[i][1] > heightCanvas * 0.1 && sites[i][1] < heightCanvas * 0.9) {
+            frontier.push(i);
+        }
+    }
+    frontier.forEach((startPolygonID) => {
+        x = sites[startPolygonID][0];
+        y = sites[startPolygonID][1];
+        precipitation = precipInit;
+
+        windsBuffer.push([ x, y ]);
+
+        while (x > 0 && precipitation > 0) {
+            x -= 5;
+            y += (Math.random() * 10) - 5;
+            nearestID = delaunay.find(x, y);
+            height = sites[nearestID].height;
+            if (height >= 0.2) {
+                if (height < 0.6) {
+                    rain = Math.random() * height;
+                    precipitation -= rain;
+                    sites[nearestID].precipitation += rain;
+                } else {
+                    sites[nearestID].precipitation += precipitation;
+                    precipitation = 0;
+                }
+                localRaining.push([ x, y ]);
+            }
+        }
+    });
+    return localRaining;
+}
+
+function generateSouth(selection, precipInit) {
+    const frontier = [];
+    const localRaining = [];
+    let x = -1;
+    let y = -1;
+    let precipitation = 0;
+    let nearestID = 0;
+    let height = 0;
+    let rain = 0;
+
+    for (let i = 0; i < sites.length; i++) {
+        if (sites[i][1] > heightCanvas - selection && sites[i][0] > widthCanvas * 0.1 && sites[i][0] < widthCanvas * 0.9) {
+            frontier.push(i);
+        }
+    }
+    frontier.forEach((startPolygonID) => {
+        x = sites[startPolygonID][0];
+        y = sites[startPolygonID][1];
+        precipitation = precipInit;
+
+        windsBuffer.push([ x, y ]);
+
+        while (y > 0 && precipitation > 0) {
+            y -= 5;
+            x += (Math.random() * 10) - 5;
+            nearestID = delaunay.find(x, y);
+            height = sites[nearestID].height;
+            if (height >= 0.2) {
+                if (height < 0.6) {
+                    rain = Math.random() * height;
+                    precipitation -= rain;
+                    sites[nearestID].precipitation += rain;
+                } else {
+                    sites[nearestID].precipitation += precipitation;
+                    precipitation = 0;
+                }
+                localRaining.push([ x, y ]);
+            }
+        }
+    });
+    return localRaining;
+}
+
+function generateWest(selection, precipInit) {
+    const frontier = [];
+    const localRaining = [];
+    let x = -1;
+    let y = -1;
+    let precipitation = 0;
+    let nearestID = 0;
+    let height = 0;
+    let rain = 0;
+
+    for (let i = 0; i < sites.length; i++) {
+        if (sites[i][0] < selection && sites[i][1] > heightCanvas * 0.1 && sites[i][1] < heightCanvas * 0.9) {
+            frontier.push(i);
+        }
+    }
+    frontier.forEach((startPolygonID) => {
+        x = sites[startPolygonID][0];
+        y = sites[startPolygonID][1];
+        precipitation = precipInit;
+
+        windsBuffer.push([ x, y ]);
+
+        while (x < widthCanvas && precipitation > 0) {
+            x += 5;
+            y += (Math.random() * 10) - 5;
+            nearestID = delaunay.find(x, y);
+            height = sites[nearestID].height;
+            if (height >= 0.2) {
+                if (height < 0.6) {
+                    rain = Math.random() * height;
+                    precipitation -= rain;
+                    sites[nearestID].precipitation += rain;
+                } else {
+                    sites[nearestID].precipitation += precipitation;
+                    precipitation = 0;
+                }
+                localRaining.push([ x, y ]);
+            }
+        }
+    });
+    return localRaining;
+}
+
+function generatePrecipitation() {
+    windsBuffer = [];
+    raining = [];
 
     if (randomWinds.checked) {
         randomizeWinds();
@@ -31,351 +223,210 @@ function generatePrecipitation(){
 
     let sides = north.checked + east.checked + south.checked + west.checked;
 
-    if(sides == 0){
+    if (sides === 0) {
         sides = 1;
-        const side = Math.random();
-        if (side >= 0.25 && side < 0.5) {
-            north.checked = true;
-        } else if (side >= 0.5 && side < 0.75) {
-            east.checked = true;
-        } else if (side >= 0.75) {
-            south.checked = true;
-        } else {
-            west.checked = true;
-        }
+        randomizeWindsDefault();
     }
 
-    const precipInit = precipitationInput.value / Math.sqrt(sides),
-    selection = 30 / sides;
+    const precipInit = precipitationInput.value / Math.sqrt(sides);
+    const selection = 30 / sides;
 
-    let frontier,
-    x,y,
-    precipitation,
-    nearestID,height,
-    rain;
-
-    if (north.checked){
-        frontier = new Array();
-        for (let i = 0; i < sites.length; i++) {
-            if(sites[i][1] < selection && sites[i][0] > widthCanvas*0.1 && sites[i][0] < widthCanvas*0.9){
-                frontier.push(i);
-            }
-        }
-        frontier.forEach(startPolygonID => {
-            x = sites[startPolygonID][0];
-            y = sites[startPolygonID][1];
-            precipitation = precipInit;
-
-            winds_buffer.push([x,y]);
-
-            while (y < heightCanvas && precipitation > 0) {
-                y += 5;
-                x += Math.random() * 10 - 5;
-                nearestID = delaunay.find(x,y);
-                height = sites[nearestID].height;
-                if(height >= 0.2){
-                    if(height < 0.6){
-                        rain = Math.random() * height;
-                        precipitation -= rain;
-                        sites[nearestID].precipitation += rain;
-                    } else {
-                        sites[nearestID].precipitation += precipitation;
-                        precipitation = 0;
-                    }
-                    raining.push([x,y])
-                }
-            }
-        });
-
+    if (north.checked) {
+        raining.concat(generateNorth(selection, precipInit));
     }
-    if (east.checked){
-        frontier = new Array();
-        for (let i = 0; i < sites.length; i++) {
-            if(sites[i][0] > widthCanvas - selection && sites[i][1] > heightCanvas*0.1 && sites[i][1] < heightCanvas*0.9){
-                frontier.push(i);
-            }
-        }
-        frontier.forEach(startPolygonID => {
-            x = sites[startPolygonID][0];
-            y = sites[startPolygonID][1];
-            precipitation = precipInit;
-
-            winds_buffer.push([x,y]);
-
-            while (x > 0 && precipitation > 0) {
-                x -= 5
-                y += Math.random() * 10 - 5;  
-                nearestID = delaunay.find(x,y);
-                height = sites[nearestID].height;
-                if(height >= 0.2){
-                    if(height < 0.6){
-                        rain = Math.random() * height;
-                        precipitation -= rain;
-                        sites[nearestID].precipitation += rain;
-                    } else {
-                        sites[nearestID].precipitation += precipitation;
-                        precipitation = 0;
-                    }
-                    raining.push([x,y])
-                }
-            }
-        });
+    if (east.checked) {
+        raining.concat(generateEast(selection, precipInit));
     }
-    if(south.checked){
-        frontier = new Array();
-        for (let i = 0; i < sites.length; i++) {
-            if(sites[i][1] > heightCanvas - selection && sites[i][0] > widthCanvas*0.1 && sites[i][0] < widthCanvas*0.9){
-                frontier.push(i);
-            }
-        }
-        frontier.forEach(startPolygonID => {
-            x = sites[startPolygonID][0];
-            y = sites[startPolygonID][1];
-            precipitation = precipInit;
-
-            winds_buffer.push([x,y]);
-
-            while (y > 0 && precipitation > 0) {
-                y -= 5;
-                x += Math.random() * 10 - 5;
-                nearestID = delaunay.find(x,y);
-                height = sites[nearestID].height;
-                if(height >= 0.2){
-                    if(height < 0.6){
-                        rain = Math.random() * height;
-                        precipitation -= rain;
-                        sites[nearestID].precipitation += rain;
-                    } else {
-                        sites[nearestID].precipitation += precipitation;
-                        precipitation = 0;
-                    }
-                    raining.push([x,y])
-                }
-            }
-        });
+    if (south.checked) {
+        raining.concat(generateSouth(selection, precipInit));
     }
-    if(west.checked){
-        frontier = new Array();
-        for (let i = 0; i < sites.length; i++) {
-            if(sites[i][0] < selection && sites[i][1] > heightCanvas*0.1 && sites[i][1] < heightCanvas*0.9){
-                frontier.push(i);
-            }
-        }
-        frontier.forEach(startPolygonID => {
-            x = sites[startPolygonID][0];
-            y = sites[startPolygonID][1];
-            precipitation = precipInit;
-
-            winds_buffer.push([x,y]);
-
-            while (x < widthCanvas && precipitation > 0) {
-                x += 5;
-                y += Math.random() * 10 -5;
-                nearestID = delaunay.find(x,y);
-                height = sites[nearestID].height;
-                if(height >= 0.2){
-                    if(height < 0.6){
-                        rain = Math.random() * height;
-                        precipitation -= rain;
-                        sites[nearestID].precipitation += rain;
-                    } else {
-                        sites[nearestID].precipitation += precipitation;
-                        precipitation = 0;
-                    }
-                    raining.push([x,y])
-                }
-            }
-        });
+    if (west.checked) {
+        raining.concat(generateWest(selection, precipInit));
     }
 
     for (let i = 0; i < sites.length; i++) {
-        if(sites[i].height >= 0.2){
-            let precipMoyenne = [sites[i].precipitation];
-            for (const neighborID of delaunay.neighbors(i)){
+        if (sites[i].height >= 0.2) {
+            const precipMoyenne = [ sites[i].precipitation ];
+            for (const neighborID of delaunay.neighbors(i)) {
                 precipMoyenne.push(sites[neighborID].precipitation);
             }
-            let moyenne = d3.mean(precipMoyenne);
+            const moyenne = d3.mean(precipMoyenne);
             sites[i].precipitation = moyenne;
             sites[i].flux = moyenne;
-        } 
+        }
     }
-
 }
 
-function drawPrecipitation(){
-    winds_buffer.forEach(wind => {
-        drawCircle(wind[0],wind[1],1,'white'); 
+function drawPrecipitation() {
+    windsBuffer.forEach((wind) => {
+        drawCircle(wind[0], wind[1], 1, 'white');
     });
 
-    raining.forEach(rain => {
-        drawCircle(rain[0],rain[1], 0.3, 'blue');
+    raining.forEach((rain) => {
+        drawCircle(rain[0], rain[1], 0.3, 'blue');
     });
 }
 
-function generateRiver(){
-    riversData = new Array();
+function generateRiver() {
+    riversData = [];
     riverID = 0;
-    riversOrder = new Array();
-    confluence = new Array();
+    riversOrder = [];
+    confluence = [];
 
     for (let i = 0; i < landPolygonID.length; i++) {
-        let neighborsPolygons = new Array(),
-        aval = new Array(),
-        localMinID,
-        sommetsLocaux = new Array(),
-        idCellLand = landPolygonID[i],
-        xDiff,
-        yDiff;
+        const neighborsPolygons = [];
+        const aval = [];
+        const sommetsLocaux = [];
+        const idCellLand = landPolygonID[i];
+        let xDiff;
+        let yDiff;
 
         for (const neighborID of delaunay.neighbors(idCellLand)) {
             neighborsPolygons.push(neighborID);
             sommetsLocaux.push(sites[neighborID].height);
-            if(sites[neighborID].height < 0.2){
-                xDiff = (sites[idCellLand][0] + sites[neighborID][0])/2;
-                yDiff = (sites[idCellLand][1] + sites[neighborID][1])/2;
+            if (sites[neighborID].height < 0.2) {
+                xDiff = (sites[idCellLand][0] + sites[neighborID][0]) / 2;
+                yDiff = (sites[idCellLand][1] + sites[neighborID][1]) / 2;
                 aval.push({
-                    x:      xDiff,
-                    y:      yDiff,
-                    cell:   neighborID
+                    x: xDiff,
+                    y: yDiff,
+                    cell: neighborID,
                 });
             }
         }
 
-        localMinID = neighborsPolygons[sommetsLocaux.indexOf(Math.min(...sommetsLocaux))];
+        const localMinID = neighborsPolygons[sommetsLocaux.indexOf(Math.min(...sommetsLocaux))];
 
-        if(sites[idCellLand].flux > 0.85){
-            if(!sites[idCellLand].river){
-                //Nouvelle river
+        if (sites[idCellLand].flux > 0.85) {
+            if (!sites[idCellLand].river) {
+                // Nouvelle river
                 sites[idCellLand].river = riverID;
                 riverID++;
-                riversOrder.push({r: sites[idCellLand].river, order: Math.random / 1000});
+                riversOrder.push({ river: sites[idCellLand].river, order: Math.random / 1000 });
                 riversData.push({
-                    river:  sites[idCellLand].river,
-                    cell:   idCellLand,
-                    x:      sites[idCellLand][0],
-                    y:      sites[idCellLand][1],
-                    type:   "source"
+                    river: sites[idCellLand].river,
+                    cell: idCellLand,
+                    x: sites[idCellLand][0],
+                    y: sites[idCellLand][1],
+                    type: 'source',
                 });
             }
 
-            if(!sites[localMinID].river){
-                //On ajoute la river en cours à la cellule aval si elle ne possède pas déjà de river
+            if (!sites[localMinID].river) {
+                // On ajoute la river en cours à la cellule aval si elle ne possède pas déjà de river
                 sites[localMinID].river = sites[idCellLand].river;
             } else {
                 const riverTo = sites[localMinID].river;
-                const iRiver      = riversData.filter(element => element.river == sites[idCellLand].river);
-                const minRiver    = riversData.filter(element => element.river == riverTo);
-                let iRiverLength = iRiver.length,
-                minRiverLength = minRiver.length;
+                const iRiver = riversData.filter((element) => element.river === sites[idCellLand].river);
+                const minRiver = riversData.filter((element) => element.river === riverTo);
+                let iRiverLength = iRiver.length;
+                let minRiverLength = minRiver.length;
 
-                if(iRiverLength >= minRiverLength){
-                    riversOrder[sites[idCellLand].river].order == iRiverLength;
+                if (iRiverLength >= minRiverLength) {
+                    riversOrder[sites[idCellLand].river].order += iRiverLength;
                     sites[localMinID].river = sites[idCellLand].river;
                     iRiverLength++;
                     minRiverLength--;
+                } else if (!riversOrder[riverTo]) {
+                    console.error('Order error');
+                    riversOrder[riverTo] = [];
+                    riversOrder[riverTo].order = minRiverLength;
                 } else {
-                    if(!riversOrder[riverTo]){
-                        console.error("Order error");
-                        riversOrder[riverTo] = new Array();
-                        riversOrder[riverTo].order = minRiverLength;
-                    } else {
-                        riversOrder[riverTo].order += minRiverLength;
-                    }
+                    riversOrder[riverTo].order += minRiverLength;
                 }
 
-                //Marque Confluence
-                if(sites[localMinID].height >= 0.2 && iRiverLength > 1 && minRiverLength > 1){
-                    if(iRiverLength >= minRiverLength){
-                        confluence.push({id: localMinID, s: idCellLand, l: iRiverLength, r: sites[idCellLand].river});
+                // Marque Confluence
+                if (sites[localMinID].height >= 0.2 && iRiverLength > 1 && minRiverLength > 1) {
+                    if (iRiverLength >= minRiverLength) {
+                        confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: sites[idCellLand].river });
                     }
-                    if(!sites[localMinID].confluence){
+                    if (!sites[localMinID].confluence) {
                         sites[localMinID].confluence = 2;
                         let cellTo = minRiver[minRiverLength - 1].cell;
-                        if(cellTo == localMinID){
+                        if (cellTo === localMinID) {
                             cellTo = minRiver[minRiverLength - 2].cell;
                         }
-                        confluence.push({id: localMinID, s: cellTo, l: minRiverLength - 1, r: riverTo});
+                        confluence.push({ id: localMinID, start: cellTo, length: minRiverLength - 1, river: riverTo });
                     } else {
                         sites[localMinID].confluence++;
                     }
-                    if(iRiverLength < minRiverLength){
-                        confluence.push({id: localMinID, s: idCellLand, l: iRiverLength, r: sites[idCellLand].river});
+                    if (iRiverLength < minRiverLength) {
+                        confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: sites[idCellLand].river });
                     }
                 }
             }
         }
 
         sites[localMinID].flux += sites[idCellLand].flux;
-        if(sites[idCellLand].precipitation * 0.97 > sites[localMinID].precipitation){
+        if (sites[idCellLand].precipitation * 0.97 > sites[localMinID].precipitation) {
             sites[localMinID].precipitation = sites[idCellLand].precipitation * 0.97;
         }
 
-        if(sites[idCellLand].river){
-            if(sites[localMinID].height < 0.2){
-                //Deverse riviere dans ocean
-                if(sites[idCellLand].flux > 14 && aval.length > 1 && !sites[idCellLand].confluence){
+        if (sites[idCellLand].river) {
+            if (sites[localMinID].height < 0.2) {
+                // Deverse riviere dans ocean
+                if (sites[idCellLand].flux > 14 && aval.length > 1 && !sites[idCellLand].confluence) {
                     for (let c = 0; c < aval.length; c++) {
-                        if(c==0){
+                        if (c === 0) {
                             riversData.push({
-                                river:  sites[idCellLand].river,
-                                cell:   idCellLand,
-                                x:      aval[0].x,
-                                y:      aval[0].y,
-                                type:   "delta",
-                                aval:   aval[0].cell
+                                river: sites[idCellLand].river,
+                                cell: idCellLand,
+                                x: aval[0].x,
+                                y: aval[0].y,
+                                type: 'delta',
+                                aval: aval[0].cell,
                             });
                         } else {
                             riversData.push({
-                                river:  riverID,
-                                cell:   idCellLand,
-                                x:      sites[idCellLand][0],
-                                y:      sites[idCellLand][1],
-                                type:   "course"
+                                river: riverID,
+                                cell: idCellLand,
+                                x: sites[idCellLand][0],
+                                y: sites[idCellLand][1],
+                                type: 'course',
                             });
                             riversData.push({
-                                river:  riverID,
-                                cell:   idCellLand,
-                                x:      aval[c].x,
-                                y:      aval[c].y,
-                                type:   "delta"
+                                river: riverID,
+                                cell: idCellLand,
+                                x: aval[c].x,
+                                y: aval[c].y,
+                                type: 'delta',
                             });
                             riverID++;
                         }
                     }
                 } else {
-                    //Estuaire de la riviere
-                    let x = aval[0].x + ((aval[0].x - sites[idCellLand][0])/10);
-                    let y = aval[0].y + ((aval[0].y - sites[idCellLand][1])/10);
+                    // Estuaire de la riviere
+                    const x = aval[0].x + ((aval[0].x - sites[idCellLand][0]) / 10);
+                    const y = aval[0].y + ((aval[0].y - sites[idCellLand][1]) / 10);
                     riversData.push({
-                        river:  sites[idCellLand].river,
-                        cell:   idCellLand,
-                        x:      x,
-                        y:      y,
-                        type:   'estuary',
-                        aval:   aval[0].cell
+                        river: sites[idCellLand].river,
+                        cell: idCellLand,
+                        x: x,
+                        y: y,
+                        type: 'estuary',
+                        aval: aval[0].cell,
                     });
                 }
             } else {
-                //Segment de la rivière
+                // Segment de la rivière
                 riversData.push({
-                    river:  sites[idCellLand].river,
-                    cell:   localMinID,
-                    x:      sites[localMinID][0],
-                    y:      sites[localMinID][1],
-                type:       "course"
+                    river: sites[idCellLand].river,
+                    cell: localMinID,
+                    x: sites[localMinID][0],
+                    y: sites[localMinID][1],
+                    type: 'course',
                 });
             }
         }
     }
 
-    riversOrder.sort(function (a,b) {
-        if (a.order < b.order){
+    riversOrder.sort(function sortRiverOrder(riverA, riverB) {
+        if (riverA.order < riverB.order) {
             return 1;
-        } else if (a.order > b.order){
+        } else if (riverA.order > riverB.order) {
             return -1;
-        } else {
-            return 0;
         }
+        return 0;
     });
 }
 
@@ -403,7 +454,7 @@ function drawnRiver(){
     }*/
 
     for (let i = 0; i < riversOrder.length; i++) {
-        let dataRiver = riversData.filter(element => element.river == riversOrder[i].r);
+        let dataRiver = riversData.filter(element => element.river == riversOrder[i].river);
 
         if(dataRiver.length > 1){
             let riverAmended = new Array();
@@ -492,8 +543,8 @@ function drawnRiver(){
                             count = 0;
                             width = Math.pow(sites[cellDestinationID].flux, 0.9);
                             let df = (width * 3 / (50 - sizeInput.valueAsNumber * 2) - riverWidth) /2,
-                            cellControle1 = confluenceData[0].s,
-                            cellControle2 = confluenceData[1].s,
+                            cellControle1 = confluenceData[0].start,
+                            cellControle2 = confluenceData[1].start,
                             baseX = (sites[cellControle1][0] + sites[cellControle2][0]) / 2,
                             baseY = (sites[cellControle1][1] + sites[cellControle2][1]) / 2,
                             xCurve = -Math.sin(angle) * df + end.x,
