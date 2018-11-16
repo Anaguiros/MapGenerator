@@ -39,7 +39,6 @@ function add(polygonStartID, type) {
                 if (sites[neighborID].height > 1) {
                     sites[neighborID].height = 1;
                 }
-                sites[neighborID].type = undefined;
                 exploredPolygon[neighborID] = true;
                 explorationQueue.push(neighborID);
             }
@@ -65,7 +64,7 @@ function drawCoastLine() {
         contextCanvas.moveTo(startPoint[0], startPoint[1]);
         contextCanvas.lineTo(endPoint[0], endPoint[1]);
         contextCanvas.closePath();
-        if (border.type === 'Ocean') {
+        if (border.typeCoastline === 'Ocean') {
             contextCanvas.strokeStyle = '#000';
             contextCanvas.lineWidth = 2;
         } else {

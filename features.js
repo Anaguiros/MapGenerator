@@ -1,3 +1,6 @@
+/* globals delaunay */
+/* globals sites widthCanvas heightCanvas*/
+
 /**
  * Principe d'innondation pour déterminer la coastline.
  * On part d'un coin (très faible proba d'être dans un lac), puis on innonde les voisins pour définir le type (ocean, lac)
@@ -7,7 +10,7 @@ function generateFeatures() {
 
     const initPoints = [ [ 0, 0 ], [ widthCanvas - 1, 0 ], [ 0, heightCanvas - 1 ], [ widthCanvas - 1, heightCanvas - 1 ] ];
     let startPoint = [ 0, 0 ];
-    initPoints.forEach(coord => {
+    initPoints.forEach((coord) => {
         if (sites[delaunay.find(coord[0], coord[1])].height < 0.2) {
             startPoint = [ coord[0], coord[1] ];
         }
@@ -17,7 +20,7 @@ function generateFeatures() {
     const exploredPolygonID = [];
     let startpolygonID = delaunay.find(startPoint[0], startPoint[1]);
     let type = 'Ocean';
-    let description;
+    let description = '';
 
     explorationPolygonIDQueue.push(startpolygonID);
     exploredPolygonID.push(startpolygonID);
@@ -50,7 +53,7 @@ function generateFeatures() {
 
     let unmarked = [];
     for (let i = 0; i < sites.length; i++) {
-        if (exploredPolygonID.indexOf(i) < 0 && (typeof sites[i].type === 'undefined'||true)) {
+        if (exploredPolygonID.indexOf(i) < 0 && (typeof sites[i].type === 'undefined')) {
             unmarked.push(i);
         }
     }
@@ -90,8 +93,8 @@ function generateFeatures() {
                 // Generation CoastLine
                 if (sites[neighborID].height < 0.2 && type === 'Island') {
                     let commonPoints = [];
-                    let type;
-                    let number;
+                    let typeCoastline = 'Ocean';
+                    let numberBorder = -1;
 
                     commonPoints = getCommonPoints(exploredID, neighborID);
 
@@ -100,14 +103,14 @@ function generateFeatures() {
 
                     if (sites[neighborID].type === 'Ocean' || sites[neighborID].type === 'Recif') {
                         sites[neighborID].type = 'Recif';
-                        type = 'Ocean';
-                        number = sites[exploredID].numberID;
+                        typeCoastline = 'Ocean';
+                        numberBorder = sites[exploredID].numberID;
                     } else {
-                        type = 'Lake';
-                        number = sites[neighborID].numberID;
+                        typeCoastline = 'Lake';
+                        numberBorder = sites[neighborID].numberID;
                     }
 
-                    lines.push({ start, end, type, number });
+                    lines.push({ start, end, typeCoastline, numberBorder });
                 }
 
 
@@ -122,7 +125,7 @@ function generateFeatures() {
         }
         unmarked = [];
         for (let i = 0; i < sites.length; i++) {
-            if (exploredPolygonID.indexOf(i) < 0 && (typeof sites[i].type === 'undefined' || true)) {
+            if (exploredPolygonID.indexOf(i) < 0 && (typeof sites[i].type === 'undefined')) {
                 unmarked.push(i);
             }
         }
