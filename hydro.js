@@ -57,7 +57,7 @@ function generatePrecipitation(){
     if (north.checked){
         frontier = new Array();
         for (let i = 0; i < sites.length; i++) {
-            if(sites[i][1] < selection && sites[i][0] > width_canvas*0.1 && sites[i][0] < width_canvas*0.9){
+            if(sites[i][1] < selection && sites[i][0] > widthCanvas*0.1 && sites[i][0] < widthCanvas*0.9){
                 frontier.push(i);
             }
         }
@@ -68,7 +68,7 @@ function generatePrecipitation(){
 
             winds_buffer.push([x,y]);
 
-            while (y < height_canvas && precipitation > 0) {
+            while (y < heightCanvas && precipitation > 0) {
                 y += 5;
                 x += Math.random() * 10 - 5;
                 nearestID = delaunay.find(x,y);
@@ -91,7 +91,7 @@ function generatePrecipitation(){
     if (east.checked){
         frontier = new Array();
         for (let i = 0; i < sites.length; i++) {
-            if(sites[i][0] > width_canvas - selection && sites[i][1] > height_canvas*0.1 && sites[i][1] < height_canvas*0.9){
+            if(sites[i][0] > widthCanvas - selection && sites[i][1] > heightCanvas*0.1 && sites[i][1] < heightCanvas*0.9){
                 frontier.push(i);
             }
         }
@@ -124,7 +124,7 @@ function generatePrecipitation(){
     if(south.checked){
         frontier = new Array();
         for (let i = 0; i < sites.length; i++) {
-            if(sites[i][1] > height_canvas - selection && sites[i][0] > width_canvas*0.1 && sites[i][0] < width_canvas*0.9){
+            if(sites[i][1] > heightCanvas - selection && sites[i][0] > widthCanvas*0.1 && sites[i][0] < widthCanvas*0.9){
                 frontier.push(i);
             }
         }
@@ -157,7 +157,7 @@ function generatePrecipitation(){
     if(west.checked){
         frontier = new Array();
         for (let i = 0; i < sites.length; i++) {
-            if(sites[i][0] < selection && sites[i][1] > height_canvas*0.1 && sites[i][1] < height_canvas*0.9){
+            if(sites[i][0] < selection && sites[i][1] > heightCanvas*0.1 && sites[i][1] < heightCanvas*0.9){
                 frontier.push(i);
             }
         }
@@ -168,7 +168,7 @@ function generatePrecipitation(){
 
             winds_buffer.push([x,y]);
 
-            while (x < width_canvas && precipitation > 0) {
+            while (x < widthCanvas && precipitation > 0) {
                 x += 5;
                 y += Math.random() * 10 -5;
                 nearestID = delaunay.find(x,y);
@@ -384,7 +384,7 @@ function drawnRiver(){
     .x(function(d){return d.x;})
     .y(function(d){return d.y;})
     .curve(d3.curveCatmullRom.alpha(0.1))
-    .context(context)
+    .context(contextCanvas)
     ;
 
     let confAngles = new Array(),
@@ -445,11 +445,11 @@ function drawnRiver(){
             }
             //Dessin line river
             if(dataRiver[1].type == "delta"){
-                context.beginPath();
+                contextCanvas.beginPath();
                 line(riverAmended);
-                context.lineWidth = 0.6;
-                context.strokeStyle = "steelblue";
-                context.stroke();
+                contextCanvas.lineWidth = 0.6;
+                contextCanvas.strokeStyle = "steelblue";
+                contextCanvas.stroke();
             } else {
                 let count =1,
                 width = 0;
@@ -512,15 +512,15 @@ function drawnRiver(){
                         }
                     }*/
 
-                    context.beginPath();
+                    contextCanvas.beginPath();
                     if(middle != undefined && next != undefined){
                         line([start, middle, end, next]);
                     } else {
                         line([start, end]);
                     }
-                    context.lineWidth = riverWidth;
-                    context.strokeStyle = "steelblue";
-                    context.stroke();
+                    contextCanvas.lineWidth = riverWidth;
+                    contextCanvas.strokeStyle = "steelblue";
+                    contextCanvas.stroke();
                 }
             }
         }

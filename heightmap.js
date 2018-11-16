@@ -60,17 +60,17 @@ function drawCoastLine(){
         const start_point = border.start.split(" "),
         end_point = border.end.split(" ");
 
-        context.beginPath();
-        context.moveTo(start_point[0], start_point[1]);
-        context.lineTo(end_point[0], end_point[1]);
-        context.closePath();
+        contextCanvas.beginPath();
+        contextCanvas.moveTo(start_point[0], start_point[1]);
+        contextCanvas.lineTo(end_point[0], end_point[1]);
+        contextCanvas.closePath();
         if(border.type === 'Ocean'){
-            context.strokeStyle = "#000";
-            context.lineWidth = 2;
+            contextCanvas.strokeStyle = "#000";
+            contextCanvas.lineWidth = 2;
         } else {
-            context.strokeStyle = "#296F92";
+            contextCanvas.strokeStyle = "#296F92";
         }
-        context.stroke();
+        contextCanvas.stroke();
     });
 }
 

@@ -1,5 +1,5 @@
 {
-    "extends": ["strict"],
+    "extends": ["strict", "strict/d3"],
     "globals": {
     },
     "rules": {

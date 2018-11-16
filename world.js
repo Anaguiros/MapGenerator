@@ -1,104 +1,106 @@
-const width_canvas = 1228,
-    height_canvas = 640;
+const widthCanvas = 1228;
+const heightCanvas = 640;
 
-const canvas = d3.select("canvas")
-    .attr("width", width_canvas)
-    .attr("height", height_canvas)
-    .on("touchmove mousemove", moved)
-    .on("click", clicked)
-    //.call(d3.zoom().translateExtent([[0,0],[width_canvas, height_canvas]]).scaleExtent([1, 40]).on("zoom", zoom))
-    ; 
+const canvas = d3.select('canvas')
+    .attr('width', widthCanvas)
+    .attr('height', heightCanvas)
+    .on('touchmove mousemove', moved)
+    .on('click', clicked)
+    // .call(d3.zoom().translateExtent([[0,0],[width_canvas, height_canvas]]).scaleExtent([1, 40]).on('zoom', zoom))
+    ;
 
 const contextCanvas = d3.select('canvas').node().getContext('2d');
 const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
 const colorWeather = d3.scaleSequential(d3.interpolateBlues);
 
-var sampler,
-    sites,
-    sample;
+let sampler;
+let sites;
+let sample;
 
-var delaunay;
-var voronoi;
+let delaunay;
+let voronoi;
 
-var adjectifs = [
-    "Ablaze", "Ablazing", "Accented", "Ashen", "Ashy", "Beaming", "Bi-Color", "Blazing", "Bleached", "Bleak", 
-    "Blended", "Blotchy", "Bold", "Brash", "Bright", "Brilliant", "Burnt", "Checkered", "Chromatic", "Classic", 
-    "Clean", "Colored", "Colorful", "Colorless", "Complementing", "Contrasting", "Cool", "Coordinating", "Crisp", "Dappled", 
-    "Dark", "Dayglo", "Deep", "Delicate", "Digital", "Dim", "Dirty", "Discolored", "Dotted", "Drab", 
-    "Dreary", "Dull", "Dusty", "Earth", "Electric", "Eye-Catching", "Faded", "Faint", "Festive", "Fiery", 
-    "Flashy", "Flattering", "Flecked", "Florescent", "Frosty", "Full-Toned", "Glistening", "Glittering", "Glowing", "Harsh", 
-    "Hazy", "Hot", "Hued", "Icy", "Illuminated", "Incandescent", "Intense", "Interwoven", "Iridescent", "Kaleidoscopic", 
-    "Lambent", "Light", "Loud", "Luminous", "Lusterless", "Lustrous", "Majestic", "Marbled", "Matte", "Medium", 
-    "Mellow", "Milky", "Mingled", "Mixed", "Monochromatic", "Motley", "Mottled", "Muddy", "Multicolored", "Multihued", 
-    "Murky", "Natural", "Neutral", "Opalescent", "Opaque", "Pale", "Pastel", "Patchwork", "Patchy", "Patterned", 
-    "Perfect", "Picturesque", "Plain", "Primary", "Prismatic", "Psychedelic", "Pure", "Radiant", "Reflective", "Rich", 
-    "Royal", "Ruddy", "Rustic", "Satiny", "Saturated", "Secondary", "Shaded", "Sheer", "Shining", "Shiny", 
-    "Shocking", "Showy", "Smoky", "Soft", "Solid", "Somber", "Soothing", "Sooty", "Sparkling", "Speckled", 
-    "Stained", "Streaked", "Streaky", "Striking", "Strong Neutral", "Subtle", "Sunny", "Swirling", "Tinged", "Tinted", 
-    "Tonal", "Toned", "Translucent", "Transparent", "Two-Tone", "Undiluted", "Uneven", "Uniform", "Vibrant", "Vivid", 
-    "Wan", "Warm", "Washed-Out", "Waxen", "Wild"
+const adjectifs = [
+    'Ablaze', 'Ablazing', 'Accented', 'Ashen', 'Ashy', 'Beaming', 'Bi-Color', 'Blazing', 'Bleached', 'Bleak',
+    'Blended', 'Blotchy', 'Bold', 'Brash', 'Bright', 'Brilliant', 'Burnt', 'Checkered', 'Chromatic', 'Classic',
+    'Clean', 'Colored', 'Colorful', 'Colorless', 'Complementing', 'Contrasting', 'Cool', 'Coordinating', 'Crisp', 'Dappled',
+    'Dark', 'Dayglo', 'Deep', 'Delicate', 'Digital', 'Dim', 'Dirty', 'Discolored', 'Dotted', 'Drab',
+    'Dreary', 'Dull', 'Dusty', 'Earth', 'Electric', 'Eye-Catching', 'Faded', 'Faint', 'Festive', 'Fiery',
+    'Flashy', 'Flattering', 'Flecked', 'Florescent', 'Frosty', 'Full-Toned', 'Glistening', 'Glittering', 'Glowing', 'Harsh',
+    'Hazy', 'Hot', 'Hued', 'Icy', 'Illuminated', 'Incandescent', 'Intense', 'Interwoven', 'Iridescent', 'Kaleidoscopic',
+    'Lambent', 'Light', 'Loud', 'Luminous', 'Lusterless', 'Lustrous', 'Majestic', 'Marbled', 'Matte', 'Medium',
+    'Mellow', 'Milky', 'Mingled', 'Mixed', 'Monochromatic', 'Motley', 'Mottled', 'Muddy', 'Multicolored', 'Multihued',
+    'Murky', 'Natural', 'Neutral', 'Opalescent', 'Opaque', 'Pale', 'Pastel', 'Patchwork', 'Patchy', 'Patterned',
+    'Perfect', 'Picturesque', 'Plain', 'Primary', 'Prismatic', 'Psychedelic', 'Pure', 'Radiant', 'Reflective', 'Rich',
+    'Royal', 'Ruddy', 'Rustic', 'Satiny', 'Saturated', 'Secondary', 'Shaded', 'Sheer', 'Shining', 'Shiny',
+    'Shocking', 'Showy', 'Smoky', 'Soft', 'Solid', 'Somber', 'Soothing', 'Sooty', 'Sparkling', 'Speckled',
+    'Stained', 'Streaked', 'Streaky', 'Striking', 'Strong Neutral', 'Subtle', 'Sunny', 'Swirling', 'Tinged', 'Tinted',
+    'Tonal', 'Toned', 'Translucent', 'Transparent', 'Two-Tone', 'Undiluted', 'Uneven', 'Uniform', 'Vibrant', 'Vivid',
+    'Wan', 'Warm', 'Washed-Out', 'Waxen', 'Wild',
 ];
 
 randomWorld(9);
 
 function randomWorld(count) {
-    if (document.getElementById('rngEnabled').checked) { // on initialise le RNG avec la seed fournie
+    if (document.getElementById('rngEnabled').checked) {
+        // on initialise le RNG avec la seed fournie
         Math.seedrandom(document.getElementById('rngSeed').value);
-    } else { // on affiche la seed pour pouvoir regénérer une map identique si besoin
+    } else {
+        // on affiche la seed pour pouvoir regénérer une map identique si besoin
         document.getElementById('rngSeed').value = Math.seedrandom();
     }
 
-    sampler = poissonDiscSampler(width_canvas, height_canvas, sizeInput.valueAsNumber);
-    sites = new Array();
+    sampler = poissonDiscSampler(widthCanvas, heightCanvas, sizeInput.valueAsNumber);
+    sites = [];
 
-    while (sample = sampler()){
+    while (sample = sampler()) {
         sites.push(sample);
-    } 
+    }
     delaunay = new d3.Delaunay.from(sites);
-    voronoi = delaunay.voronoi([0.5, 0.5, width_canvas - 0.5, height_canvas - 0.5]);
+    voronoi = delaunay.voronoi([ 0.5, 0.5, widthCanvas - 0.5, heightCanvas - 0.5 ]);
     relax();
     initHeights();
-    
-    //Random Blobs
-    for (c = 0; c < count; c++) {
-        if(c==0){
-            var randomPolygonID = delaunay.find(Math.random() * width_canvas / 4 + width_canvas / 2, Math.random() * height_canvas / 6 + height_canvas / 2);
-            //highInput.value = 0.3;
-            //highOutput.value = 0.3;
-            //radiusInput.value = 0.98;
-            //radiusOutput.value = 0.98;
-            add(randomPolygonID, "island");
+
+    // Random Blobs
+    for (let blob = 0; blob < count; blob++) {
+        if (blob === 0) {
+            const randomPolygonID = delaunay.find(
+                (Math.random() * widthCanvas) / (4 + (widthCanvas / 2)),
+                (Math.random() * heightCanvas) / (6 + (heightCanvas / 2))
+            );
+            // highInput.value = 0.3;
+            // highOutput.value = 0.3;
+            // radiusInput.value = 0.98;
+            // radiusOutput.value = 0.98;
+            add(randomPolygonID, 'island');
         } else {
-            const limit_random = 20;
+            const limitRandom = 20;
             let iteration = 0;
-            while (iteration < limit_random) {
+            while (iteration < limitRandom) {
                 const randomPolygonID = Math.floor(Math.random() * sites.length);
                 iteration++;
                 const site = voronoi.cellPolygon(randomPolygonID)[0];
 
-                if(site[0] > width_canvas*0.25 && site[0] < width_canvas*0.75 && site[1] > height_canvas*0.25 && site[1] < height_canvas*0.75){
-                    //const randomHeight = (Math.random() * 0.4 + 0.1).toFixed(2);
-                    //highInput.value = randomHeight;
-                    //highOutput.value = randomHeight;
-                    add(randomPolygonID, "hill");
+                if (site[0] > widthCanvas * 0.25 && site[0] < widthCanvas * 0.75 && site[1] > heightCanvas * 0.25 && site[1] < heightCanvas * 0.75) {
+                    // const randomHeight = (Math.random() * 0.4 + 0.1).toFixed(2);
+                    // highInput.value = randomHeight;
+                    // highOutput.value = randomHeight;
+                    add(randomPolygonID, 'hill');
                 }
             }
-            
-            
-
         }
     }
     processWorld();
     showWorld();
 }
 
-function relax(){
-    let relaxedSites = new Array();
-    for (const polygon of voronoi.cellPolygons()) { 
+function relax() {
+    const relaxedSites = [];
+    for (const polygon of voronoi.cellPolygons()) {
         relaxedSites.push(d3.polygonCentroid(polygon));
     }
 
-    sites=relaxedSites
+    sites = relaxedSites;
     delaunay = new d3.Delaunay.from(sites);
-    voronoi = delaunay.voronoi([0.5, 0.5, width_canvas - 0.5, height_canvas - 0.5]);
+    voronoi = delaunay.voronoi([ 0.5, 0.5, widthCanvas - 0.5, heightCanvas - 0.5 ]);
 }

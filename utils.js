@@ -82,38 +82,38 @@ function prevHalfedge(edge) {
 }
 
 function forEachTriangleEdge(callbackFunction) {
-    for (let e = 0; e < delaunay.triangles.length; e++) {
-        if (e > delaunay.halfedges[e]) {
-            const p = delaunay.points[delaunay.triangles[e]];
-            const q = delaunay.points[delaunay.triangles[nextHalfedge(e)]];
-            callbackFunction(e, p, q);
+    for (let edge = 0; edge < delaunay.triangles.length; edge++) {
+        if (edge > delaunay.halfedges[edge]) {
+            const points = delaunay.points[delaunay.triangles[edge]];
+            const otherPoints = delaunay.points[delaunay.triangles[nextHalfedge(edge)]];
+            callbackFunction(edge, points, otherPoints);
         }
     }
 }
 
-function edgesOfTriangle(triangleID){ 
-    return [3 * triangleID, 3 * triangleID + 1, 3 * triangleID + 2];
+function edgesOfTriangle(triangleID) {
+    return [ 3 * triangleID, (3 * triangleID) + 1, (3 * triangleID) + 2 ];
 }
 
 function pointsOfTriangle(triangleID) {
     return edgesOfTriangle(triangleID)
-        .map(e => delaunay.triangles[e]);
+        .map(edge => delaunay.triangles[edge]);
 }
 
 function forEachTriangle(callback) {
     for (let triangleID = 0; triangleID < delaunay.triangles.length / 3; triangleID++) {
-        callback(triangleID, pointsOfTriangle(triangleID).map(p => [delaunay.points[p*2],delaunay.points[p*2+1]]));
+        callback(triangleID, pointsOfTriangle(triangleID).map(point => [ delaunay.points[point * 2], delaunay.points[(point * 2) + 1] ]));
     }
 }
 
-function triangleOfEdge(e){
-    return Math.floor(e / 3);
+function triangleOfEdge(edge) {
+    return Math.floor(edge / 3);
 }
 
-function trianglesAdjacentToTriangle(t) {
+function trianglesAdjacentToTriangle(triangle) {
     const adjacentTriangles = [];
-    for (const e of edgesOfTriangle(t)) {
-        const opposite = delaunay.halfedges[e];
+    for (const edge of edgesOfTriangle(triangle)) {
+        const opposite = delaunay.halfedges[edge];
         if (opposite >= 0) {
             adjacentTriangles.push(triangleOfEdge(opposite));
         }
