@@ -430,103 +430,111 @@ function generateRiver() {
     });
 }
 
-function drawnRiver(){
-    let line = d3.line()
-    .x(function(d){return d.x;})
-    .y(function(d){return d.y;})
-    .curve(d3.curveCatmullRom.alpha(0.1))
-    .context(contextCanvas)
-    ;
+function drawnRiver() {
+    const line = d3.line()
+        .x(function (d) {
+            return d.x;
+        })
+        .y(function (d) {
+            return d.y;
+        })
+        .curve(d3.curveCatmullRom.alpha(0.1))
+        .context(contextCanvas);
 
-    let confAngles = new Array(),
-    side = 1;
+    const confAngles = [];
+    let side = 1;
 
-    //DEBUG COLORATION
-    /*for (let i = 0; i < riversData.length; i++) {
-        if(riversData[i].type == "delta"){
+    // DEBUG COLORATION
+    /* for (let i = 0; i < riversData.length; i++) {
+        if(riversData[i].type == 'delta'){
             colorPolygon(riversData[i].cell, '#F00');
-        } else if(riversData[i].type == "estuary"){
+        } else if(riversData[i].type == 'estuary'){
             colorPolygon(riversData[i].cell, '#00F');
-        } else if(riversData[i].type == "source"){
+        } else if(riversData[i].type == 'source'){
             colorPolygon(riversData[i].cell, '#0F0');
         }
-        
     }*/
 
     for (let i = 0; i < riversOrder.length; i++) {
-        let dataRiver = riversData.filter(element => element.river == riversOrder[i].river);
+        const dataRiver = riversData.filter((element) => element.river === riversOrder[i].river);
 
-        if(dataRiver.length > 1){
-            let riverAmended = new Array();
-            if(dataRiver.length > 2 || dataRiver[1].type == "delta"){
-                //Découpage du segment en tiers
-                for (let r = 0; r < dataRiver.length; r++) {
-                    let dX = dataRiver[r].x,
-                    dY = dataRiver[r].y;
-                    riverAmended.push({x: dX, y: dY});
-                    if(r+1 < dataRiver.length){
-                        let eX = dataRiver[r+1].x,
-                        eY = dataRiver[r+1].y,
-                        angle = Math.atan2(eY-dY, eX-dX);
-                        if(dataRiver[r+1].type == "course"){
-                            let mean = (sizeInput.valueAsNumber / 10) + Math.random() * (sizeInput.valueAsNumber / 10),
-                            firstThirdX = (dX * 2 + eX) / 3,
-                            firstThirdY = (dY * 2 + eY) / 3,
-                            secondThirdX = (dX + eX * 2) / 3,
-                            secondThirdY = (dY + eY * 2) / 3;
+        if (dataRiver.length > 1) {
+            const riverAmended = [];
+            if (dataRiver.length > 2 || dataRiver[1].type === 'delta') {
+                // Découpage du segment en tiers
+                for (let river = 0; river < dataRiver.length; river++) {
+                    const dX = dataRiver[river].x;
+                    const dY = dataRiver[river].y;
+                    riverAmended.push({ x: dX, y: dY });
+                    if (river + 1 < dataRiver.length) {
+                        const eX = dataRiver[river + 1].x;
+                        const eY = dataRiver[river + 1].y;
+                        const angle = Math.atan2(eY - dY, eX - dX);
+                        if (dataRiver[river + 1].type === 'course') {
+                            const mean = (sizeInput.valueAsNumber / 10) + (Math.random() * (sizeInput.valueAsNumber / 10));
+                            let firstThirdX = ((dX * 2) + eX) / 3;
+                            let firstThirdY = ((dY * 2) + eY) / 3;
+                            let secondThirdX = (dX + (eX * 2)) / 3;
+                            let secondThirdY = (dY + (eY * 2)) / 3;
 
-                            if (Math.random() > 0.5) {side *= -1;}
+                            if (Math.random() > 0.5) {
+                                side *= -1;
+                            }
                             firstThirdX += -Math.sin(angle) * mean * side;
                             firstThirdY += Math.cos(angle) * mean * side;
-                            if (Math.random() > 0.6) {side *= -1;}
+                            if (Math.random() > 0.6) {
+                                side *= -1;
+                            }
                             secondThirdX += Math.sin(angle) * mean * side;
                             secondThirdY += -Math.cos(angle) * mean * side;
-                            riverAmended.push({x: firstThirdX, y: firstThirdY});
-                            riverAmended.push({x: secondThirdX, y: secondThirdY});
+                            riverAmended.push({ x: firstThirdX, y: firstThirdY });
+                            riverAmended.push({ x: secondThirdX, y: secondThirdY });
                         } else {
-                            let mean = (sizeInput.valueAsNumber / 20) + Math.random() * (sizeInput.valueAsNumber / 20),
-                            middleX = (dX + eX) / 2,
-                            middleY = (dY + eY) / 2;
+                            const mean = (sizeInput.valueAsNumber / 20) + (Math.random() * (sizeInput.valueAsNumber / 20));
+                            let middleX = (dX + eX) / 2;
+                            let middleY = (dY + eY) / 2;
                             middleX += -Math.sin(angle) * mean * side;
                             middleY += Math.cos(angle) * mean * side;
-                            riverAmended.push({x: middleX, y: middleY});
+                            riverAmended.push({ x: middleX, y: middleY });
                         }
                     }
                 }
             }
-            //Dessin line river
-            if(dataRiver[1].type == "delta"){
+            // Dessin line river
+            if (dataRiver[1].type === 'delta') {
                 contextCanvas.beginPath();
                 line(riverAmended);
                 contextCanvas.lineWidth = 0.6;
-                contextCanvas.strokeStyle = "steelblue";
+                contextCanvas.strokeStyle = 'steelblue';
                 contextCanvas.stroke();
             } else {
-                let count =1,
-                width = 0;
-                for (let s = 0; s < riverAmended.length/3; s++) {
-                    let start, middle, end, next;
-                    
-                    if(s === Math.floor(riverAmended.length/3)){
-                        start = riverAmended[s*3 - 1],
-                        end = riverAmended[s*3];
+                let count = 1;
+                let width = 0;
+                for (let s = 0; s < riverAmended.length / 3; s++) {
+                    let start;
+                    let middle;
+                    let end;
+                    let next;
+
+                    if (s === Math.floor(riverAmended.length / 3)) {
+                        start = riverAmended[(s * 3) - 1];
+                        end = riverAmended[s * 3];
                     } else {
-                        start = riverAmended[s*3],
-                        middle = riverAmended[s*3 + 1],
-                        end = riverAmended[s*3 + 2];
-                        if(s != riverAmended.length/3){
-                            next = riverAmended[s*3 + 3];
+                        start = riverAmended[s * 3];
+                        middle = riverAmended[(s * 3) + 1];
+                        end = riverAmended[(s * 3) + 2];
+                        if (s !== riverAmended.length / 3) {
+                            next = riverAmended[(s * 3) + 3];
                         }
-                        
                     }
 
-                    let cellDestinationID = delaunay.find(end.x, end.y),
-                    xNode = end.x,
-                    yNode = end.y,
-                    //riverWidth = ((count + width) * 3) / (50 - sizeInput.valueAsNumber * 2);
-                    riverWidth = Math.sqrt((count + width));
+                    const cellDestinationID = delaunay.find(end.x, end.y);
+                    let xNode = end.x;
+                    let yNode = end.y;
+                    // let riverWidth = ((count + width) * 3) / (50 - sizeInput.valueAsNumber * 2);
+                    let riverWidth = Math.sqrt((count + width));
                     count++;
-                    /*if(cellDestinationID){
+                    /* if(cellDestinationID){
                         if(sites[cellDestinationID].confluence){
                             let confluenceData = confluence.filter(element => element.id == cellDestinationID),
                             angle;
@@ -564,13 +572,13 @@ function drawnRiver(){
                     }*/
 
                     contextCanvas.beginPath();
-                    if(middle != undefined && next != undefined){
-                        line([start, middle, end, next]);
+                    if (middle !== undefined && next !== undefined) {
+                        line([ start, middle, end, next ]);
                     } else {
-                        line([start, end]);
+                        line([ start, end ]);
                     }
                     contextCanvas.lineWidth = riverWidth;
-                    contextCanvas.strokeStyle = "steelblue";
+                    contextCanvas.strokeStyle = 'steelblue';
                     contextCanvas.stroke();
                 }
             }
