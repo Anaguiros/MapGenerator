@@ -1,40 +1,42 @@
-var lines, landPolygonID;
+/* global delaunay sites highInput radiusInput sharpnessInput downcuttingInput contextCanvas*/
+let lines = null;
+let landPolygonID = [];
 
-function initHeights(){
+function initHeights() {
     for (let i = 0; i < sites.length; i++) {
         sites[i].height = 0;
     }
 }
 
-function add(polygonStartID, type){
-    let explorationQueue = new Array(),
-    exploredPolygon = new Array(sites.length);
+function add(polygonStartID, type) {
+    const explorationQueue = [];
+    const exploredPolygon = new Array(sites.length);
 
     for (let i = 0; i < exploredPolygon.length; i++) {
         exploredPolygon[i] = false;
     }
 
     let height = highInput.valueAsNumber;
-    const radius = radiusInput.valueAsNumber,
-    sharpness = sharpnessInput.valueAsNumber;
+    const radius = radiusInput.valueAsNumber;
+    const sharpness = sharpnessInput.valueAsNumber;
 
     sites[polygonStartID].height += height;
     exploredPolygon[polygonStartID] = true;
     explorationQueue.push(polygonStartID);
     for (let i = 0; i < explorationQueue.length && height > 0.01; i++) {
-        if(type == "island"){
-            height = sites[explorationQueue[i]].height * radius - height/100;
+        if (type === 'island') {
+            height = (sites[explorationQueue[i]].height * radius) - (height / 100);
         } else {
-            height = height * radius;
+            height *= radius;
         }
         for (const neighborID of delaunay.neighbors(explorationQueue[i])) {
-            if(!exploredPolygon[neighborID]){
-                const noise = Math.random()*sharpness + 1.1 - sharpness;
-                if(sharpness == 0){
+            if (!exploredPolygon[neighborID]) {
+                let noise = (Math.random() * sharpness) + 1.1 - sharpness;
+                if (sharpness === 0) {
                     noise = 1;
                 }
                 sites[neighborID].height += height * noise;
-                if(sites[neighborID].height > 1){
+                if (sites[neighborID].height > 1) {
                     sites[neighborID].height = 1;
                 }
                 sites[neighborID].type = undefined;
@@ -45,71 +47,68 @@ function add(polygonStartID, type){
     }
 }
 
-function downcutCoastLine(){
+function downcutCoastLine() {
     const downcut = downcuttingInput.valueAsNumber;
     for (let i = 0; i < sites.length; i++) {
-        if(sites[i].height >= 0.2){
+        if (sites[i].height >= 0.2) {
             sites[i].height -= downcut;
         }
-        
     }
 }
 
-function drawCoastLine(){
-    lines.forEach(border => {
-        const start_point = border.start.split(" "),
-        end_point = border.end.split(" ");
+function drawCoastLine() {
+    lines.forEach((border) => {
+        const startPoint = border.start.split(' ');
+        const endPoint = border.end.split(' ');
 
         contextCanvas.beginPath();
-        contextCanvas.moveTo(start_point[0], start_point[1]);
-        contextCanvas.lineTo(end_point[0], end_point[1]);
+        contextCanvas.moveTo(startPoint[0], startPoint[1]);
+        contextCanvas.lineTo(endPoint[0], endPoint[1]);
         contextCanvas.closePath();
-        if(border.type === 'Ocean'){
-            contextCanvas.strokeStyle = "#000";
+        if (border.type === 'Ocean') {
+            contextCanvas.strokeStyle = '#000';
             contextCanvas.lineWidth = 2;
         } else {
-            contextCanvas.strokeStyle = "#296F92";
+            contextCanvas.strokeStyle = '#296F92';
         }
         contextCanvas.stroke();
     });
 }
 
-function resolveDepression(){
-    landPolygonID = new Array();
+function resolveDepression() {
+    landPolygonID = [];
     for (let i = 0; i < sites.length; i++) {
-        if(sites[i].height >= 0.2){
+        if (sites[i].height >= 0.2) {
             landPolygonID.push(i);
         }
     }
 
-    let depression = 1,
-    minCell,
-    minHigh;
+    let depression = 1;
+    let minCell = -1;
+    let minHigh = 0;
 
     while (depression > 0) {
         depression = 0;
         for (let i = 0; i < landPolygonID.length; i++) {
             minHigh = 10;
             for (const neighborID of delaunay.neighbors(landPolygonID[i])) {
-                if(sites[neighborID].height < minHigh){
+                if (sites[neighborID].height < minHigh) {
                     minHigh = sites[neighborID].height;
-                    minCell = neighborID
+                    minCell = neighborID;
                 }
             }
-            if(sites[landPolygonID[i]].height <= sites[minCell].height){
+            if (sites[landPolygonID[i]].height <= sites[minCell].height) {
                 depression += 1;
                 sites[landPolygonID[i]].height = sites[minCell].height + 0.01;
             }
         }
     }
-    landPolygonID.sort(function (a,b) {
-        if (sites[a].height < sites[b].height){
+    landPolygonID.sort(function sortheight(cellA, cellB) {
+        if (sites[cellA].height < sites[cellB].height) {
             return 1;
-        } else if (sites[a].height > sites[b].height){
+        } else if (sites[cellA].height > sites[cellB].height) {
             return -1;
-        } else {
-            return 0;
         }
+        return 0;
     });
-
 }

@@ -1,24 +1,13 @@
-/* global document d3 delaunay voronoi poissonDiscSampler sizeInput initHeights moved clicked add showWorld processWorld*/
+/* globals document d3*/
+/* globals widthCanvas heightCanvas sizeInput*/
 
-const widthCanvas = 1228;
-const heightCanvas = 640;
+let sites = [];
+let sample = null;
 
-const canvas = d3.select('canvas')
-    .attr('width', widthCanvas)
-    .attr('height', heightCanvas)
-    .on('touchmove mousemove', moved)
-    .on('click', clicked);
+let delaunay = null;
+let voronoi = null;
 
-const contextCanvas = d3.select('canvas').node().getContext('2d');
-const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
-const colorWeather = d3.scaleSequential(d3.interpolateBlues);
-
-let sites;
-let sample;
-
-let delaunay;
-let voronoi;
-
+/* exported adjectifs */
 const adjectifs = [
     'Ablaze', 'Ablazing', 'Accented', 'Ashen', 'Ashy', 'Beaming', 'Bi-Color', 'Blazing', 'Bleached', 'Bleak',
     'Blended', 'Blotchy', 'Bold', 'Brash', 'Bright', 'Brilliant', 'Burnt', 'Checkered', 'Chromatic', 'Classic',
