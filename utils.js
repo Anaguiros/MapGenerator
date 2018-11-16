@@ -1,3 +1,5 @@
+/* globals d3 delaunay voronoi document*/
+
 function processWorld() {
     // Init
     initPrecipitation();
@@ -36,7 +38,7 @@ function moved() {
         d3.select('#precipitation').text('no!');
     }
 
-    const river = riversData.find(function (element) {
+    const river = riversData.find(function findRiver(element) {
         if (element.cell === nearestId) {
             return true;
         }
@@ -97,12 +99,12 @@ function edgesOfTriangle(triangleID) {
 
 function pointsOfTriangle(triangleID) {
     return edgesOfTriangle(triangleID)
-        .map(edge => delaunay.triangles[edge]);
+        .map((edge) => delaunay.triangles[edge]);
 }
 
-function forEachTriangle(callback) {
+function forEachTriangle(callbackFunction) {
     for (let triangleID = 0; triangleID < delaunay.triangles.length / 3; triangleID++) {
-        callback(triangleID, pointsOfTriangle(triangleID).map(point => [ delaunay.points[point * 2], delaunay.points[(point * 2) + 1] ]));
+        callbackFunction(triangleID, pointsOfTriangle(triangleID).map((point) => [ delaunay.points[point * 2], delaunay.points[(point * 2) + 1] ]));
     }
 }
 
@@ -140,12 +142,12 @@ function getCommonPoints(polygonID, neighborPolygonID) {
     let commonPoints = [];
 
     for (let i = 0; i < polygon.length - 1; i++) {
-        polygonPoints.push(polygon[i][0] + ' ' + polygon[i][1]);
+        polygonPoints.push(`${ polygon[i][0] } ${ polygon[i][1] }`);
     }
     commonPoints.push(polygonPoints);
 
     for (let i = 0; i < polygonNeighbor.length - 1; i++) {
-        polygonNeighborPoints.push(polygonNeighbor[i][0] + ' ' + polygonNeighbor[i][1]);
+        polygonNeighborPoints.push(`${ polygonNeighbor[i][0] } ${ polygonNeighbor[i][1] }`);
     }
     commonPoints.push(polygonNeighborPoints);
 
