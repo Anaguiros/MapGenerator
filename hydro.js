@@ -68,8 +68,8 @@ function generateNorth(selection, precipInit) {
             x += (Math.random() * 10) - 5;
             nearestID = delaunay.find(x, y);
             height = sites[nearestID].height;
-            if (height >= 0.2) {
-                if (height < 0.6) {
+            if (height >= altitudeOcean) {
+                if (height < altitudePeak) {
                     rain = Math.random() * height;
                     precipitation -= rain;
                     sites[nearestID].precipitation += rain;
@@ -111,8 +111,8 @@ function generateEast(selection, precipInit) {
             y += (Math.random() * 10) - 5;
             nearestID = delaunay.find(x, y);
             height = sites[nearestID].height;
-            if (height >= 0.2) {
-                if (height < 0.6) {
+            if (height >= altitudeOcean) {
+                if (height < altitudePeak) {
                     rain = Math.random() * height;
                     precipitation -= rain;
                     sites[nearestID].precipitation += rain;
@@ -154,8 +154,8 @@ function generateSouth(selection, precipInit) {
             x += (Math.random() * 10) - 5;
             nearestID = delaunay.find(x, y);
             height = sites[nearestID].height;
-            if (height >= 0.2) {
-                if (height < 0.6) {
+            if (height >= altitudeOcean) {
+                if (height < altitudePeak) {
                     rain = Math.random() * height;
                     precipitation -= rain;
                     sites[nearestID].precipitation += rain;
@@ -197,8 +197,8 @@ function generateWest(selection, precipInit) {
             y += (Math.random() * 10) - 5;
             nearestID = delaunay.find(x, y);
             height = sites[nearestID].height;
-            if (height >= 0.2) {
-                if (height < 0.6) {
+            if (height >= altitudeOcean) {
+                if (height < altitudePeak) {
                     rain = Math.random() * height;
                     precipitation -= rain;
                     sites[nearestID].precipitation += rain;
@@ -245,7 +245,7 @@ function generatePrecipitation() {
     }
 
     for (let i = 0; i < sites.length; i++) {
-        if (sites[i].height >= 0.2) {
+        if (sites[i].height >= altitudeOcean) {
             const precipMoyenne = [ sites[i].precipitation ];
             for (const neighborID of delaunay.neighbors(i)) {
                 precipMoyenne.push(sites[neighborID].precipitation);
@@ -284,7 +284,7 @@ function generateRiver() {
         for (const neighborID of delaunay.neighbors(idCellLand)) {
             neighborsPolygons.push(neighborID);
             sommetsLocaux.push(sites[neighborID].height);
-            if (sites[neighborID].height < 0.2) {
+            if (sites[neighborID].height < altitudeOcean) {
                 xDiff = (sites[idCellLand][0] + sites[neighborID][0]) / 2;
                 yDiff = (sites[idCellLand][1] + sites[neighborID][1]) / 2;
                 aval.push({
@@ -336,7 +336,7 @@ function generateRiver() {
                 }
 
                 // Marque Confluence
-                if (sites[localMinID].height >= 0.2 && iRiverLength > 1 && minRiverLength > 1) {
+                if (sites[localMinID].height >= altitudeOcean && iRiverLength > 1 && minRiverLength > 1) {
                     if (iRiverLength >= minRiverLength) {
                         confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: sites[idCellLand].river });
                     }
@@ -363,7 +363,7 @@ function generateRiver() {
         }
 
         if (sites[idCellLand].river) {
-            if (sites[localMinID].height < 0.2) {
+            if (sites[localMinID].height < altitudeOcean) {
                 // Deverse riviere dans ocean
                 if (sites[idCellLand].flux > 14 && aval.length > 1 && !sites[idCellLand].confluence) {
                     for (let c = 0; c < aval.length; c++) {

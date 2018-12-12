@@ -29,7 +29,7 @@ function colorPolygon(polygonID, color) {
 
 function drawElevationPolygons() {
     for (let i = 0; i < sites.length; i++) {
-        if (sites[i].height >= 0.2) {
+        if (sites[i].height >= altitudeOcean) {
             colorPolygon(i, colorNatural(1 - sites[i].height));
         } else if (sites[i].type === 'Lake') {
             colorPolygon(i, '#3C8CBC');
@@ -43,7 +43,7 @@ function drawElevationPolygons() {
 
 function drawWeatherPolygons() {
     for (let i = 0; i < sites.length; i++) {
-        if (sites[i].height >= 0.2) {
+        if (sites[i].height >= altitudeOcean) {
             colorPolygon(i, colorWeather(sites[i].precipitation));
         } else if (sites[i].type === 'Lake') {
             colorPolygon(i, '#3C8CBC');

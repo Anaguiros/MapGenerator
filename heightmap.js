@@ -2,6 +2,10 @@
 let lines = null;
 let landPolygonID = [];
 
+const altitudeOcean = 0.2;
+const altitudePeak = 0.6;
+const altitudeMax = 1;
+
 function initHeights() {
     for (let i = 0; i < sites.length; i++) {
         sites[i].height = 0;
@@ -36,8 +40,8 @@ function add(polygonStartID, type) {
                     noise = 1;
                 }
                 sites[neighborID].height += height * noise;
-                if (sites[neighborID].height > 1) {
-                    sites[neighborID].height = 1;
+                if (sites[neighborID].height > altitudeMax) {
+                    sites[neighborID].height = altitudeMax;
                 }
                 exploredPolygon[neighborID] = true;
                 explorationQueue.push(neighborID);
@@ -49,7 +53,7 @@ function add(polygonStartID, type) {
 function downcutCoastLine() {
     const downcut = downcuttingInput.valueAsNumber;
     for (let i = 0; i < sites.length; i++) {
-        if (sites[i].height >= 0.2) {
+        if (sites[i].height >= altitudeOcean) {
             sites[i].height -= downcut;
         }
     }
@@ -77,7 +81,7 @@ function drawCoastLine() {
 function resolveDepression() {
     landPolygonID = [];
     for (let i = 0; i < sites.length; i++) {
-        if (sites[i].height >= 0.2) {
+        if (sites[i].height >= altitudeOcean) {
             landPolygonID.push(i);
         }
     }

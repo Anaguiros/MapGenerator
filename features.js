@@ -11,7 +11,7 @@ function generateFeatures() {
     const initPoints = [ [ 0, 0 ], [ widthCanvas - 1, 0 ], [ 0, heightCanvas - 1 ], [ widthCanvas - 1, heightCanvas - 1 ] ];
     let startPoint = [ 0, 0 ];
     initPoints.forEach((coord) => {
-        if (sites[delaunay.find(coord[0], coord[1])].height < 0.2) {
+        if (sites[delaunay.find(coord[0], coord[1])].height < altitudeOcean) {
             startPoint = [ coord[0], coord[1] ];
         }
     });
@@ -36,7 +36,7 @@ function generateFeatures() {
     while (explorationPolygonIDQueue.length > 0) {
         const exploredID = explorationPolygonIDQueue.shift();
         for (const neighborID of delaunay.neighbors(exploredID)) {
-            if (exploredPolygonID.indexOf(neighborID) < 0 && sites[neighborID].height < 0.2) {
+            if (exploredPolygonID.indexOf(neighborID) < 0 && sites[neighborID].height < altitudeOcean) {
                 sites[neighborID].type = type;
                 sites[neighborID].description = description;
                 explorationPolygonIDQueue.push(neighborID);
@@ -61,11 +61,11 @@ function generateFeatures() {
     while (unmarked.length > 0) {
         startpolygonID = unmarked[0];
 
-        if (sites[startpolygonID].height >= 0.2) {
+        if (sites[startpolygonID].height >= altitudeOcean) {
             type = 'Island';
             numberID = islandCounter;
             islandCounter += 1;
-            minHeight = 0.2;
+            minHeight = altitudeOcean;
             maxHeight = 10;
             description = generator$places$forests();
         } else {
@@ -73,7 +73,7 @@ function generateFeatures() {
             numberID = lakeCounter;
             lakeCounter += 1;
             minHeight = -10;
-            maxHeight = 0.2;
+            maxHeight = altitudeOcean;
             description = generator$places$lakes();
         }
 
@@ -91,7 +91,7 @@ function generateFeatures() {
             const exploredID = explorationPolygonIDQueue.shift();
             for (const neighborID of delaunay.neighbors(exploredID)) {
                 // Generation CoastLine
-                if (sites[neighborID].height < 0.2 && type === 'Island') {
+                if (sites[neighborID].height < altitudeOcean && type === 'Island') {
                     let commonPoints = [];
                     let typeCoastline = 'Ocean';
                     let numberBorder = -1;
