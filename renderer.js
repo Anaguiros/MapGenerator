@@ -1,6 +1,13 @@
+// Libs import
 /* globals document d3 delaunay voronoi*/
-/* globals sites moved clicked*/
-/* globals drawPrecipitation drawCoastLine drawnRiver*/
+
+// Functions import
+/* globals drawPrecipitation drawCoastLine drawnRiver moved clicked */
+
+// Variables import
+/* globals altitudeOcean sites */
+
+/* exported showWorld */
 
 const widthCanvas = 1228;
 const heightCanvas = 640;
@@ -21,16 +28,23 @@ function clearCanvas() {
 }
 
 function colorPolygon(polygonID, color) {
+    const points = voronoi.cellPolygon(polygonID);
+    contextCanvas.moveTo(points[0][0], points[0][1]);
     contextCanvas.beginPath();
-    voronoi.renderCell(polygonID, contextCanvas);
+    for (let i = 1; i < points.length; i++) {
+        contextCanvas.lineTo(points[i][0], points[i][1]);
+    }
+    contextCanvas.closePath();
     contextCanvas.fillStyle = color;
     contextCanvas.fill();
+    contextCanvas.strokeStyle = color;
+    contextCanvas.stroke();
 }
 
 function drawElevationPolygons() {
     for (let i = 0; i < sites.length; i++) {
         if (sites[i].height >= altitudeOcean) {
-            colorPolygon(i, colorNatural(1 - sites[i].height));
+            colorPolygon(i, colorNatural(altitudeMax - sites[i].height));
         } else if (sites[i].type === 'Lake') {
             colorPolygon(i, '#3C8CBC');
         } else if (sites[i].type === 'Recif') {

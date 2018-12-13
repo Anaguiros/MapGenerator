@@ -11,6 +11,7 @@ function processWorld() {
     generateRiver();
     // Generate Features + Coastline
     generateFeatures();
+    // removeRedundant();
 }
 
 function moved() {

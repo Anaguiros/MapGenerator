@@ -115,3 +115,31 @@ function resolveDepression() {
         return 0;
     });
 }
+
+function removeRedundant() {
+    const redundantID = [];
+    const tmpSites = [];
+    for (let i = 0; i < sites.length; i++) {
+        if (sites[i].type === 'Ocean') {
+            let directSea = false;
+            for (const neighborID of delaunay.neighbors(i)) {
+                if (sites[neighborID].type === 'Recif') {
+                    directSea = true;
+                }
+            }
+            if (!directSea) {
+                redundantID.push(i);
+            }
+        }
+    }
+
+    for (let i = 0; i < sites.length; i++) {
+        if (redundantID.indexOf(i) === -1) {
+            tmpSites.push(sites[i]);
+        }
+    }
+
+    sites = tmpSites;
+    delaunay = new d3.Delaunay.from(sites);
+    voronoi = delaunay.voronoi([ 0.5, 0.5, widthCanvas - 0.5, heightCanvas - 0.5 ]);
+}
