@@ -1,5 +1,5 @@
 /* global delaunay sites highInput radiusInput sharpnessInput downcuttingInput contextCanvas*/
-let lines = null;
+let coastLines = [];
 let landPolygonID = [];
 
 const altitudeOcean = 0.2;
@@ -60,7 +60,7 @@ function downcutCoastLine() {
 }
 
 function drawCoastLine() {
-    lines.forEach((border) => {
+    coastLines.forEach((border) => {
         const startPoint = border.start.split(' ');
         const endPoint = border.end.split(' ');
 
