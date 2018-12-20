@@ -39,6 +39,7 @@ function relax() {
 }
 
 function randomWorld(count) {
+    console.time('randomWorld');
     if (document.getElementById('rngEnabled').checked) {
         // on initialise le RNG avec la seed fournie
         Math.seedrandom(document.getElementById('rngSeed').value);
@@ -89,6 +90,7 @@ function randomWorld(count) {
     }
     processWorld();
     showWorld();
+    console.timeEnd('randomWorld');
 }
 
 randomWorld(9);

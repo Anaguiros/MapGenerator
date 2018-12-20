@@ -21,14 +21,21 @@ d3.select('canvas')
     .on('touchmove mousemove', moved)
     .on('click', clicked);
 
-const contextCanvas = d3.select('canvas').node().getContext('2d');
-
-function clearCanvas() {
-    contextCanvas.clearRect(0, 0, widthCanvas, heightCanvas);
-}
-
 function colorPolygon(polygonID, color) {
     const points = voronoi.cellPolygon(polygonID);
+    contextCanvas.moveTo(points[0][0], points[0][1]);
+    contextCanvas.beginPath();
+    for (let i = 1; i < points.length; i++) {
+        contextCanvas.lineTo(points[i][0], points[i][1]);
+    }
+    contextCanvas.closePath();
+    contextCanvas.fillStyle = color;
+    contextCanvas.fill();
+    contextCanvas.strokeStyle = color;
+    contextCanvas.stroke();
+}
+
+function colorTriangle(points, color) {
     contextCanvas.moveTo(points[0][0], points[0][1]);
     contextCanvas.beginPath();
     for (let i = 1; i < points.length; i++) {
@@ -69,11 +76,42 @@ function drawWeatherPolygons() {
     }
 }
 
+function drawElevationTriangles() {
+    for (const triangle of delaunay.trianglePolygons()) {
+        let heightAverage = 0;
+        let typeTriangle = [];
+        for (let i = 0; i < triangle.length - 1; i++) {
+            const pointCoord = triangle[i];
+            const site = sites[delaunay.find(pointCoord[0], pointCoord[1])];
+            heightAverage += site.height;
+            typeTriangle.push(site.type);
+        }
+        heightAverage /= (triangle.length - 1);
+        typeTriangle = typeTriangle.sort((triangleA, triangleB) =>
+            typeTriangle.filter((tempTriangle) => tempTriangle === triangleA).length -
+            typeTriangle.filter((tempTriangle) => tempTriangle === triangleB).length).pop();
+
+        if (typeTriangle === 'Island') {
+            colorTriangle(triangle, colorNatural(altitudeMax - heightAverage));
+        } else if (typeTriangle === 'Lake') {
+            colorTriangle(triangle, '#3C8CBC');
+        } else if (typeTriangle === 'Recif') {
+            colorTriangle(triangle, '#646B9A');
+        } else {
+            colorTriangle(triangle, '#604E99');
+        }
+    }
+}
+
 function showWorld() {
-    clearCanvas();
+    clearScreen();
 
     if (document.getElementById('mapData').value === 'elevation') {
-        drawElevationPolygons();
+        if (document.getElementById('mapStyle').value === 'triangle') {
+            drawElevationTriangles();
+        } else {
+            drawElevationPolygons();
+        }
     } else if (document.getElementById('mapData').value === 'precipitation') {
         drawWeatherPolygons();
         drawPrecipitation();

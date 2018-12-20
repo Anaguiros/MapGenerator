@@ -34,10 +34,19 @@
             <button onclick="document.getElementById('rngSeed').value = generator$places$islands()">Generate readable seed</button>
         </div>
         <div style="width: 50%;float: right;">
-            <label>Toggle flux map<select id="mapData" onchange="changeMap">
-                <option value="elevation">Elevation</option>
-                <option value="precipitation">Precipitations</option>
-            </select></label><br>
+            <label>Map Data
+                <select id="mapData" onchange="showWorld()">
+                    <option value="elevation">Elevation</option>
+                    <option value="precipitation">Precipitations</option>
+                </select>
+            </label>
+            <br>
+            <label>Map Style
+                <select id="mapStyle" onchange="showWorld()">
+                    <option value="polygon">Polygon</option>
+                    <option value="triangle">Triangle</option>
+                </select>
+            </label>
         </div>
         <div>
             <label>Sector Size:</label><input id="sizeInput" value="19" type="range" min="1" max="20" step="1" oninput="sizeOutput.value = sizeInput.valueAsNumber"><output id="sizeOutput">20</output><br>
@@ -64,11 +73,12 @@
     <script type="text/javascript" src="descriptors/fantasy-forests-names-generator.js"></script>
 
     <script type="text/javascript" src="utils.js"></script>
-    <script type="text/javascript" src="renderer.js"></script>
+    <script type="text/javascript" src="renderer/renderer.js"></script>
     <script type="text/javascript" src="poissonDiscSampler.js"></script>
     <script type="text/javascript" src="heightmap.js"></script>
     <script type="text/javascript" src="features.js"></script>
     <script type="text/javascript" src="hydro.js"></script>
+    <script type="text/javascript" src="biomes.js"></script>
     <script type="text/javascript" src="world.js"></script>
     
     
