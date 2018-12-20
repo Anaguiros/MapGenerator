@@ -9,43 +9,15 @@
 
 /* exported showWorld */
 
-const widthCanvas = 1228;
-const heightCanvas = 640;
-
 const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
 const colorWeather = d3.scaleSequential(d3.interpolateBlues);
 
-d3.select('canvas')
-    .attr('width', widthCanvas)
-    .attr('height', heightCanvas)
-    .on('touchmove mousemove', moved)
-    .on('click', clicked);
-
 function colorPolygon(polygonID, color) {
-    const points = voronoi.cellPolygon(polygonID);
-    contextCanvas.moveTo(points[0][0], points[0][1]);
-    contextCanvas.beginPath();
-    for (let i = 1; i < points.length; i++) {
-        contextCanvas.lineTo(points[i][0], points[i][1]);
-    }
-    contextCanvas.closePath();
-    contextCanvas.fillStyle = color;
-    contextCanvas.fill();
-    contextCanvas.strokeStyle = color;
-    contextCanvas.stroke();
+    canvasColorPolygon(voronoi.cellPolygon(polygonID), color);
 }
 
 function colorTriangle(points, color) {
-    contextCanvas.moveTo(points[0][0], points[0][1]);
-    contextCanvas.beginPath();
-    for (let i = 1; i < points.length; i++) {
-        contextCanvas.lineTo(points[i][0], points[i][1]);
-    }
-    contextCanvas.closePath();
-    contextCanvas.fillStyle = color;
-    contextCanvas.fill();
-    contextCanvas.strokeStyle = color;
-    contextCanvas.stroke();
+    canvasColorPolygon(points, color);
 }
 
 function drawElevationPolygons() {
@@ -118,18 +90,4 @@ function showWorld() {
     }
     drawCoastLine();
     drawnRiver();
-}
-
-function drawTriangles() {
-    contextCanvas.beginPath();
-    delaunay.render(contextCanvas);
-    contextCanvas.strokeStyle = '#ccc';
-    contextCanvas.stroke();
-}
-
-function drawSite() {
-    contextCanvas.beginPath();
-    delaunay.renderPoints(contextCanvas);
-    contextCanvas.fillStyle = '#f00';
-    contextCanvas.fill();
 }
