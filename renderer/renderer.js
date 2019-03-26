@@ -12,18 +12,18 @@
 const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
 const colorWeather = d3.scaleSequential(d3.interpolateBlues);
 
-function colorPolygon(polygonID, color) {
-    canvasColorPolygon(voronoi.cellPolygon(polygonID), color);
+function colorPolygon(polygonID, color, voronoiBorderVisible = false) {
+    canvasColorPolygon(voronoi.cellPolygon(polygonID), color, voronoiBorderVisible);
 }
 
-function colorTriangle(points, color) {
-    canvasColorPolygon(points, color);
+function colorTriangle(points, color, voronoiBorderVisible = false) {
+    canvasColorPolygon(points, color, voronoiBorderVisible);
 }
 
-function drawElevationPolygons() {
+function drawElevationPolygons(voronoiBorderVisible) {
     for (let i = 0; i < sites.length; i++) {
         if (sites[i].height >= altitudeOcean) {
-            colorPolygon(i, colorNatural(altitudeMax - sites[i].height));
+            colorPolygon(i, colorNatural(altitudeMax - sites[i].height), voronoiBorderVisible);
         } else if (sites[i].type === 'Lake') {
             colorPolygon(i, '#3C8CBC');
         } else if (sites[i].type === 'Recif') {
@@ -48,7 +48,7 @@ function drawWeatherPolygons() {
     }
 }
 
-function drawElevationTriangles() {
+function drawElevationTriangles(voronoiBorderVisible) {
     for (const triangle of delaunay.trianglePolygons()) {
         let heightAverage = 0;
         let typeTriangle = [];
@@ -64,7 +64,7 @@ function drawElevationTriangles() {
             typeTriangle.filter((tempTriangle) => tempTriangle === triangleB).length).pop();
 
         if (typeTriangle === 'Island') {
-            colorTriangle(triangle, colorNatural(altitudeMax - heightAverage));
+            colorTriangle(triangle, colorNatural(altitudeMax - heightAverage), voronoiBorderVisible);
         } else if (typeTriangle === 'Lake') {
             colorTriangle(triangle, '#3C8CBC');
         } else if (typeTriangle === 'Recif') {
@@ -75,19 +75,25 @@ function drawElevationTriangles() {
     }
 }
 
-function showWorld() {
-    clearScreen();
-
+function styleMap() {
+    const voronoiBorderVisible = document.getElementById('voronoiBorders').checked;
     if (document.getElementById('mapData').value === 'elevation') {
         if (document.getElementById('mapStyle').value === 'triangle') {
-            drawElevationTriangles();
+            drawElevationTriangles(voronoiBorderVisible);
         } else {
-            drawElevationPolygons();
+            drawElevationPolygons(voronoiBorderVisible);
         }
     } else if (document.getElementById('mapData').value === 'precipitation') {
         drawWeatherPolygons();
         drawPrecipitation();
     }
+}
+
+function showWorld() {
+    clearScreen();
+    styleMap();
     drawCoastLine();
     drawnRiver();
 }
+
+

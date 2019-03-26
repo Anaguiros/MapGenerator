@@ -76,6 +76,8 @@ function changeMap(event) {
 
 document.getElementById('mapData').onchange = changeMap;
 
+document.getElementById('voronoiBorders').onchange = changeMap;
+
 function nextHalfedge(edge) {
     return (edge % 3 === 2) ? edge - 2 : edge + 1;
 }
