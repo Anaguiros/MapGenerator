@@ -48,14 +48,14 @@ function generateOcean(explorationPolygonIDQueue, exploredPolygonID) {
     }
 }
 
-function generateCoastLine(exploredID, neighborID, type) {
+function generateCoastLinePolygon(exploredID, neighborID, type) {
     if (sites[neighborID].height < altitudeOcean && type === 'Island') {
         let commonPoints = [];
         let typeCoastline = 'Ocean';
         let numberBorder = -1;
 
         commonPoints = getCommonPoints(exploredID, neighborID);
-
+        
         const start = commonPoints[0];
         const end = commonPoints[1];
 
@@ -70,6 +70,11 @@ function generateCoastLine(exploredID, neighborID, type) {
 
         coastLines.push({ start, end, typeCoastline, numberBorder });
     }
+}
+
+function generateCoastLineTriangle() {
+    const start = `${ sites[exploredID][0] } ${ sites[exploredID][1] }`;
+    const end = `${ sites[neighborID][0] } ${ sites[neighborID][1] }`;
 }
 
 function generateIsland(startPolygonID, explorationPolygonIDQueue, exploredPolygonID, counters) {
@@ -107,7 +112,7 @@ function generateIsland(startPolygonID, explorationPolygonIDQueue, exploredPolyg
     while (explorationPolygonIDQueue.length > 0) {
         const exploredID = explorationPolygonIDQueue.shift();
         for (const neighborID of delaunay.neighbors(exploredID)) {
-            generateCoastLine(exploredID, neighborID, type);
+            generateCoastLinePolygon(exploredID, neighborID, type);
             if (exploredPolygonID.indexOf(neighborID) < 0 && sites[neighborID].height < maxHeight && sites[neighborID].height >= minHeight) {
                 sites[neighborID].type = type;
                 sites[neighborID].description = description;

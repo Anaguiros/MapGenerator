@@ -2,10 +2,10 @@
 /* globals document d3 delaunay voronoi*/
 
 // Functions import
-/* globals drawPrecipitation drawCoastLine drawnRiver moved clicked */
+/* globals drawPrecipitation drawnRiver moved clicked */
 
 // Variables import
-/* globals altitudeOcean sites */
+/* globals altitudeOcean sites contextCanvas*/
 
 /* exported showWorld */
 
@@ -73,6 +73,22 @@ function drawElevationTriangles(voronoiBorderVisible) {
             colorTriangle(triangle, '#604E99');
         }
     }
+}
+
+function drawCoastLine() {
+    coastLines.forEach((border) => {
+        const startPoint = border.start.split(' ');
+        const endPoint = border.end.split(' ');
+        let color = '#000';
+        let width = 1;
+
+        if (border.typeCoastline === 'Ocean') {
+            width = 2;
+        } else {
+            color = '#296F92';
+        }
+        canvasDrawLine(startPoint, endPoint, color, width);
+    });
 }
 
 function styleMap() {

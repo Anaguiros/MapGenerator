@@ -59,25 +59,6 @@ function downcutCoastLine() {
     }
 }
 
-function drawCoastLine() {
-    coastLines.forEach((border) => {
-        const startPoint = border.start.split(' ');
-        const endPoint = border.end.split(' ');
-
-        contextCanvas.beginPath();
-        contextCanvas.moveTo(startPoint[0], startPoint[1]);
-        contextCanvas.lineTo(endPoint[0], endPoint[1]);
-        contextCanvas.closePath();
-        if (border.typeCoastline === 'Ocean') {
-            contextCanvas.strokeStyle = '#000';
-            contextCanvas.lineWidth = 2;
-        } else {
-            contextCanvas.strokeStyle = '#296F92';
-        }
-        contextCanvas.stroke();
-    });
-}
-
 function resolveDepression() {
     landPolygonID = [];
     for (let i = 0; i < sites.length; i++) {

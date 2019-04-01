@@ -1,6 +1,8 @@
 const widthCanvas = 1228;
 const heightCanvas = 640;
 
+import { moved, clicked } from 'utils';
+
 d3.select('canvas')
     .attr('width', widthCanvas)
     .attr('height', heightCanvas)
@@ -29,3 +31,15 @@ function canvasColorPolygon(points, color, border = false) {
     }
     contextCanvas.stroke();
 }
+
+function canvasDrawLine(startPoint, endPoint, color, width = 1) {
+    contextCanvas.beginPath();
+    contextCanvas.moveTo(startPoint[0], startPoint[1]);
+    contextCanvas.lineTo(endPoint[0], endPoint[1]);
+    contextCanvas.closePath();
+    contextCanvas.strokeStyle = color;
+    contextCanvas.lineWidth = width;
+    contextCanvas.stroke();
+}
+
+export { widthCanvas, heightCanvas };
