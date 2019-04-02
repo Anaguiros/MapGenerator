@@ -1,41 +1,34 @@
-/* globals document d3*/
-/* globals widthCanvas heightCanvas sizeInput*/
+import { poissonDiscSampler } from './poisson_disc_sampler';
 
-let sites = [];
+import { processWorld } from './utils';
+import { showWorld } from './renderer/renderer';
+import { widthCanvas, heightCanvas } from "./renderer/canvas";
+
+import { initHeights, add } from './heightmap';
+
 let sample = null;
 
-let delaunay = null;
-let voronoi = null;
-
-/* exported adjectifs */
-const adjectifs = [
-    'Ablaze', 'Ablazing', 'Accented', 'Ashen', 'Ashy', 'Beaming', 'Bi-Color', 'Blazing', 'Bleached', 'Bleak',
-    'Blended', 'Blotchy', 'Bold', 'Brash', 'Bright', 'Brilliant', 'Burnt', 'Checkered', 'Chromatic', 'Classic',
-    'Clean', 'Colored', 'Colorful', 'Colorless', 'Complementing', 'Contrasting', 'Cool', 'Coordinating', 'Crisp', 'Dappled',
-    'Dark', 'Dayglo', 'Deep', 'Delicate', 'Digital', 'Dim', 'Dirty', 'Discolored', 'Dotted', 'Drab',
-    'Dreary', 'Dull', 'Dusty', 'Earth', 'Electric', 'Eye-Catching', 'Faded', 'Faint', 'Festive', 'Fiery',
-    'Flashy', 'Flattering', 'Flecked', 'Florescent', 'Frosty', 'Full-Toned', 'Glistening', 'Glittering', 'Glowing', 'Harsh',
-    'Hazy', 'Hot', 'Hued', 'Icy', 'Illuminated', 'Incandescent', 'Intense', 'Interwoven', 'Iridescent', 'Kaleidoscopic',
-    'Lambent', 'Light', 'Loud', 'Luminous', 'Lusterless', 'Lustrous', 'Majestic', 'Marbled', 'Matte', 'Medium',
-    'Mellow', 'Milky', 'Mingled', 'Mixed', 'Monochromatic', 'Motley', 'Mottled', 'Muddy', 'Multicolored', 'Multihued',
-    'Murky', 'Natural', 'Neutral', 'Opalescent', 'Opaque', 'Pale', 'Pastel', 'Patchwork', 'Patchy', 'Patterned',
-    'Perfect', 'Picturesque', 'Plain', 'Primary', 'Prismatic', 'Psychedelic', 'Pure', 'Radiant', 'Reflective', 'Rich',
-    'Royal', 'Ruddy', 'Rustic', 'Satiny', 'Saturated', 'Secondary', 'Shaded', 'Sheer', 'Shining', 'Shiny',
-    'Shocking', 'Showy', 'Smoky', 'Soft', 'Solid', 'Somber', 'Soothing', 'Sooty', 'Sparkling', 'Speckled',
-    'Stained', 'Streaked', 'Streaky', 'Striking', 'Strong Neutral', 'Subtle', 'Sunny', 'Swirling', 'Tinged', 'Tinted',
-    'Tonal', 'Toned', 'Translucent', 'Transparent', 'Two-Tone', 'Undiluted', 'Uneven', 'Uniform', 'Vibrant', 'Vivid',
-    'Wan', 'Warm', 'Washed-Out', 'Waxen', 'Wild',
-];
+const worldState = {
+    widthCanvas,
+    heightCanvas,
+    sites: [],
+    delaunay: null,
+    voronoi: null,
+    altitudeOcean: 0.2,
+    altitudePeak: 0.6,
+    altitudeMax: 1,
+    coastLines: [],
+};
 
 function relax() {
     const relaxedSites = [];
-    for (const polygon of voronoi.cellPolygons()) {
+    for (const polygon of worldState.voronoi.cellPolygons()) {
         relaxedSites.push(d3.polygonCentroid(polygon));
     }
 
-    sites = relaxedSites;
-    delaunay = new d3.Delaunay.from(sites);
-    voronoi = delaunay.voronoi([ 0.5, 0.5, widthCanvas - 0.5, heightCanvas - 0.5 ]);
+    worldState.sites = relaxedSites;
+    worldState.delaunay = new d3.Delaunay.from(worldState.sites);
+    worldState.voronoi = worldState.delaunay.voronoi([ 0.5, 0.5, worldState.widthCanvas - 0.5, worldState.heightCanvas - 0.5 ]);
 }
 
 function randomWorld(count) {
@@ -48,23 +41,23 @@ function randomWorld(count) {
         document.getElementById('rngSeed').value = Math.seedrandom();
     }
 
-    const sampler = poissonDiscSampler(widthCanvas, heightCanvas, sizeInput.valueAsNumber);
-    sites = [];
+    const sampler = poissonDiscSampler(worldState.widthCanvas, worldState.heightCanvas, sizeInput.valueAsNumber);
+    worldState.sites = [];
 
     while (sample = sampler()) {
-        sites.push(sample);
+        worldState.sites.push(sample);
     }
-    delaunay = new d3.Delaunay.from(sites);
-    voronoi = delaunay.voronoi([ 0.5, 0.5, widthCanvas - 0.5, heightCanvas - 0.5 ]);
+    worldState.delaunay = new d3.Delaunay.from(worldState.sites);
+    worldState.voronoi = worldState.delaunay.voronoi([ 0.5, 0.5, worldState.widthCanvas - 0.5, worldState.heightCanvas - 0.5 ]);
     relax();
     initHeights();
 
     // Random Blobs
     for (let blob = 0; blob < count; blob++) {
         if (blob === 0) {
-            const randomPolygonID = delaunay.find(
-                (Math.random() * widthCanvas / 4) + (widthCanvas / 2),
-                (Math.random() * heightCanvas / 6) + (heightCanvas / 2)
+            const randomPolygonID = worldState.delaunay.find(
+                (Math.random() * worldState.widthCanvas / 4) + (worldState.widthCanvas / 2),
+                (Math.random() * worldState.heightCanvas / 6) + (worldState.heightCanvas / 2)
             );
             // highInput.value = 0.3;
             // highOutput.value = 0.3;
@@ -75,11 +68,11 @@ function randomWorld(count) {
             const limitRandom = 20;
             let iteration = 0;
             while (iteration < limitRandom) {
-                const randomPolygonID = Math.floor(Math.random() * sites.length);
+                const randomPolygonID = Math.floor(Math.random() * worldState.sites.length);
                 iteration++;
-                const site = voronoi.cellPolygon(randomPolygonID)[0];
+                const site = worldState.voronoi.cellPolygon(randomPolygonID)[0];
 
-                if (site[0] > widthCanvas * 0.25 && site[0] < widthCanvas * 0.75 && site[1] > heightCanvas * 0.25 && site[1] < heightCanvas * 0.75) {
+                if (site[0] > worldState.widthCanvas * 0.25 && site[0] < worldState.widthCanvas * 0.75 && site[1] > worldState.heightCanvas * 0.25 && site[1] < worldState.heightCanvas * 0.75) {
                     // const randomHeight = (Math.random() * 0.4 + 0.1).toFixed(2);
                     // highInput.value = randomHeight;
                     // highOutput.value = randomHeight;
@@ -93,4 +86,4 @@ function randomWorld(count) {
     console.timeEnd('randomWorld');
 }
 
-randomWorld(9);
+export { randomWorld, worldState };

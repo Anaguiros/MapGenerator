@@ -1,7 +1,7 @@
+import { moved, clicked } from '../utils';
+
 const widthCanvas = 1228;
 const heightCanvas = 640;
-
-import { moved, clicked } from 'utils';
 
 d3.select('canvas')
     .attr('width', widthCanvas)
@@ -42,4 +42,5 @@ function canvasDrawLine(startPoint, endPoint, color, width = 1) {
     contextCanvas.stroke();
 }
 
-export { widthCanvas, heightCanvas };
+export { contextCanvas, widthCanvas, heightCanvas };
+export { clearScreen, canvasColorPolygon, canvasDrawLine };

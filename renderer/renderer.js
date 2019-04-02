@@ -1,19 +1,12 @@
-// Libs import
-/* globals document d3 delaunay voronoi*/
-
-// Functions import
-/* globals drawPrecipitation drawnRiver moved clicked */
-
-// Variables import
-/* globals altitudeOcean sites contextCanvas*/
-
-/* exported showWorld */
+import { worldState } from '../world';
+import { drawPrecipitation, drawnRiver } from './hydro';
+import { clearScreen, canvasColorPolygon, canvasDrawLine } from './canvas';
 
 const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
 const colorWeather = d3.scaleSequential(d3.interpolateBlues);
 
 function colorPolygon(polygonID, color, voronoiBorderVisible = false) {
-    canvasColorPolygon(voronoi.cellPolygon(polygonID), color, voronoiBorderVisible);
+    canvasColorPolygon(worldState.voronoi.cellPolygon(polygonID), color, voronoiBorderVisible);
 }
 
 function colorTriangle(points, color, voronoiBorderVisible = false) {
@@ -21,12 +14,12 @@ function colorTriangle(points, color, voronoiBorderVisible = false) {
 }
 
 function drawElevationPolygons(voronoiBorderVisible) {
-    for (let i = 0; i < sites.length; i++) {
-        if (sites[i].height >= altitudeOcean) {
-            colorPolygon(i, colorNatural(altitudeMax - sites[i].height), voronoiBorderVisible);
-        } else if (sites[i].type === 'Lake') {
+    for (let i = 0; i < worldState.sites.length; i++) {
+        if (worldState.sites[i].height >= worldState.altitudeOcean) {
+            colorPolygon(i, colorNatural(worldState.altitudeMax - worldState.sites[i].height), voronoiBorderVisible);
+        } else if (worldState.sites[i].type === 'Lake') {
             colorPolygon(i, '#3C8CBC');
-        } else if (sites[i].type === 'Recif') {
+        } else if (worldState.sites[i].type === 'Recif') {
             colorPolygon(i, '#646B9A');
         } else {
             colorPolygon(i, '#604E99');
@@ -35,12 +28,12 @@ function drawElevationPolygons(voronoiBorderVisible) {
 }
 
 function drawWeatherPolygons() {
-    for (let i = 0; i < sites.length; i++) {
-        if (sites[i].height >= altitudeOcean) {
-            colorPolygon(i, colorWeather(sites[i].precipitation));
-        } else if (sites[i].type === 'Lake') {
+    for (let i = 0; i < worldState.sites.length; i++) {
+        if (worldState.sites[i].height >= worldState.altitudeOcean) {
+            colorPolygon(i, colorWeather(worldState.sites[i].precipitation));
+        } else if (worldState.sites[i].type === 'Lake') {
             colorPolygon(i, '#3C8CBC');
-        } else if (sites[i].type === 'Recif') {
+        } else if (worldState.sites[i].type === 'Recif') {
             colorPolygon(i, '#646B9A');
         } else {
             colorPolygon(i, '#604E99');
@@ -49,12 +42,12 @@ function drawWeatherPolygons() {
 }
 
 function drawElevationTriangles(voronoiBorderVisible) {
-    for (const triangle of delaunay.trianglePolygons()) {
+    for (const triangle of worldState.delaunay.trianglePolygons()) {
         let heightAverage = 0;
         let typeTriangle = [];
         for (let i = 0; i < triangle.length - 1; i++) {
             const pointCoord = triangle[i];
-            const site = sites[delaunay.find(pointCoord[0], pointCoord[1])];
+            const site = worldState.sites[worldState.delaunay.find(pointCoord[0], pointCoord[1])];
             heightAverage += site.height;
             typeTriangle.push(site.type);
         }
@@ -64,7 +57,7 @@ function drawElevationTriangles(voronoiBorderVisible) {
             typeTriangle.filter((tempTriangle) => tempTriangle === triangleB).length).pop();
 
         if (typeTriangle === 'Island') {
-            colorTriangle(triangle, colorNatural(altitudeMax - heightAverage), voronoiBorderVisible);
+            colorTriangle(triangle, colorNatural(worldState.altitudeMax - heightAverage), voronoiBorderVisible);
         } else if (typeTriangle === 'Lake') {
             colorTriangle(triangle, '#3C8CBC');
         } else if (typeTriangle === 'Recif') {
@@ -76,7 +69,7 @@ function drawElevationTriangles(voronoiBorderVisible) {
 }
 
 function drawCoastLine() {
-    coastLines.forEach((border) => {
+    worldState.coastLines.forEach((border) => {
         const startPoint = border.start.split(' ');
         const endPoint = border.end.split(' ');
         let color = '#000';
@@ -109,7 +102,7 @@ function showWorld() {
     clearScreen();
     styleMap();
     drawCoastLine();
-    drawnRiver();
+    // drawnRiver();
 }
 
-
+export { showWorld };

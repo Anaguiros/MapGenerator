@@ -1,20 +1,16 @@
-/* global delaunay sites highInput radiusInput sharpnessInput downcuttingInput contextCanvas*/
-let coastLines = [];
+import { worldState } from './world';
+
 let landPolygonID = [];
 
-const altitudeOcean = 0.2;
-const altitudePeak = 0.6;
-const altitudeMax = 1;
-
 function initHeights() {
-    for (let i = 0; i < sites.length; i++) {
-        sites[i].height = 0;
+    for (let i = 0; i < worldState.sites.length; i++) {
+        worldState.sites[i].height = 0;
     }
 }
 
 function add(polygonStartID, type) {
     const explorationQueue = [];
-    const exploredPolygon = new Array(sites.length);
+    const exploredPolygon = new Array(worldState.sites.length);
 
     for (let i = 0; i < exploredPolygon.length; i++) {
         exploredPolygon[i] = false;
@@ -24,24 +20,24 @@ function add(polygonStartID, type) {
     const radius = radiusInput.valueAsNumber;
     const sharpness = sharpnessInput.valueAsNumber;
 
-    sites[polygonStartID].height += height;
+    worldState.sites[polygonStartID].height += height;
     exploredPolygon[polygonStartID] = true;
     explorationQueue.push(polygonStartID);
     for (let i = 0; i < explorationQueue.length && height > 0.01; i++) {
         if (type === 'island') {
-            height = (sites[explorationQueue[i]].height * radius) - (height / 100);
+            height = (worldState.sites[explorationQueue[i]].height * radius) - (height / 100);
         } else {
             height *= radius;
         }
-        for (const neighborID of delaunay.neighbors(explorationQueue[i])) {
+        for (const neighborID of worldState.delaunay.neighbors(explorationQueue[i])) {
             if (!exploredPolygon[neighborID]) {
                 let noise = (Math.random() * sharpness) + 1.1 - sharpness;
                 if (sharpness === 0) {
                     noise = 1;
                 }
-                sites[neighborID].height += height * noise;
-                if (sites[neighborID].height > altitudeMax) {
-                    sites[neighborID].height = altitudeMax;
+                worldState.sites[neighborID].height += height * noise;
+                if (worldState.sites[neighborID].height > worldState.altitudeMax) {
+                    worldState.sites[neighborID].height = worldState.altitudeMax;
                 }
                 exploredPolygon[neighborID] = true;
                 explorationQueue.push(neighborID);
@@ -52,17 +48,17 @@ function add(polygonStartID, type) {
 
 function downcutCoastLine() {
     const downcut = downcuttingInput.valueAsNumber;
-    for (let i = 0; i < sites.length; i++) {
-        if (sites[i].height >= altitudeOcean) {
-            sites[i].height -= downcut;
+    for (let i = 0; i < worldState.sites.length; i++) {
+        if (worldState.sites[i].height >= worldState.altitudeOcean) {
+            worldState.sites[i].height -= downcut;
         }
     }
 }
 
 function resolveDepression() {
     landPolygonID = [];
-    for (let i = 0; i < sites.length; i++) {
-        if (sites[i].height >= altitudeOcean) {
+    for (let i = 0; i < worldState.sites.length; i++) {
+        if (worldState.sites[i].height >= worldState.altitudeOcean) {
             landPolygonID.push(i);
         }
     }
@@ -75,22 +71,22 @@ function resolveDepression() {
         depression = 0;
         for (let i = 0; i < landPolygonID.length; i++) {
             minHigh = 10;
-            for (const neighborID of delaunay.neighbors(landPolygonID[i])) {
-                if (sites[neighborID].height < minHigh) {
-                    minHigh = sites[neighborID].height;
+            for (const neighborID of worldState.delaunay.neighbors(landPolygonID[i])) {
+                if (worldState.sites[neighborID].height < minHigh) {
+                    minHigh = worldState.sites[neighborID].height;
                     minCell = neighborID;
                 }
             }
-            if (sites[landPolygonID[i]].height <= sites[minCell].height) {
+            if (worldState.sites[landPolygonID[i]].height <= worldState.sites[minCell].height) {
                 depression += 1;
-                sites[landPolygonID[i]].height = sites[minCell].height + 0.01;
+                worldState.sites[landPolygonID[i]].height = worldState.sites[minCell].height + 0.01;
             }
         }
     }
     landPolygonID.sort(function sortheight(cellA, cellB) {
-        if (sites[cellA].height < sites[cellB].height) {
+        if (worldState.sites[cellA].height < worldState.sites[cellB].height) {
             return 1;
-        } else if (sites[cellA].height > sites[cellB].height) {
+        } else if (worldState.sites[cellA].height > worldState.sites[cellB].height) {
             return -1;
         }
         return 0;
@@ -100,11 +96,11 @@ function resolveDepression() {
 function removeRedundant() {
     const redundantID = [];
     const tmpSites = [];
-    for (let i = 0; i < sites.length; i++) {
-        if (sites[i].type === 'Ocean') {
+    for (let i = 0; i < worldState.sites.length; i++) {
+        if (worldState.sites[i].type === 'Ocean') {
             let directSea = false;
-            for (const neighborID of delaunay.neighbors(i)) {
-                if (sites[neighborID].type === 'Recif') {
+            for (const neighborID of worldState.delaunay.neighbors(i)) {
+                if (worldState.sites[neighborID].type === 'Recif') {
                     directSea = true;
                 }
             }
@@ -114,13 +110,18 @@ function removeRedundant() {
         }
     }
 
-    for (let i = 0; i < sites.length; i++) {
+    for (let i = 0; i < worldState.sites.length; i++) {
         if (redundantID.indexOf(i) === -1) {
-            tmpSites.push(sites[i]);
+            tmpSites.push(worldState.sites[i]);
         }
     }
 
-    sites = tmpSites;
-    delaunay = new d3.Delaunay.from(sites);
-    voronoi = delaunay.voronoi([ 0.5, 0.5, widthCanvas - 0.5, heightCanvas - 0.5 ]);
+    worldState.sites = tmpSites;
+    worldState.delaunay = new d3.Delaunay.from(worldState.sites);
+    worldState.voronoi = worldState.delaunay.voronoi([ 0.5, 0.5, worldState.widthCanvas - 0.5, worldState.heightCanvas - 0.5 ]);
 }
+
+// Export - Functions
+export { initHeights, add, downcutCoastLine, resolveDepression, removeRedundant };
+// Export - Variables
+export { landPolygonID };
