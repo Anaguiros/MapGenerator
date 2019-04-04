@@ -42,5 +42,19 @@ function canvasDrawLine(startPoint, endPoint, color, width = 1) {
     contextCanvas.stroke();
 }
 
+function canvasDrawCircle(x, y, radius, colorFill, colorStroke) {
+    if (typeof colorStroke === 'undefined') {
+        colorStroke = colorFill;
+    }
+
+    contextCanvas.beginPath();
+    contextCanvas.arc(x, y, radius, 0, 2 * Math.PI, false);
+    contextCanvas.fillStyle = colorFill;
+    contextCanvas.fill();
+    contextCanvas.lineWidth = 1;
+    contextCanvas.strokeStyle = colorStroke;
+    contextCanvas.stroke();
+}
+
 export { contextCanvas, widthCanvas, heightCanvas };
-export { clearScreen, canvasColorPolygon, canvasDrawLine };
+export { clearScreen, canvasColorPolygon, canvasDrawLine, canvasDrawCircle };

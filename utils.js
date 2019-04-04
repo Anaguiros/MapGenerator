@@ -13,7 +13,7 @@ function processWorld() {
     resolveDepression();
     // Generation Precipitation + rivers
     generatePrecipitation();
-    // generateRiver();
+    generateRiver();
     // Generation Features + Coastline
     generateFeatures();
     // removeRedundant();
@@ -44,7 +44,7 @@ function moved() {
         d3.select('#precipitation').text('no!');
     }
 
-    const river = riversData.find(function findRiver(element) {
+    const river = worldState.hydro.riversData.find(function findRiver(element) {
         if (element.cell === nearestId) {
             return true;
         }
@@ -168,18 +168,5 @@ function getCommonPoints(polygonID, neighborPolygonID) {
     return commonPoints;
 }
 
-function drawCircle(x, y, radius, colorFill, colorStroke) {
-    if (typeof colorStroke === 'undefined') {
-        colorStroke = colorFill;
-    }
-
-    contextCanvas.beginPath();
-    contextCanvas.arc(x, y, radius, 0, 2 * Math.PI, false);
-    contextCanvas.fillStyle = colorFill;
-    contextCanvas.fill();
-    contextCanvas.lineWidth = 1;
-    contextCanvas.strokeStyle = colorStroke;
-    contextCanvas.stroke();
-}
 
 export { clicked, moved, getCommonPoints, processWorld };

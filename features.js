@@ -1,14 +1,21 @@
 import { worldState } from './world';
 import { getCommonPoints } from './utils';
+import { colorPolygon } from './renderer/renderer';
 
 function getUnmarked(exploredPolygonID) {
     const unmarked = [];
     for (let i = 0; i < worldState.sites.length; i++) {
-        if (exploredPolygonID.indexOf(i) < 0 && (typeof worldState.sites[i].type === 'undefined')) {
+        if (exploredPolygonID.indexOf(i) < 0 && worldState.sites[i].type === 'void') {
             unmarked.push(i);
         }
     }
     return unmarked;
+}
+
+function initType() {
+    for (let i = 0; i < worldState.sites.length; i++) {
+        worldState.sites[i].type = 'void';
+    }
 }
 
 function generateOcean(explorationPolygonIDQueue, exploredPolygonID) {
@@ -53,6 +60,9 @@ function generateCoastLinePolygon(exploredID, neighborID, type) {
         let commonPoints = [];
         let typeCoastline = 'Ocean';
         let numberBorder = -1;
+
+        colorPolygon(exploredID, '#F00');
+        colorPolygon(neighborID, '#0F0');
 
         commonPoints = getCommonPoints(exploredID, neighborID);
 
@@ -149,6 +159,7 @@ function generateFeatures() {
     worldState.coastLines = [];
     const explorationPolygonIDQueue = [];
     const exploredPolygonID = [];
+    initType();
 
     generateOcean(explorationPolygonIDQueue, exploredPolygonID);
     generateIslands(explorationPolygonIDQueue, exploredPolygonID);

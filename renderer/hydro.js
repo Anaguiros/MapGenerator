@@ -1,10 +1,13 @@
+import { contextCanvas, canvasDrawCircle } from './canvas';
+import { worldState } from '../world';
+
 function drawPrecipitation() {
-    windsBuffer.forEach((wind) => {
-        drawCircle(wind[0], wind[1], 1, 'white');
+    worldState.hydro.windsBuffer.forEach((wind) => {
+        canvasDrawCircle(wind[0], wind[1], 1, 'white');
     });
 
-    raining.forEach((rain) => {
-        drawCircle(rain[0], rain[1], 0.3, 'blue');
+    worldState.hydro.raining.forEach((rain) => {
+        canvasDrawCircle(rain[0], rain[1], 0.3, 'blue');
     });
 }
 
@@ -23,18 +26,18 @@ function drawnRiver() {
     let side = 1;
 
     // DEBUG COLORATION
-    /* for (let i = 0; i < riversData.length; i++) {
-        if(riversData[i].type == 'delta'){
-            colorPolygon(riversData[i].cell, '#F00');
-        } else if(riversData[i].type == 'estuary'){
-            colorPolygon(riversData[i].cell, '#00F');
-        } else if(riversData[i].type == 'source'){
-            colorPolygon(riversData[i].cell, '#0F0');
+    /* for (let i = 0; i < worldState.hydro.riversData.length; i++) {
+        if(worldState.hydro.riversData[i].type == 'delta'){
+            colorPolygon(worldState.hydro.riversData[i].cell, '#F00');
+        } else if(worldState.hydro.riversData[i].type == 'estuary'){
+            colorPolygon(worldState.hydro.riversData[i].cell, '#00F');
+        } else if(worldState.hydro.riversData[i].type == 'source'){
+            colorPolygon(worldState.hydro.riversData[i].cell, '#0F0');
         }
     }*/
 
-    for (let i = 0; i < riversOrder.length; i++) {
-        const dataRiver = riversData.filter((element) => element.river === riversOrder[i].river);
+    for (let i = 0; i < worldState.hydro.riversOrder.length; i++) {
+        const dataRiver = worldState.hydro.riversData.filter((element) => element.river === worldState.hydro.riversOrder[i].river);
 
         if (dataRiver.length > 1) {
             const riverAmended = [];
@@ -106,7 +109,7 @@ function drawnRiver() {
                         }
                     }
 
-                    const cellDestinationID = delaunay.find(end.x, end.y);
+                    const cellDestinationID = worldState.delaunay.find(end.x, end.y);
                     let xNode = end.x;
                     let yNode = end.y;
                     // let riverWidth = ((count + width) * 3) / (50 - sizeInput.valueAsNumber * 2);
@@ -114,7 +117,7 @@ function drawnRiver() {
                     count++;
                     /* if(cellDestinationID){
                         if(sites[cellDestinationID].confluence){
-                            let confluenceData = confluence.filter(element => element.id == cellDestinationID),
+                            let confluenceData = worldState.hydro.confluence.filter(element => element.id == cellDestinationID),
                             angle;
                             if(s+1 !== Math.floor(riverAmended.length/3) && middle){
                                 angle = Math.atan2(end.y - middle.y, end.x - middle.x);

@@ -17,7 +17,16 @@ const worldState = {
     altitudeOcean: 0.2,
     altitudePeak: 0.6,
     altitudeMax: 1,
+    landPolygonID: [],
     coastLines: [],
+    hydro: {
+        windsBuffer: [],
+        raining: [],
+        riversData: [],
+        riverID: 0,
+        riversOrder: [],
+        confluence: [],
+    },
 };
 
 function relax() {

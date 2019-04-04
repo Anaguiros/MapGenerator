@@ -1,7 +1,5 @@
 import { worldState } from './world';
 
-let landPolygonID = [];
-
 function initHeights() {
     for (let i = 0; i < worldState.sites.length; i++) {
         worldState.sites[i].height = 0;
@@ -56,10 +54,10 @@ function downcutCoastLine() {
 }
 
 function resolveDepression() {
-    landPolygonID = [];
+    worldState.landPolygonID = [];
     for (let i = 0; i < worldState.sites.length; i++) {
         if (worldState.sites[i].height >= worldState.altitudeOcean) {
-            landPolygonID.push(i);
+            worldState.landPolygonID.push(i);
         }
     }
 
@@ -69,21 +67,21 @@ function resolveDepression() {
 
     while (depression > 0) {
         depression = 0;
-        for (let i = 0; i < landPolygonID.length; i++) {
+        for (let i = 0; i < worldState.landPolygonID.length; i++) {
             minHigh = 10;
-            for (const neighborID of worldState.delaunay.neighbors(landPolygonID[i])) {
+            for (const neighborID of worldState.delaunay.neighbors(worldState.landPolygonID[i])) {
                 if (worldState.sites[neighborID].height < minHigh) {
                     minHigh = worldState.sites[neighborID].height;
                     minCell = neighborID;
                 }
             }
-            if (worldState.sites[landPolygonID[i]].height <= worldState.sites[minCell].height) {
+            if (worldState.sites[worldState.landPolygonID[i]].height <= worldState.sites[minCell].height) {
                 depression += 1;
-                worldState.sites[landPolygonID[i]].height = worldState.sites[minCell].height + 0.01;
+                worldState.sites[worldState.landPolygonID[i]].height = worldState.sites[minCell].height + 0.01;
             }
         }
     }
-    landPolygonID.sort(function sortheight(cellA, cellB) {
+    worldState.landPolygonID.sort(function sortheight(cellA, cellB) {
         if (worldState.sites[cellA].height < worldState.sites[cellB].height) {
             return 1;
         } else if (worldState.sites[cellA].height > worldState.sites[cellB].height) {
@@ -123,5 +121,3 @@ function removeRedundant() {
 
 // Export - Functions
 export { initHeights, add, downcutCoastLine, resolveDepression, removeRedundant };
-// Export - Variables
-export { landPolygonID };

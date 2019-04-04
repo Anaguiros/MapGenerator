@@ -6,14 +6,6 @@ const east = document.getElementById('east');
 const south = document.getElementById('south');
 const west = document.getElementById('west');
 
-let windsBuffer;
-let raining;
-
-let riversData;
-let riverID;
-let riversOrder;
-let confluence;
-
 function randomizeWinds() {
     north.checked = Math.random() >= 0.75;
     east.checked = Math.random() >= 0.75;
@@ -61,7 +53,7 @@ function generateNorth(selection, precipInit) {
         y = worldState.sites[startPolygonID][1];
         precipitation = precipInit;
 
-        windsBuffer.push([ x, y ]);
+        worldState.hydro.windsBuffer.push([ x, y ]);
 
         while (y < worldState.heightCanvas && precipitation > 0) {
             y += 5;
@@ -104,7 +96,7 @@ function generateEast(selection, precipInit) {
         y = worldState.sites[startPolygonID][1];
         precipitation = precipInit;
 
-        windsBuffer.push([ x, y ]);
+        worldState.hydro.windsBuffer.push([ x, y ]);
 
         while (x > 0 && precipitation > 0) {
             x -= 5;
@@ -147,7 +139,7 @@ function generateSouth(selection, precipInit) {
         y = worldState.sites[startPolygonID][1];
         precipitation = precipInit;
 
-        windsBuffer.push([ x, y ]);
+        worldState.hydro.windsBuffer.push([ x, y ]);
 
         while (y > 0 && precipitation > 0) {
             y -= 5;
@@ -190,7 +182,7 @@ function generateWest(selection, precipInit) {
         y = worldState.sites[startPolygonID][1];
         precipitation = precipInit;
 
-        windsBuffer.push([ x, y ]);
+        worldState.hydro.windsBuffer.push([ x, y ]);
 
         while (x < worldState.widthCanvas && precipitation > 0) {
             x += 5;
@@ -214,8 +206,8 @@ function generateWest(selection, precipInit) {
 }
 
 function generatePrecipitation() {
-    windsBuffer = [];
-    raining = [];
+    worldState.hydro.windsBuffer = [];
+    worldState.hydro.raining = [];
 
     if (randomWinds.checked) {
         randomizeWinds();
@@ -232,16 +224,16 @@ function generatePrecipitation() {
     const selection = 30 / sides;
 
     if (north.checked) {
-        raining.concat(generateNorth(selection, precipInit));
+        worldState.hydro.raining.concat(generateNorth(selection, precipInit));
     }
     if (east.checked) {
-        raining.concat(generateEast(selection, precipInit));
+        worldState.hydro.raining.concat(generateEast(selection, precipInit));
     }
     if (south.checked) {
-        raining.concat(generateSouth(selection, precipInit));
+        worldState.hydro.raining.concat(generateSouth(selection, precipInit));
     }
     if (west.checked) {
-        raining.concat(generateWest(selection, precipInit));
+        worldState.hydro.raining.concat(generateWest(selection, precipInit));
     }
 
     for (let i = 0; i < worldState.sites.length; i++) {
@@ -258,16 +250,16 @@ function generatePrecipitation() {
 }
 
 function generateRiver() {
-    riversData = [];
-    riverID = 0;
-    riversOrder = [];
-    confluence = [];
+    worldState.hydro.riversData = [];
+    worldState.hydro.riverID = 0;
+    worldState.hydro.riversOrder = [];
+    worldState.hydro.confluence = [];
 
-    for (let i = 0; i < landPolygonID.length; i++) {
+    for (let i = 0; i < worldState.landPolygonID.length; i++) {
         const neighborsPolygons = [];
         const aval = [];
         const sommetsLocaux = [];
-        const idCellLand = landPolygonID[i];
+        const idCellLand = worldState.landPolygonID[i];
         let xDiff;
         let yDiff;
 
@@ -290,10 +282,10 @@ function generateRiver() {
         if (worldState.sites[idCellLand].flux > 0.85) {
             if (!worldState.sites[idCellLand].river) {
                 // Nouvelle river
-                worldState.sites[idCellLand].river = riverID;
-                riverID++;
-                riversOrder.push({ river: worldState.sites[idCellLand].river, order: Math.random / 1000 });
-                riversData.push({
+                worldState.sites[idCellLand].river = worldState.hydro.riverID;
+                worldState.hydro.riverID++;
+                worldState.hydro.riversOrder.push({ river: worldState.sites[idCellLand].river, order: Math.random / 1000 });
+                worldState.hydro.riversData.push({
                     river: worldState.sites[idCellLand].river,
                     cell: idCellLand,
                     x: worldState.sites[idCellLand][0],
@@ -307,28 +299,28 @@ function generateRiver() {
                 worldState.sites[localMinID].river = worldState.sites[idCellLand].river;
             } else {
                 const riverTo = worldState.sites[localMinID].river;
-                const iRiver = riversData.filter((element) => element.river === worldState.sites[idCellLand].river);
-                const minRiver = riversData.filter((element) => element.river === riverTo);
+                const iRiver = worldState.hydro.riversData.filter((element) => element.river === worldState.sites[idCellLand].river);
+                const minRiver = worldState.hydro.riversData.filter((element) => element.river === riverTo);
                 let iRiverLength = iRiver.length;
                 let minRiverLength = minRiver.length;
 
                 if (iRiverLength >= minRiverLength) {
-                    riversOrder[worldState.sites[idCellLand].river].order += iRiverLength;
+                    worldState.hydro.riversOrder[worldState.sites[idCellLand].river].order += iRiverLength;
                     worldState.sites[localMinID].river = worldState.sites[idCellLand].river;
                     iRiverLength++;
                     minRiverLength--;
-                } else if (!riversOrder[riverTo]) {
+                } else if (!worldState.hydro.riversOrder[riverTo]) {
                     console.error('Order error');
-                    riversOrder[riverTo] = [];
-                    riversOrder[riverTo].order = minRiverLength;
+                    worldState.hydro.riversOrder[riverTo] = [];
+                    worldState.hydro.riversOrder[riverTo].order = minRiverLength;
                 } else {
-                    riversOrder[riverTo].order += minRiverLength;
+                    worldState.hydro.riversOrder[riverTo].order += minRiverLength;
                 }
 
                 // Marque Confluence
                 if (worldState.sites[localMinID].height >= worldState.altitudeOcean && iRiverLength > 1 && minRiverLength > 1) {
                     if (iRiverLength >= minRiverLength) {
-                        confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: worldState.sites[idCellLand].river });
+                        worldState.hydro.confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: worldState.sites[idCellLand].river });
                     }
                     if (!worldState.sites[localMinID].confluence) {
                         worldState.sites[localMinID].confluence = 2;
@@ -336,12 +328,12 @@ function generateRiver() {
                         if (cellTo === localMinID) {
                             cellTo = minRiver[minRiverLength - 2].cell;
                         }
-                        confluence.push({ id: localMinID, start: cellTo, length: minRiverLength - 1, river: riverTo });
+                        worldState.hydro.confluence.push({ id: localMinID, start: cellTo, length: minRiverLength - 1, river: riverTo });
                     } else {
                         worldState.sites[localMinID].confluence++;
                     }
                     if (iRiverLength < minRiverLength) {
-                        confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: worldState.sites[idCellLand].river });
+                        worldState.hydro.confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: worldState.sites[idCellLand].river });
                     }
                 }
             }
@@ -358,7 +350,7 @@ function generateRiver() {
                 if (worldState.sites[idCellLand].flux > 14 && aval.length > 1 && !worldState.sites[idCellLand].confluence) {
                     for (let c = 0; c < aval.length; c++) {
                         if (c === 0) {
-                            riversData.push({
+                            worldState.hydro.riversData.push({
                                 river: worldState.sites[idCellLand].river,
                                 cell: idCellLand,
                                 x: aval[0].x,
@@ -367,28 +359,28 @@ function generateRiver() {
                                 aval: aval[0].cell,
                             });
                         } else {
-                            riversData.push({
-                                river: riverID,
+                            worldState.hydro.riversData.push({
+                                river: worldState.hydro.riverID,
                                 cell: idCellLand,
                                 x: worldState.sites[idCellLand][0],
                                 y: worldState.sites[idCellLand][1],
                                 type: 'course',
                             });
-                            riversData.push({
-                                river: riverID,
+                            worldState.hydro.riversData.push({
+                                river: worldState.hydro.riverID,
                                 cell: idCellLand,
                                 x: aval[c].x,
                                 y: aval[c].y,
                                 type: 'delta',
                             });
-                            riverID++;
+                            worldState.hydro.riverID++;
                         }
                     }
                 } else {
                     // Estuaire de la riviere
                     const x = aval[0].x + ((aval[0].x - worldState.sites[idCellLand][0]) / 10);
                     const y = aval[0].y + ((aval[0].y - worldState.sites[idCellLand][1]) / 10);
-                    riversData.push({
+                    worldState.hydro.riversData.push({
                         river: worldState.sites[idCellLand].river,
                         cell: idCellLand,
                         x: x,
@@ -399,7 +391,7 @@ function generateRiver() {
                 }
             } else {
                 // Segment de la rivière
-                riversData.push({
+                worldState.hydro.riversData.push({
                     river: worldState.sites[idCellLand].river,
                     cell: localMinID,
                     x: worldState.sites[localMinID][0],
@@ -410,7 +402,7 @@ function generateRiver() {
         }
     }
 
-    riversOrder.sort(function sortRiverOrder(riverA, riverB) {
+    worldState.hydro.riversOrder.sort(function sortRiverOrder(riverA, riverB) {
         if (riverA.order < riverB.order) {
             return 1;
         } else if (riverA.order > riverB.order) {

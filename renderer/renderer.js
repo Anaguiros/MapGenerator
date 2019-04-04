@@ -84,6 +84,7 @@ function drawCoastLine() {
     });
 }
 
+
 function styleMap() {
     const voronoiBorderVisible = document.getElementById('voronoiBorders').checked;
     if (document.getElementById('mapData').value === 'elevation') {
@@ -102,7 +103,7 @@ function showWorld() {
     clearScreen();
     styleMap();
     drawCoastLine();
-    // drawnRiver();
+    drawnRiver();
 }
 
-export { showWorld };
+export { showWorld, colorPolygon };
