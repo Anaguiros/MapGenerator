@@ -1,6 +1,6 @@
-import { worldState } from '../world';
-import { drawPrecipitation, drawnRiver } from './hydro';
-import { clearScreen, canvasColorPolygon, canvasDrawLine } from './canvas';
+import { worldState } from '../world.js';
+import { drawPrecipitation, drawnRiver } from './hydro.js';
+import { clearScreen, canvasColorPolygon, canvasDrawLine } from './canvas.js';
 
 const colorNatural = d3.scaleSequential(d3.interpolateSpectral);
 const colorWeather = d3.scaleSequential(d3.interpolateBlues);

@@ -1,2 +1,2 @@
-import { randomWorld } from './world';
+import { randomWorld } from './world.js';
 randomWorld(9);

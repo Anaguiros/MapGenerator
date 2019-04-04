@@ -1,5 +1,5 @@
-import { contextCanvas, canvasDrawCircle } from './canvas';
-import { worldState } from '../world';
+import { contextCanvas, canvasDrawCircle } from './canvas.js';
+import { worldState } from '../world.js';
 
 function drawPrecipitation() {
     worldState.hydro.windsBuffer.forEach((wind) => {

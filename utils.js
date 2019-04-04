@@ -1,9 +1,9 @@
-import { worldState } from './world';
-import { add, downcutCoastLine, resolveDepression, removeRedundant } from './heightmap';
-import { initPrecipitation, generatePrecipitation, generateRiver } from './hydro';
-import { generateFeatures } from './features';
-import { showWorld } from './renderer/renderer';
-import { contextCanvas } from './renderer/canvas';
+import { worldState } from './world.js';
+import { add, downcutCoastLine, resolveDepression, removeRedundant } from './heightmap.js';
+import { initPrecipitation, generatePrecipitation, generateRiver } from './hydro.js';
+import { generateFeatures } from './features.js';
+import { showWorld } from './renderer/renderer.js';
+import { contextCanvas } from './renderer/canvas.js';
 
 function processWorld() {
     // Init
