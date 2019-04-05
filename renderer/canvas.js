@@ -1,4 +1,4 @@
-import { moved, clicked } from '../utils';
+import { moved, clicked } from '../utils.js';
 
 const widthCanvas = 1228;
 const heightCanvas = 640;

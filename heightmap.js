@@ -1,4 +1,4 @@
-import { worldState } from './world';
+import { worldState } from './world.js';
 
 function initHeights() {
     for (let i = 0; i < worldState.sites.length; i++) {

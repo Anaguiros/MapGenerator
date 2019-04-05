@@ -1,10 +1,8 @@
-import { poissonDiscSampler } from './poisson_disc_sampler';
-
-import { processWorld } from './utils';
-import { showWorld } from './renderer/renderer';
-import { widthCanvas, heightCanvas } from "./renderer/canvas";
-
-import { initHeights, add } from './heightmap';
+import { poissonDiscSampler } from './poisson_disc_sampler.js';
+import { processWorld } from './utils.js';
+import { showWorld } from './renderer/renderer.js';
+import { widthCanvas, heightCanvas } from './renderer/canvas.js';
+import { initHeights, add } from './heightmap.js';
 
 let sample = null;
 

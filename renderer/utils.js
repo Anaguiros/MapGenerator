@@ -1,4 +1,4 @@
-import { randomWorld } from '../world';
+import { randomWorld } from '../world.js';
 
 function fade(id) {
     const element = document.getElementById(id);

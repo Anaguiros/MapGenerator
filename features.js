@@ -1,6 +1,6 @@
-import { worldState } from './world';
-import { getCommonPoints } from './utils';
-import { colorPolygon } from './renderer/renderer';
+import { worldState } from './world.js';
+import { getCommonPoints } from './utils.js';
+import { colorPolygon } from './renderer/renderer.js';
 
 function getUnmarked(exploredPolygonID) {
     const unmarked = [];

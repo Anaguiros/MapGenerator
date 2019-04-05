@@ -1,5 +1,4 @@
-
-import { worldState } from './world';
+import { worldState } from './world.js';
 
 const north = document.getElementById('north');
 const east = document.getElementById('east');
