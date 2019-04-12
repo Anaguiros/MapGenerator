@@ -1,6 +1,7 @@
 import { worldState } from './world.js';
 import { add, downcutCoastLine, resolveDepression, removeRedundant } from './heightmap.js';
 import { initPrecipitation, generatePrecipitation, generateRiver } from './hydro.js';
+import { generateBiomes } from './biomes.js';
 import { generateFeatures } from './features.js';
 import { showWorld } from './renderer/renderer.js';
 import { contextCanvas } from './renderer/canvas.js';
@@ -14,6 +15,7 @@ function processWorld() {
     // Generation Precipitation + rivers
     generatePrecipitation();
     generateRiver();
+    generateBiomes();
     // Generation Features + Coastline
     generateFeatures();
     // removeRedundant();
@@ -53,6 +55,19 @@ function moved() {
     if (river !== undefined) {
         d3.select('#riverType').text(river.type);
         d3.select('#river').text(river.river);
+    } else {
+        d3.select('#riverType').text('');
+        d3.select('#river').text('');
+    }
+
+    if (worldState.sites[nearestId].temperatureDisplay) {
+        d3.select('#temperature').text(worldState.sites[nearestId].temperatureDisplay);
+    }
+
+    if (worldState.sites[nearestId].biomeLabel) {
+        d3.select('#biome').text(worldState.sites[nearestId].biomeLabel);
+    } else {
+        d3.select('#biome').text('no');
     }
 }
 

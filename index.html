@@ -24,7 +24,8 @@
         <button id="buttonRandom">Random map</button>
         <button id="buttonOptions">Options</button>
         Cliquer pour ajouter une île.<br>
-        [<span id="coordX">0</span> ; <span id="coordY">0</span>] Cell: <span id="cell">0</span>; Altitude: <span id="high">0</span>; Entité <span id="number">inconnue</span> : <span id="feature">Aucun signe distinctif</span>; </span> Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River[<span id="riverType"></span>]: <span id="river">no</span>;<br>
+        [<span id="coordX">0</span> ; <span id="coordY">0</span>] Cell: <span id="cell">0</span>; Altitude: <span id="high">0</span>; Entité <span id="number">inconnue</span> : <span id="feature">Aucun signe distinctif</span>; <br>
+        Température: <span id="temperature">0</span>°C; Biome: <span id="biome">no</span>; Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River[<span id="riverType"></span>]: <span id="river">no</span>;<br>
         
     </div>
     <div id="options" style="display:none;">
@@ -34,15 +35,25 @@
             <button onclick="document.getElementById('rngSeed').value = generator$places$islands()">Generate readable seed</button>
         </div>
         <div style="width: 50%;float: right;">
+            <label>Winds: </label>
+                <label>Random<input type="checkbox" id="randomWinds" checked></label>|
+                <label>N<input type="checkbox" id="north"></label>
+                <label>E<input type="checkbox" id="east" ></label>
+                <label>S<input type="checkbox" id="south" ></label>
+                <label>W<input type="checkbox" id="west" ></label>
+            <br>
+            <label>Precipitation:</label><input id="precipitationInput" value="7" type="range" min="0" max="10" step="0.1" oninput="precipitationOutput.value = precipitationInput.valueAsNumber;"><output id="precipitationOutput">7</output><br>
+            <label>Température:</label><input id="temperatureInput" value="10" type="range" min="0" max="25" step="1" oninput="temperatureOutput.value = temperatureInput.valueAsNumber"><output id="temperatureOutput">10</output> <label>(random<input type="checkbox" id="randomTemperature" checked>)</label><br>
             <label>Map Data
-                <select id="mapData" onchange="showWorld()">
+                <select id="mapData">
                     <option value="elevation">Elevation</option>
                     <option value="precipitation">Precipitations</option>
+                    <option value="biome">Biomes</option>
                 </select>
             </label>
             <br>
             <label>Map Style
-                <select id="mapStyle" onchange="showWorld()">
+                <select id="mapStyle">
                     <option value="polygon">Polygon</option>
                     <option value="triangle">Triangle</option>
                 </select>
@@ -57,15 +68,7 @@
             <label>Max High:</label><input id="highInput" value="0.2" type="range" min="0.1" max="1" step="0.1" oninput="highOutput.value = highInput.valueAsNumber"><output id="highOutput">0.2</output><br>
             <label>Blob Radius:</label><input id="radiusInput" value="0.78" type="range" min="0.75" max="0.99" step="0.001" oninput="radiusOutput.value = radiusInput.valueAsNumber"><output id="radiusOutput">0.78</output><br>
             <label>Blob Sharpness:</label><input id="sharpnessInput" value="0.2" type="range" min="0" max="0.5" step="0.1" oninput="sharpnessOutput.value = sharpnessInput.valueAsNumber"><output id="sharpnessOutput">0.2</output><br>
-            <label>Winds: </label>
-                <label>Random<input type="checkbox" id="randomWinds" checked></label>|
-                <label>N<input type="checkbox" id="north"></label>
-                <label>E<input type="checkbox" id="east" ></label>
-                <label>S<input type="checkbox" id="south" ></label>
-                <label>W<input type="checkbox" id="west" ></label>
-            <br>
             <label>Downcutting:</label><input id="downcuttingInput" value="0" type="range" min="0" max="0.5" step="0.01" oninput="downcuttingOutput.value = downcuttingInput.valueAsNumber"><output id="downcuttingOutput">0</output><br>
-            <label>Precipitation:</label><input id="precipitationInput" value="7" type="range" min="0" max="10" step="0.1" oninput="precipitationOutput.value = precipitationInput.valueAsNumber"><output id="precipitationOutput">7</output><br>
         </div>
     </div>
 </body>

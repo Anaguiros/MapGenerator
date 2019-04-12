@@ -61,9 +61,6 @@ function generateCoastLinePolygon(exploredID, neighborID, type) {
         let typeCoastline = 'Ocean';
         let numberBorder = -1;
 
-        colorPolygon(exploredID, '#F00');
-        colorPolygon(neighborID, '#0F0');
-
         commonPoints = getCommonPoints(exploredID, neighborID);
 
         const start = commonPoints[0];
@@ -82,7 +79,7 @@ function generateCoastLinePolygon(exploredID, neighborID, type) {
     }
 }
 
-function generateCoastLineTriangle() {
+function generateCoastLineTriangle(exploredID, neighborID, type) {
     const start = `${ worldState.sites[exploredID][0] } ${ worldState.sites[exploredID][1] }`;
     const end = `${ worldState.sites[neighborID][0] } ${ worldState.sites[neighborID][1] }`;
 }

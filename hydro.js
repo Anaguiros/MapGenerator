@@ -1,4 +1,5 @@
 import { worldState } from './world.js';
+import { widthCanvas, heightCanvas } from "./renderer/canvas.js";
 
 const north = document.getElementById('north');
 const east = document.getElementById('east');
@@ -32,15 +33,43 @@ function initPrecipitation() {
     }
 }
 
+function rainfall(coordX, coordY, precipitation, localRaining) {
+    if (coordX < 0) {
+        coordX = 0;
+    }
+    if (coordY < 0) {
+        coordY = 0;
+    }
+
+    if (coordX >= widthCanvas) {
+        coordX = widthCanvas;
+    }
+    if (coordY >= heightCanvas) {
+        coordY = heightCanvas;
+    }
+
+    const nearestID = worldState.delaunay.find(coordX, coordY);
+    const height = worldState.sites[nearestID].height;
+    if (height >= worldState.altitudeOcean) {
+        if (height < worldState.altitudePeak) {
+            const rain = Math.random() * height;
+            precipitation -= rain;
+            worldState.sites[nearestID].precipitation += rain;
+        } else {
+            worldState.sites[nearestID].precipitation += precipitation;
+            precipitation = 0;
+        }
+        localRaining.push([ coordX, coordY ]);
+    }
+    return precipitation;
+}
+
 function generateNorth(selection, precipInit) {
     const frontier = [];
     const localRaining = [];
     let x = -1;
     let y = -1;
     let precipitation = 0;
-    let nearestID = 0;
-    let height = 0;
-    let rain = 0;
 
     for (let i = 0; i < worldState.sites.length; i++) {
         if (worldState.sites[i][1] < selection && worldState.sites[i][0] > worldState.widthCanvas * 0.1 && worldState.sites[i][0] < worldState.widthCanvas * 0.9) {
@@ -57,19 +86,7 @@ function generateNorth(selection, precipInit) {
         while (y < worldState.heightCanvas && precipitation > 0) {
             y += 5;
             x += (Math.random() * 10) - 5;
-            nearestID = worldState.delaunay.find(x, y);
-            height = worldState.sites[nearestID].height;
-            if (height >= worldState.altitudeOcean) {
-                if (height < worldState.altitudePeak) {
-                    rain = Math.random() * height;
-                    precipitation -= rain;
-                    worldState.sites[nearestID].precipitation += rain;
-                } else {
-                    worldState.sites[nearestID].precipitation += precipitation;
-                    precipitation = 0;
-                }
-                localRaining.push([ x, y ]);
-            }
+            precipitation = rainfall(x, y, precipitation, localRaining);
         }
     });
     return localRaining;
@@ -81,9 +98,6 @@ function generateEast(selection, precipInit) {
     let x = -1;
     let y = -1;
     let precipitation = 0;
-    let nearestID = 0;
-    let height = 0;
-    let rain = 0;
 
     for (let i = 0; i < worldState.sites.length; i++) {
         if (worldState.sites[i][0] > worldState.widthCanvas - selection && worldState.sites[i][1] > worldState.heightCanvas * 0.1 && worldState.sites[i][1] < worldState.heightCanvas * 0.9) {
@@ -100,19 +114,7 @@ function generateEast(selection, precipInit) {
         while (x > 0 && precipitation > 0) {
             x -= 5;
             y += (Math.random() * 10) - 5;
-            nearestID = worldState.delaunay.find(x, y);
-            height = worldState.sites[nearestID].height;
-            if (height >= worldState.altitudeOcean) {
-                if (height < worldState.altitudePeak) {
-                    rain = Math.random() * height;
-                    precipitation -= rain;
-                    worldState.sites[nearestID].precipitation += rain;
-                } else {
-                    worldState.sites[nearestID].precipitation += precipitation;
-                    precipitation = 0;
-                }
-                localRaining.push([ x, y ]);
-            }
+            precipitation = rainfall(x, y, precipitation, localRaining);
         }
     });
     return localRaining;
@@ -124,9 +126,6 @@ function generateSouth(selection, precipInit) {
     let x = -1;
     let y = -1;
     let precipitation = 0;
-    let nearestID = 0;
-    let height = 0;
-    let rain = 0;
 
     for (let i = 0; i < worldState.sites.length; i++) {
         if (worldState.sites[i][1] > worldState.heightCanvas - selection && worldState.sites[i][0] > worldState.widthCanvas * 0.1 && worldState.sites[i][0] < worldState.widthCanvas * 0.9) {
@@ -143,19 +142,7 @@ function generateSouth(selection, precipInit) {
         while (y > 0 && precipitation > 0) {
             y -= 5;
             x += (Math.random() * 10) - 5;
-            nearestID = worldState.delaunay.find(x, y);
-            height = worldState.sites[nearestID].height;
-            if (height >= worldState.altitudeOcean) {
-                if (height < worldState.altitudePeak) {
-                    rain = Math.random() * height;
-                    precipitation -= rain;
-                    worldState.sites[nearestID].precipitation += rain;
-                } else {
-                    worldState.sites[nearestID].precipitation += precipitation;
-                    precipitation = 0;
-                }
-                localRaining.push([ x, y ]);
-            }
+            precipitation = rainfall(x, y, precipitation, localRaining);
         }
     });
     return localRaining;
@@ -167,9 +154,6 @@ function generateWest(selection, precipInit) {
     let x = -1;
     let y = -1;
     let precipitation = 0;
-    let nearestID = 0;
-    let height = 0;
-    let rain = 0;
 
     for (let i = 0; i < worldState.sites.length; i++) {
         if (worldState.sites[i][0] < selection && worldState.sites[i][1] > worldState.heightCanvas * 0.1 && worldState.sites[i][1] < worldState.heightCanvas * 0.9) {
@@ -186,19 +170,7 @@ function generateWest(selection, precipInit) {
         while (x < worldState.widthCanvas && precipitation > 0) {
             x += 5;
             y += (Math.random() * 10) - 5;
-            nearestID = worldState.delaunay.find(x, y);
-            height = worldState.sites[nearestID].height;
-            if (height >= worldState.altitudeOcean) {
-                if (height < worldState.altitudePeak) {
-                    rain = Math.random() * height;
-                    precipitation -= rain;
-                    worldState.sites[nearestID].precipitation += rain;
-                } else {
-                    worldState.sites[nearestID].precipitation += precipitation;
-                    precipitation = 0;
-                }
-                localRaining.push([ x, y ]);
-            }
+            precipitation = rainfall(x, y, precipitation, localRaining);
         }
     });
     return localRaining;
@@ -259,8 +231,8 @@ function generateRiver() {
         const aval = [];
         const sommetsLocaux = [];
         const idCellLand = worldState.landPolygonID[i];
-        let xDiff;
-        let yDiff;
+        let xDiff = 0;
+        let yDiff = 0;
 
         for (const neighborID of worldState.delaunay.neighbors(idCellLand)) {
             neighborsPolygons.push(neighborID);
@@ -382,8 +354,8 @@ function generateRiver() {
                     worldState.hydro.riversData.push({
                         river: worldState.sites[idCellLand].river,
                         cell: idCellLand,
-                        x: x,
-                        y: y,
+                        x,
+                        y,
                         type: 'estuary',
                         aval: aval[0].cell,
                     });

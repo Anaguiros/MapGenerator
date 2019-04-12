@@ -1,4 +1,5 @@
 import { randomWorld } from '../world.js';
+import { showWorld } from './renderer.js';
 
 function fade(id) {
     const element = document.getElementById(id);
@@ -13,4 +14,12 @@ document.getElementById('buttonRandom').onclick = function () {
 };
 document.getElementById('buttonOptions').onclick = function () {
     fade('options');
+};
+
+document.getElementById('mapData').onchange = function () {
+    showWorld();
+};
+
+document.getElementById('mapStyle').onchange = function () {
+    showWorld();
 };
