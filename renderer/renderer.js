@@ -41,6 +41,20 @@ function drawWeatherPolygons() {
     }
 }
 
+function drawBiomePolygons() {
+    for (let i = 0; i < worldState.sites.length; i++) {
+        if (worldState.sites[i].height >= worldState.altitudeOcean) {
+            colorPolygon(i, worldState.sites[i].biomeColor);
+        } else if (worldState.sites[i].type === 'Lake') {
+            colorPolygon(i, '#3C8CBC');
+        } else if (worldState.sites[i].type === 'Recif') {
+            colorPolygon(i, '#646B9A');
+        } else {
+            colorPolygon(i, '#604E99');
+        }
+    }
+}
+
 function drawElevationTriangles(voronoiBorderVisible) {
     for (const triangle of worldState.delaunay.trianglePolygons()) {
         let heightAverage = 0;
@@ -96,6 +110,8 @@ function styleMap() {
     } else if (document.getElementById('mapData').value === 'precipitation') {
         drawWeatherPolygons();
         drawPrecipitation();
+    } else if (document.getElementById('mapData').value === 'biome') {
+        drawBiomePolygons();
     }
 }
 
