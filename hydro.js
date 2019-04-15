@@ -1,5 +1,5 @@
 import { worldState } from './world.js';
-import { widthCanvas, heightCanvas } from "./renderer/canvas.js";
+import { widthCanvas, heightCanvas } from './renderer/canvas.js';
 
 const north = document.getElementById('north');
 const east = document.getElementById('east');
@@ -30,6 +30,10 @@ function initPrecipitation() {
     for (let i = 0; i < worldState.sites.length; i++) {
         worldState.sites[i].precipitation = 0.01;
         worldState.sites[i].flux = 0.01;
+
+        if (worldState.sites[i].type === 'Island') {
+            delete worldState.sites[i].river;
+        }
     }
 }
 
