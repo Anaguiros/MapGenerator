@@ -88,8 +88,8 @@ function generateNorth(selection, precipInit) {
         worldState.hydro.windsBuffer.push([ x, y ]);
 
         while (y < worldState.heightCanvas && precipitation > 0) {
-            y += 5;
-            x += (Math.random() * 10) - 5;
+            y += 10;
+            x += (Math.random() * 20) - 10;
             precipitation = rainfall(x, y, precipitation, localRaining);
         }
     });
@@ -116,8 +116,8 @@ function generateEast(selection, precipInit) {
         worldState.hydro.windsBuffer.push([ x, y ]);
 
         while (x > 0 && precipitation > 0) {
-            x -= 5;
-            y += (Math.random() * 10) - 5;
+            x -= 10;
+            y += (Math.random() * 20) - 10;
             precipitation = rainfall(x, y, precipitation, localRaining);
         }
     });
@@ -144,8 +144,8 @@ function generateSouth(selection, precipInit) {
         worldState.hydro.windsBuffer.push([ x, y ]);
 
         while (y > 0 && precipitation > 0) {
-            y -= 5;
-            x += (Math.random() * 10) - 5;
+            y -= 10;
+            x += (Math.random() * 20) - 10;
             precipitation = rainfall(x, y, precipitation, localRaining);
         }
     });
@@ -172,8 +172,8 @@ function generateWest(selection, precipInit) {
         worldState.hydro.windsBuffer.push([ x, y ]);
 
         while (x < worldState.widthCanvas && precipitation > 0) {
-            x += 5;
-            y += (Math.random() * 10) - 5;
+            x += 10;
+            y += (Math.random() * 20) - 10;
             precipitation = rainfall(x, y, precipitation, localRaining);
         }
     });
@@ -199,16 +199,16 @@ function generatePrecipitation() {
     const selection = 30 / sides;
 
     if (north.checked) {
-        worldState.hydro.raining.concat(generateNorth(selection, precipInit));
+        worldState.hydro.raining = worldState.hydro.raining.concat(generateNorth(selection, precipInit));
     }
     if (east.checked) {
-        worldState.hydro.raining.concat(generateEast(selection, precipInit));
+        worldState.hydro.raining = worldState.hydro.raining.concat(generateEast(selection, precipInit));
     }
     if (south.checked) {
-        worldState.hydro.raining.concat(generateSouth(selection, precipInit));
+        worldState.hydro.raining = worldState.hydro.raining.concat(generateSouth(selection, precipInit));
     }
     if (west.checked) {
-        worldState.hydro.raining.concat(generateWest(selection, precipInit));
+        worldState.hydro.raining = worldState.hydro.raining.concat(generateWest(selection, precipInit));
     }
 
     for (let i = 0; i < worldState.sites.length; i++) {

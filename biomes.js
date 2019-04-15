@@ -184,10 +184,6 @@ const biomes = [
     },
 ];
 
-console.log(biomesIDs);
-console.log(biomesGrads);
-console.log(biomes);
-
 function getHumidityFromPrecipitations(precipitation) {
     let humidity = 9;
 

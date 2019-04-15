@@ -18,25 +18,25 @@ function drawElevationPolygons(voronoiBorderVisible) {
         if (worldState.sites[i].height >= worldState.altitudeOcean) {
             colorPolygon(i, colorNatural(worldState.altitudeMax - worldState.sites[i].height), voronoiBorderVisible);
         } else if (worldState.sites[i].type === 'Lake') {
-            colorPolygon(i, '#3C8CBC');
+            colorPolygon(i, '#3C8CBC', voronoiBorderVisible);
         } else if (worldState.sites[i].type === 'Recif') {
-            colorPolygon(i, '#646B9A');
+            colorPolygon(i, '#646B9A', voronoiBorderVisible);
         } else {
-            colorPolygon(i, '#604E99');
+            colorPolygon(i, '#604E99', voronoiBorderVisible);
         }
     }
 }
 
-function drawWeatherPolygons() {
+function drawWeatherPolygons(voronoiBorderVisible) {
     for (let i = 0; i < worldState.sites.length; i++) {
         if (worldState.sites[i].height >= worldState.altitudeOcean) {
-            colorPolygon(i, colorWeather(worldState.sites[i].precipitation));
+            colorPolygon(i, colorWeather(worldState.sites[i].precipitation), voronoiBorderVisible);
         } else if (worldState.sites[i].type === 'Lake') {
-            colorPolygon(i, '#3C8CBC');
+            colorPolygon(i, '#3C8CBC', voronoiBorderVisible);
         } else if (worldState.sites[i].type === 'Recif') {
-            colorPolygon(i, '#646B9A');
+            colorPolygon(i, '#646B9A', voronoiBorderVisible);
         } else {
-            colorPolygon(i, '#604E99');
+            colorPolygon(i, '#604E99', voronoiBorderVisible);
         }
     }
 }
@@ -108,7 +108,7 @@ function styleMap() {
             drawElevationPolygons(voronoiBorderVisible);
         }
     } else if (document.getElementById('mapData').value === 'precipitation') {
-        drawWeatherPolygons();
+        drawWeatherPolygons(voronoiBorderVisible);
         drawPrecipitation();
     } else if (document.getElementById('mapData').value === 'biome') {
         drawBiomePolygons();
