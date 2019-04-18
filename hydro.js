@@ -204,161 +204,166 @@ function generateRiver() {
     worldState.hydro.riversOrder = [];
     worldState.hydro.confluence = [];
 
+    worldState.landPolygonID.sort((IDa, IDb) => worldState.sites[IDb].height - worldState.sites[IDa].height);
+
+    console.log('Sorted');
+
+
     for (let i = 0; i < worldState.landPolygonID.length; i++) {
-        const neighborsPolygons = [];
-        const aval = [];
-        const sommetsLocaux = [];
+    //     const neighborsPolygons = [];
+    //     const aval = [];
+    //     const sommetsLocaux = [];
         const idCellLand = worldState.landPolygonID[i];
-        let xDiff = 0;
-        let yDiff = 0;
+        const startX = worldState.landPolygonID[i][0];
+        const startY = worldState.landPolygonID[i][1];
 
-        for (const neighborID of worldState.delaunay.neighbors(idCellLand)) {
-            neighborsPolygons.push(neighborID);
-            sommetsLocaux.push(worldState.sites[neighborID].height);
-            if (worldState.sites[neighborID].height < worldState.altitudeOcean) {
-                xDiff = (worldState.sites[idCellLand][0] + worldState.sites[neighborID][0]) / 2;
-                yDiff = (worldState.sites[idCellLand][1] + worldState.sites[neighborID][1]) / 2;
-                aval.push({
-                    x: xDiff,
-                    y: yDiff,
-                    cell: neighborID,
-                });
-            }
-        }
+    //     for (const neighborID of worldState.delaunay.neighbors(idCellLand)) {
+    //         neighborsPolygons.push(neighborID);
+    //         sommetsLocaux.push(worldState.sites[neighborID].height);
+    //         if (worldState.sites[neighborID].height < worldState.altitudeOcean) {
+    //             xDiff = (worldState.sites[idCellLand][0] + worldState.sites[neighborID][0]) / 2;
+    //             yDiff = (worldState.sites[idCellLand][1] + worldState.sites[neighborID][1]) / 2;
+    //             aval.push({
+    //                 x: xDiff,
+    //                 y: yDiff,
+    //                 cell: neighborID,
+    //             });
+    //         }
+    //     }
 
-        const localMinID = neighborsPolygons[sommetsLocaux.indexOf(Math.min(...sommetsLocaux))];
+    //     const localMinID = neighborsPolygons[sommetsLocaux.indexOf(Math.min(...sommetsLocaux))];
 
-        if (worldState.sites[idCellLand].flux > 0.85) {
-            if (!worldState.sites[idCellLand].river) {
-                // Nouvelle river
-                worldState.sites[idCellLand].river = worldState.hydro.riverID;
-                worldState.hydro.riverID++;
-                worldState.hydro.riversOrder.push({ river: worldState.sites[idCellLand].river, order: Math.random / 1000 });
-                worldState.hydro.riversData.push({
-                    river: worldState.sites[idCellLand].river,
-                    cell: idCellLand,
-                    x: worldState.sites[idCellLand][0],
-                    y: worldState.sites[idCellLand][1],
-                    type: 'source',
-                });
-            }
+    //     if (worldState.sites[idCellLand].flux > 0.85) {
+    //         if (!worldState.sites[idCellLand].river) {
+    //             // Nouvelle river
+    //             worldState.sites[idCellLand].river = worldState.hydro.riverID;
+    //             worldState.hydro.riverID++;
+    //             worldState.hydro.riversOrder.push({ river: worldState.sites[idCellLand].river, order: Math.random / 1000 });
+    //             worldState.hydro.riversData.push({
+    //                 river: worldState.sites[idCellLand].river,
+    //                 cell: idCellLand,
+    //                 x: worldState.sites[idCellLand][0],
+    //                 y: worldState.sites[idCellLand][1],
+    //                 type: 'source',
+    //             });
+    //         }
 
-            if (!worldState.sites[localMinID].river) {
-                // On ajoute la river en cours à la cellule aval si elle ne possède pas déjà de river
-                worldState.sites[localMinID].river = worldState.sites[idCellLand].river;
-            } else {
-                const riverTo = worldState.sites[localMinID].river;
-                const iRiver = worldState.hydro.riversData.filter((element) => element.river === worldState.sites[idCellLand].river);
-                const minRiver = worldState.hydro.riversData.filter((element) => element.river === riverTo);
-                let iRiverLength = iRiver.length;
-                let minRiverLength = minRiver.length;
+    //         if (!worldState.sites[localMinID].river) {
+    //             // On ajoute la river en cours à la cellule aval si elle ne possède pas déjà de river
+    //             worldState.sites[localMinID].river = worldState.sites[idCellLand].river;
+    //         } else {
+    //             const riverTo = worldState.sites[localMinID].river;
+    //             const iRiver = worldState.hydro.riversData.filter((element) => element.river === worldState.sites[idCellLand].river);
+    //             const minRiver = worldState.hydro.riversData.filter((element) => element.river === riverTo);
+    //             let iRiverLength = iRiver.length;
+    //             let minRiverLength = minRiver.length;
 
-                if (iRiverLength >= minRiverLength) {
-                    worldState.hydro.riversOrder[worldState.sites[idCellLand].river].order += iRiverLength;
-                    worldState.sites[localMinID].river = worldState.sites[idCellLand].river;
-                    iRiverLength++;
-                    minRiverLength--;
-                } else if (!worldState.hydro.riversOrder[riverTo]) {
-                    console.error('Order error');
-                    worldState.hydro.riversOrder[riverTo] = [];
-                    worldState.hydro.riversOrder[riverTo].order = minRiverLength;
-                } else {
-                    worldState.hydro.riversOrder[riverTo].order += minRiverLength;
-                }
+    //             if (iRiverLength >= minRiverLength) {
+    //                 worldState.hydro.riversOrder[worldState.sites[idCellLand].river].order += iRiverLength;
+    //                 worldState.sites[localMinID].river = worldState.sites[idCellLand].river;
+    //                 iRiverLength++;
+    //                 minRiverLength--;
+    //             } else if (!worldState.hydro.riversOrder[riverTo]) {
+    //                 console.error('Order error');
+    //                 worldState.hydro.riversOrder[riverTo] = [];
+    //                 worldState.hydro.riversOrder[riverTo].order = minRiverLength;
+    //             } else {
+    //                 worldState.hydro.riversOrder[riverTo].order += minRiverLength;
+    //             }
 
-                // Marque Confluence
-                if (worldState.sites[localMinID].height >= worldState.altitudeOcean && iRiverLength > 1 && minRiverLength > 1) {
-                    if (iRiverLength >= minRiverLength) {
-                        worldState.hydro.confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: worldState.sites[idCellLand].river });
-                    }
-                    if (!worldState.sites[localMinID].confluence) {
-                        worldState.sites[localMinID].confluence = 2;
-                        let cellTo = minRiver[minRiverLength - 1].cell;
-                        if (cellTo === localMinID) {
-                            cellTo = minRiver[minRiverLength - 2].cell;
-                        }
-                        worldState.hydro.confluence.push({ id: localMinID, start: cellTo, length: minRiverLength - 1, river: riverTo });
-                    } else {
-                        worldState.sites[localMinID].confluence++;
-                    }
-                    if (iRiverLength < minRiverLength) {
-                        worldState.hydro.confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: worldState.sites[idCellLand].river });
-                    }
-                }
-            }
-        }
+    //             // Marque Confluence
+    //             if (worldState.sites[localMinID].height >= worldState.altitudeOcean && iRiverLength > 1 && minRiverLength > 1) {
+    //                 if (iRiverLength >= minRiverLength) {
+    //                     worldState.hydro.confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: worldState.sites[idCellLand].river });
+    //                 }
+    //                 if (!worldState.sites[localMinID].confluence) {
+    //                     worldState.sites[localMinID].confluence = 2;
+    //                     let cellTo = minRiver[minRiverLength - 1].cell;
+    //                     if (cellTo === localMinID) {
+    //                         cellTo = minRiver[minRiverLength - 2].cell;
+    //                     }
+    //                     worldState.hydro.confluence.push({ id: localMinID, start: cellTo, length: minRiverLength - 1, river: riverTo });
+    //                 } else {
+    //                     worldState.sites[localMinID].confluence++;
+    //                 }
+    //                 if (iRiverLength < minRiverLength) {
+    //                     worldState.hydro.confluence.push({ id: localMinID, start: idCellLand, length: iRiverLength, river: worldState.sites[idCellLand].river });
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        worldState.sites[localMinID].flux += worldState.sites[idCellLand].flux;
-        if (worldState.sites[idCellLand].precipitation * 0.97 > worldState.sites[localMinID].precipitation) {
-            worldState.sites[localMinID].precipitation = worldState.sites[idCellLand].precipitation * 0.97;
-        }
+    //     worldState.sites[localMinID].flux += worldState.sites[idCellLand].flux;
+    //     if (worldState.sites[idCellLand].precipitation * 0.97 > worldState.sites[localMinID].precipitation) {
+    //         worldState.sites[localMinID].precipitation = worldState.sites[idCellLand].precipitation * 0.97;
+    //     }
 
-        if (worldState.sites[idCellLand].river) {
-            if (worldState.sites[localMinID].height < worldState.altitudeOcean) {
-                // Deverse riviere dans ocean
-                if (worldState.sites[idCellLand].flux > 14 && aval.length > 1 && !worldState.sites[idCellLand].confluence) {
-                    for (let c = 0; c < aval.length; c++) {
-                        if (c === 0) {
-                            worldState.hydro.riversData.push({
-                                river: worldState.sites[idCellLand].river,
-                                cell: idCellLand,
-                                x: aval[0].x,
-                                y: aval[0].y,
-                                type: 'delta',
-                                aval: aval[0].cell,
-                            });
-                        } else {
-                            worldState.hydro.riversData.push({
-                                river: worldState.hydro.riverID,
-                                cell: idCellLand,
-                                x: worldState.sites[idCellLand][0],
-                                y: worldState.sites[idCellLand][1],
-                                type: 'course',
-                            });
-                            worldState.hydro.riversData.push({
-                                river: worldState.hydro.riverID,
-                                cell: idCellLand,
-                                x: aval[c].x,
-                                y: aval[c].y,
-                                type: 'delta',
-                            });
-                            worldState.hydro.riverID++;
-                        }
-                    }
-                } else {
-                    // Estuaire de la riviere
-                    const x = aval[0].x + ((aval[0].x - worldState.sites[idCellLand][0]) / 10);
-                    const y = aval[0].y + ((aval[0].y - worldState.sites[idCellLand][1]) / 10);
-                    worldState.hydro.riversData.push({
-                        river: worldState.sites[idCellLand].river,
-                        cell: idCellLand,
-                        x,
-                        y,
-                        type: 'estuary',
-                        aval: aval[0].cell,
-                    });
-                }
-            } else {
-                // Segment de la rivière
-                worldState.hydro.riversData.push({
-                    river: worldState.sites[idCellLand].river,
-                    cell: localMinID,
-                    x: worldState.sites[localMinID][0],
-                    y: worldState.sites[localMinID][1],
-                    type: 'course',
-                });
-            }
-        }
+    //     if (worldState.sites[idCellLand].river) {
+    //         if (worldState.sites[localMinID].height < worldState.altitudeOcean) {
+    //             // Deverse riviere dans ocean
+    //             if (worldState.sites[idCellLand].flux > 14 && aval.length > 1 && !worldState.sites[idCellLand].confluence) {
+    //                 for (let c = 0; c < aval.length; c++) {
+    //                     if (c === 0) {
+    //                         worldState.hydro.riversData.push({
+    //                             river: worldState.sites[idCellLand].river,
+    //                             cell: idCellLand,
+    //                             x: aval[0].x,
+    //                             y: aval[0].y,
+    //                             type: 'delta',
+    //                             aval: aval[0].cell,
+    //                         });
+    //                     } else {
+    //                         worldState.hydro.riversData.push({
+    //                             river: worldState.hydro.riverID,
+    //                             cell: idCellLand,
+    //                             x: worldState.sites[idCellLand][0],
+    //                             y: worldState.sites[idCellLand][1],
+    //                             type: 'course',
+    //                         });
+    //                         worldState.hydro.riversData.push({
+    //                             river: worldState.hydro.riverID,
+    //                             cell: idCellLand,
+    //                             x: aval[c].x,
+    //                             y: aval[c].y,
+    //                             type: 'delta',
+    //                         });
+    //                         worldState.hydro.riverID++;
+    //                     }
+    //                 }
+    //             } else {
+    //                 // Estuaire de la riviere
+    //                 const x = aval[0].x + ((aval[0].x - worldState.sites[idCellLand][0]) / 10);
+    //                 const y = aval[0].y + ((aval[0].y - worldState.sites[idCellLand][1]) / 10);
+    //                 worldState.hydro.riversData.push({
+    //                     river: worldState.sites[idCellLand].river,
+    //                     cell: idCellLand,
+    //                     x,
+    //                     y,
+    //                     type: 'estuary',
+    //                     aval: aval[0].cell,
+    //                 });
+    //             }
+    //         } else {
+    //             // Segment de la rivière
+    //             worldState.hydro.riversData.push({
+    //                 river: worldState.sites[idCellLand].river,
+    //                 cell: localMinID,
+    //                 x: worldState.sites[localMinID][0],
+    //                 y: worldState.sites[localMinID][1],
+    //                 type: 'course',
+    //             });
+    //         }
+    //     }
     }
 
-    worldState.hydro.riversOrder.sort(function sortRiverOrder(riverA, riverB) {
-        if (riverA.order < riverB.order) {
-            return 1;
-        } else if (riverA.order > riverB.order) {
-            return -1;
-        }
-        return 0;
-    });
+    // worldState.hydro.riversOrder.sort(function sortRiverOrder(riverA, riverB) {
+    //     if (riverA.order < riverB.order) {
+    //         return 1;
+    //     } else if (riverA.order > riverB.order) {
+    //         return -1;
+    //     }
+    //     return 0;
+    // });
 }
 
 // Export - Functions
