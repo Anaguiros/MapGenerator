@@ -1,5 +1,6 @@
 import { worldState } from './world.js';
 import { widthCanvas, heightCanvas } from './renderer/canvas.js';
+import { getNeighborsPolygons } from './utils.js';
 
 const north = document.getElementById('north');
 const east = document.getElementById('east');
@@ -37,33 +38,18 @@ function initPrecipitation() {
     }
 }
 
-function rainfall(coordX, coordY, precipitation, localRaining) {
-    if (coordX < 0) {
-        coordX = 0;
-    }
-    if (coordY < 0) {
-        coordY = 0;
-    }
-
-    if (coordX >= widthCanvas) {
-        coordX = widthCanvas;
-    }
-    if (coordY >= heightCanvas) {
-        coordY = heightCanvas;
-    }
-
-    const nearestID = worldState.delaunay.find(coordX, coordY);
-    const height = worldState.sites[nearestID].height;
+function rainfall(polygonID, precipitation, localRaining) {
+    const height = worldState.sites[polygonID].height;
     if (height >= worldState.altitudeOcean) {
         if (height < worldState.altitudePeak) {
             const rain = Math.random() * height;
             precipitation -= rain;
-            worldState.sites[nearestID].precipitation += rain;
+            worldState.sites[polygonID].precipitation += rain;
         } else {
-            worldState.sites[nearestID].precipitation += precipitation;
+            worldState.sites[polygonID].precipitation += precipitation;
             precipitation = 0;
         }
-        localRaining.push([ coordX, coordY ]);
+        localRaining.push([ worldState.sites[polygonID][0], worldState.sites[polygonID][1] ]);
     }
     return precipitation;
 }
@@ -71,8 +57,6 @@ function rainfall(coordX, coordY, precipitation, localRaining) {
 function generateNorth(selection, precipInit) {
     const frontier = [];
     const localRaining = [];
-    let x = -1;
-    let y = -1;
     let precipitation = 0;
 
     for (let i = 0; i < worldState.sites.length; i++) {
@@ -81,16 +65,15 @@ function generateNorth(selection, precipInit) {
         }
     }
     frontier.forEach((startPolygonID) => {
-        x = worldState.sites[startPolygonID][0];
-        y = worldState.sites[startPolygonID][1];
         precipitation = precipInit;
 
-        worldState.hydro.windsBuffer.push([ x, y ]);
+        let currentPolygon = startPolygonID;
 
-        while (y < worldState.heightCanvas && precipitation > 0) {
-            y += 10;
-            x += (Math.random() * 20) - 10;
-            precipitation = rainfall(x, y, precipitation, localRaining);
+        worldState.hydro.windsBuffer.push([ worldState.sites[startPolygonID][0], worldState.sites[startPolygonID][1] ]);
+
+        while (worldState.sites[currentPolygon][1] < (worldState.heightCanvas * 0.9) && precipitation > 0) {
+            currentPolygon = getNeighborsPolygons(currentPolygon, 'north');
+            precipitation = rainfall(currentPolygon, precipitation, localRaining);
         }
     });
     return localRaining;
@@ -99,8 +82,6 @@ function generateNorth(selection, precipInit) {
 function generateEast(selection, precipInit) {
     const frontier = [];
     const localRaining = [];
-    let x = -1;
-    let y = -1;
     let precipitation = 0;
 
     for (let i = 0; i < worldState.sites.length; i++) {
@@ -109,16 +90,15 @@ function generateEast(selection, precipInit) {
         }
     }
     frontier.forEach((startPolygonID) => {
-        x = worldState.sites[startPolygonID][0];
-        y = worldState.sites[startPolygonID][1];
         precipitation = precipInit;
 
-        worldState.hydro.windsBuffer.push([ x, y ]);
+        let currentPolygon = startPolygonID;
 
-        while (x > 0 && precipitation > 0) {
-            x -= 10;
-            y += (Math.random() * 20) - 10;
-            precipitation = rainfall(x, y, precipitation, localRaining);
+        worldState.hydro.windsBuffer.push([ worldState.sites[startPolygonID][0], worldState.sites[startPolygonID][1] ]);
+
+        while (worldState.sites[currentPolygon][0] > (worldState.widthCanvas * 0.1) && precipitation > 0) {
+            currentPolygon = getNeighborsPolygons(currentPolygon, 'east');
+            precipitation = rainfall(currentPolygon, precipitation, localRaining);
         }
     });
     return localRaining;
@@ -127,8 +107,6 @@ function generateEast(selection, precipInit) {
 function generateSouth(selection, precipInit) {
     const frontier = [];
     const localRaining = [];
-    let x = -1;
-    let y = -1;
     let precipitation = 0;
 
     for (let i = 0; i < worldState.sites.length; i++) {
@@ -137,16 +115,15 @@ function generateSouth(selection, precipInit) {
         }
     }
     frontier.forEach((startPolygonID) => {
-        x = worldState.sites[startPolygonID][0];
-        y = worldState.sites[startPolygonID][1];
         precipitation = precipInit;
 
-        worldState.hydro.windsBuffer.push([ x, y ]);
+        let currentPolygon = startPolygonID;
 
-        while (y > 0 && precipitation > 0) {
-            y -= 10;
-            x += (Math.random() * 20) - 10;
-            precipitation = rainfall(x, y, precipitation, localRaining);
+        worldState.hydro.windsBuffer.push([ worldState.sites[startPolygonID][0], worldState.sites[startPolygonID][1] ]);
+
+        while (worldState.sites[currentPolygon][1] > (worldState.heightCanvas * 0.1) && precipitation > 0) {
+            currentPolygon = getNeighborsPolygons(currentPolygon, 'south');
+            precipitation = rainfall(currentPolygon, precipitation, localRaining);
         }
     });
     return localRaining;
@@ -155,8 +132,6 @@ function generateSouth(selection, precipInit) {
 function generateWest(selection, precipInit) {
     const frontier = [];
     const localRaining = [];
-    let x = -1;
-    let y = -1;
     let precipitation = 0;
 
     for (let i = 0; i < worldState.sites.length; i++) {
@@ -165,16 +140,15 @@ function generateWest(selection, precipInit) {
         }
     }
     frontier.forEach((startPolygonID) => {
-        x = worldState.sites[startPolygonID][0];
-        y = worldState.sites[startPolygonID][1];
         precipitation = precipInit;
 
-        worldState.hydro.windsBuffer.push([ x, y ]);
+        let currentPolygon = startPolygonID;
 
-        while (x < worldState.widthCanvas && precipitation > 0) {
-            x += 10;
-            y += (Math.random() * 20) - 10;
-            precipitation = rainfall(x, y, precipitation, localRaining);
+        worldState.hydro.windsBuffer.push([ worldState.sites[startPolygonID][0], worldState.sites[startPolygonID][1] ]);
+
+        while (worldState.sites[currentPolygon][0] < (worldState.widthCanvas * 0.9) && precipitation > 0) {
+            currentPolygon = getNeighborsPolygons(currentPolygon, 'west');
+            precipitation = rainfall(currentPolygon, precipitation, localRaining);
         }
     });
     return localRaining;
@@ -195,7 +169,7 @@ function generatePrecipitation() {
         randomizeWindsDefault();
     }
 
-    const precipInit = precipitationInput.value / Math.sqrt(sides);
+    const precipInit = precipitationInput.value;// / Math.sqrt(sides);
     const selection = 30 / sides;
 
     if (north.checked) {

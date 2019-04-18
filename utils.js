@@ -183,5 +183,118 @@ function getCommonPoints(polygonID, neighborPolygonID) {
     return commonPoints;
 }
 
+function propagateNorth(neighborsIDArray) {
+    let maxCoord = 0;
+    let resultId = -1;
 
-export { clicked, moved, getCommonPoints, processWorld };
+    for (let i = 0; i < neighborsIDArray.length; i++) {
+        const neighborID = neighborsIDArray[i];
+        const neighbor = worldState.sites[neighborID];
+
+
+        if (neighbor[1] > maxCoord) {
+            maxCoord = neighbor[1];
+            resultId = neighborID;
+        }
+    }
+
+    if (resultId >= 0) {
+        return resultId;
+    }
+
+    return false;
+}
+
+function propagateEast(neighborsIDArray) {
+    let minCoord = worldState.widthCanvas;
+    let resultId = -1;
+
+    for (let i = 0; i < neighborsIDArray.length; i++) {
+        const neighborID = neighborsIDArray[i];
+        const neighbor = worldState.sites[neighborID];
+
+        if (neighbor[0] < minCoord) {
+            minCoord = neighbor[0];
+            resultId = neighborID;
+        }
+    }
+
+    if (resultId >= 0) {
+        return resultId;
+    }
+
+    return false;
+}
+
+function propagateSouth(neighborsIDArray) {
+    let minCoord = worldState.heightCanvas;
+    let resultId = -1;
+
+    for (let i = 0; i < neighborsIDArray.length; i++) {
+        const neighborID = neighborsIDArray[i];
+        const neighbor = worldState.sites[neighborID];
+
+        if (neighbor[1] < minCoord) {
+            minCoord = neighbor[1];
+            resultId = neighborID;
+        }
+    }
+
+    if (resultId >= 0) {
+        return resultId;
+    }
+
+    return false;
+}
+
+function propagateWest(neighborsIDArray) {
+    let maxCoord = 0;
+    let resultId = -1;
+
+    for (let i = 0; i < neighborsIDArray.length; i++) {
+        const neighborID = neighborsIDArray[i];
+        const neighbor = worldState.sites[neighborID];
+
+        if (neighbor[0] > maxCoord) {
+            maxCoord = neighbor[0];
+            resultId = neighborID;
+        }
+    }
+
+    if (resultId >= 0) {
+        return resultId;
+    }
+
+    return false;
+}
+
+function getNeighborsPolygons(polygonID, direction = 'north') {
+    const neighborsID = [];
+
+    for (const neighborID of worldState.delaunay.neighbors(polygonID)) {
+        neighborsID.push(neighborID);
+    }
+
+    let result = polygonID;
+
+    switch (direction) {
+    case 'north':
+        result = propagateNorth(neighborsID);
+        break;
+    case 'east':
+        result = propagateEast(neighborsID);
+        break;
+    case 'south':
+        result = propagateSouth(neighborsID);
+        break;
+    case 'west':
+        result = propagateWest(neighborsID);
+        break;
+    default:
+        break;
+    }
+
+    return result;
+}
+
+export { clicked, moved, getCommonPoints, getNeighborsPolygons, processWorld };
