@@ -12,12 +12,14 @@ function processWorld() {
     // Generate Height
     downcutCoastLine();
     resolveDepression();
-    // Generation Precipitation + rivers
+
     generatePrecipitation();
-    generateRiver();
+
     generateBiomes();
     // Generation Features + Coastline
     generateFeatures();
+
+    generateRiver();
     // removeRedundant();
 }
 
@@ -32,7 +34,7 @@ function moved() {
     d3.select('#high').text(worldState.sites[nearestId].height);
     if (worldState.sites[nearestId].type) {
         d3.select('#feature').text(worldState.sites[nearestId].description);
-        d3.select('#number').text(worldState.sites[nearestId].numberID);
+        d3.select('#number').text(worldState.sites[nearestId].featureID);
     } else {
         d3.select('#feature').text('Aucun signe distinctif');
         d3.select('#number').text('inconnue');
@@ -117,7 +119,7 @@ function forEachTriangleEdge(callbackFunction) {
 }
 
 function edgesOfTriangle(triangleID) {
-    return [ 3 * triangleID, (3 * triangleID) + 1, (3 * triangleID) + 2 ];
+    return [3 * triangleID, (3 * triangleID) + 1, (3 * triangleID) + 2];
 }
 
 function pointsOfTriangle(triangleID) {
@@ -127,7 +129,7 @@ function pointsOfTriangle(triangleID) {
 
 function forEachTriangle(callbackFunction) {
     for (let triangleID = 0; triangleID < worldState.delaunay.triangles.length / 3; triangleID++) {
-        callbackFunction(triangleID, pointsOfTriangle(triangleID).map((point) => [ worldState.delaunay.points[point * 2], worldState.delaunay.points[(point * 2) + 1] ]));
+        callbackFunction(triangleID, pointsOfTriangle(triangleID).map((point) => [worldState.delaunay.points[point * 2], worldState.delaunay.points[(point * 2) + 1]]));
     }
 }
 
@@ -165,12 +167,12 @@ function getCommonPoints(polygonID, neighborPolygonID) {
     let commonPoints = [];
 
     for (let i = 0; i < polygon.length - 1; i++) {
-        polygonPoints.push(`${ polygon[i][0] } ${ polygon[i][1] }`);
+        polygonPoints.push(`${polygon[i][0]} ${polygon[i][1]}`);
     }
     commonPoints.push(polygonPoints);
 
     for (let i = 0; i < polygonNeighbor.length - 1; i++) {
-        polygonNeighborPoints.push(`${ polygonNeighbor[i][0] } ${ polygonNeighbor[i][1] }`);
+        polygonNeighborPoints.push(`${polygonNeighbor[i][0]} ${polygonNeighbor[i][1]}`);
     }
     commonPoints.push(polygonNeighborPoints);
 
@@ -278,20 +280,20 @@ function getNeighborsPolygons(polygonID, direction = 'north') {
     let result = polygonID;
 
     switch (direction) {
-    case 'north':
-        result = propagateNorth(neighborsID);
-        break;
-    case 'east':
-        result = propagateEast(neighborsID);
-        break;
-    case 'south':
-        result = propagateSouth(neighborsID);
-        break;
-    case 'west':
-        result = propagateWest(neighborsID);
-        break;
-    default:
-        break;
+        case 'north':
+            result = propagateNorth(neighborsID);
+            break;
+        case 'east':
+            result = propagateEast(neighborsID);
+            break;
+        case 'south':
+            result = propagateSouth(neighborsID);
+            break;
+        case 'west':
+            result = propagateWest(neighborsID);
+            break;
+        default:
+            break;
     }
 
     return result;

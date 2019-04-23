@@ -81,14 +81,16 @@ function resolveDepression() {
             }
         }
     }
-    worldState.landPolygonID.sort(function sortheight(cellA, cellB) {
-        if (worldState.sites[cellA].height < worldState.sites[cellB].height) {
-            return 1;
-        } else if (worldState.sites[cellA].height > worldState.sites[cellB].height) {
-            return -1;
-        }
-        return 0;
-    });
+    // worldState.landPolygonID.sort(function sortheight(cellA, cellB) {
+    //     if (worldState.sites[cellA].height < worldState.sites[cellB].height) {
+    //         return 1;
+    //     } else if (worldState.sites[cellA].height > worldState.sites[cellB].height) {
+    //         return -1;
+    //     }
+    //     return 0;
+    // });
+
+    worldState.landPolygonID.sort((cellA, cellB) => worldState.sites[cellB].height - worldState.sites[cellA].height);
 }
 
 function removeRedundant() {

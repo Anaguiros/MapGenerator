@@ -69,10 +69,10 @@ function generateCoastLinePolygon(exploredID, neighborID, type) {
         if (worldState.sites[neighborID].type === 'Ocean' || worldState.sites[neighborID].type === 'Recif') {
             worldState.sites[neighborID].type = 'Recif';
             typeCoastline = 'Ocean';
-            numberBorder = worldState.sites[exploredID].numberID;
+            numberBorder = worldState.sites[exploredID].featureID;
         } else {
             typeCoastline = 'Lake';
-            numberBorder = worldState.sites[neighborID].numberID;
+            numberBorder = worldState.sites[neighborID].featureID;
         }
 
         worldState.coastLines.push({ start, end, typeCoastline, numberBorder });
@@ -112,7 +112,7 @@ function generateIsland(startPolygonID, explorationPolygonIDQueue, exploredPolyg
 
     worldState.sites[startPolygonID].type = type;
     worldState.sites[startPolygonID].description = description;
-    worldState.sites[startPolygonID].numberID = counters.numberID;
+    worldState.sites[startPolygonID].featureID = counters.numberID;
 
     explorationPolygonIDQueue.push(startPolygonID);
     exploredPolygonID.push(startPolygonID);
@@ -125,7 +125,7 @@ function generateIsland(startPolygonID, explorationPolygonIDQueue, exploredPolyg
              worldState.sites[neighborID].height >= minHeight) {
                 worldState.sites[neighborID].type = type;
                 worldState.sites[neighborID].description = description;
-                worldState.sites[neighborID].numberID = counters.numberID;
+                worldState.sites[neighborID].featureID = counters.numberID;
                 explorationPolygonIDQueue.push(neighborID);
                 exploredPolygonID.push(neighborID);
             }

@@ -204,7 +204,7 @@ function generateRiver() {
     worldState.hydro.riversOrder = [];
     worldState.hydro.confluence = [];
 
-    worldState.landPolygonID.sort((IDa, IDb) => worldState.sites[IDb].height - worldState.sites[IDa].height);
+    // worldState.landPolygonID.sort((IDa, IDb) => worldState.sites[IDb].height - worldState.sites[IDa].height);
 
     console.log('Sorted');
 
@@ -214,8 +214,9 @@ function generateRiver() {
     //     const aval = [];
     //     const sommetsLocaux = [];
         const idCellLand = worldState.landPolygonID[i];
-        const startX = worldState.landPolygonID[i][0];
-        const startY = worldState.landPolygonID[i][1];
+        const startX = worldState.sites[idCellLand][0];
+        const startY = worldState.sites[idCellLand][1];
+        let featureID = worldState.sites[idCellLand].featureID;
 
     //     for (const neighborID of worldState.delaunay.neighbors(idCellLand)) {
     //         neighborsPolygons.push(neighborID);
