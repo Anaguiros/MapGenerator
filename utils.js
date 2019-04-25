@@ -1,5 +1,5 @@
 import { worldState } from './world.js';
-import { add, downcutCoastLine, resolveDepression, removeRedundant } from './heightmap.js';
+import { add, downcutCoastLine, initHeights, generateHeights, resolveDepression, removeRedundant } from './heightmap.js';
 import { initPrecipitation, generatePrecipitation, generateRiver } from './hydro.js';
 import { generateBiomes } from './biomes.js';
 import { generateFeatures } from './features.js';
@@ -8,18 +8,20 @@ import { contextCanvas } from './renderer/canvas.js';
 
 function processWorld() {
     // Init
-    initPrecipitation();
+    initHeights();
+    generateHeights();
+//    initPrecipitation();
     // Generate Height
-    downcutCoastLine();
-    resolveDepression();
+//    downcutCoastLine();
+//    resolveDepression();
 
-    generatePrecipitation();
+//    generatePrecipitation();
 
-    generateBiomes();
+//    generateBiomes();
     // Generation Features + Coastline
-    generateFeatures();
+//    generateFeatures();
 
-    generateRiver();
+//    generateRiver();
     // removeRedundant();
 }
 
@@ -74,23 +76,23 @@ function moved() {
 }
 
 function clicked() {
-    const point = d3.mouse(this);
-    const nearestId = worldState.delaunay.find(point[0], point[1]);
+    // const point = d3.mouse(this);
+    // const nearestId = worldState.delaunay.find(point[0], point[1]);
 
-    add(nearestId, 'hill');
-    processWorld();
-    showWorld();
+    // add(nearestId, 'hill');
+    // processWorld();
+    // showWorld();
 }
 
-function zoom() {
-    const transform = d3.event.transform;
-    contextCanvas.save();
-    clearCanvas();
-    contextCanvas.translate(transform.x, transform.y);
-    contextCanvas.scale(transform.k, transform.k);
-    showWorld();
-    contextCanvas.restore();
-}
+// function zoom() {
+//     const transform = d3.event.transform;
+//     contextCanvas.save();
+//     clearCanvas();
+//     contextCanvas.translate(transform.x, transform.y);
+//     contextCanvas.scale(transform.k, transform.k);
+//     showWorld();
+//     contextCanvas.restore();
+// }
 
 function changeMap(event) {
     showWorld();
@@ -100,64 +102,64 @@ document.getElementById('mapData').onchange = changeMap;
 
 document.getElementById('voronoiBorders').onchange = changeMap;
 
-function nextHalfedge(edge) {
-    return (edge % 3 === 2) ? edge - 2 : edge + 1;
-}
+// function nextHalfedge(edge) {
+//     return (edge % 3 === 2) ? edge - 2 : edge + 1;
+// }
 
-function prevHalfedge(edge) {
-    return (edge % 3 === 0) ? edge + 2 : edge - 1;
-}
+// function prevHalfedge(edge) {
+//     return (edge % 3 === 0) ? edge + 2 : edge - 1;
+// }
 
-function forEachTriangleEdge(callbackFunction) {
-    for (let edge = 0; edge < worldState.delaunay.triangles.length; edge++) {
-        if (edge > worldState.delaunay.halfedges[edge]) {
-            const points = worldState.delaunay.points[worldState.delaunay.triangles[edge]];
-            const otherPoints = worldState.delaunay.points[worldState.delaunay.triangles[nextHalfedge(edge)]];
-            callbackFunction(edge, points, otherPoints);
-        }
-    }
-}
+// function forEachTriangleEdge(callbackFunction) {
+//     for (let edge = 0; edge < worldState.delaunay.triangles.length; edge++) {
+//         if (edge > worldState.delaunay.halfedges[edge]) {
+//             const points = worldState.delaunay.points[worldState.delaunay.triangles[edge]];
+//             const otherPoints = worldState.delaunay.points[worldState.delaunay.triangles[nextHalfedge(edge)]];
+//             callbackFunction(edge, points, otherPoints);
+//         }
+//     }
+// }
 
-function edgesOfTriangle(triangleID) {
-    return [3 * triangleID, (3 * triangleID) + 1, (3 * triangleID) + 2];
-}
+// function edgesOfTriangle(triangleID) {
+//     return [3 * triangleID, (3 * triangleID) + 1, (3 * triangleID) + 2];
+// }
 
-function pointsOfTriangle(triangleID) {
-    return edgesOfTriangle(triangleID)
-        .map((edge) => worldState.delaunay.triangles[edge]);
-}
+// function pointsOfTriangle(triangleID) {
+//     return edgesOfTriangle(triangleID)
+//         .map((edge) => worldState.delaunay.triangles[edge]);
+// }
 
-function forEachTriangle(callbackFunction) {
-    for (let triangleID = 0; triangleID < worldState.delaunay.triangles.length / 3; triangleID++) {
-        callbackFunction(triangleID, pointsOfTriangle(triangleID).map((point) => [worldState.delaunay.points[point * 2], worldState.delaunay.points[(point * 2) + 1]]));
-    }
-}
+// function forEachTriangle(callbackFunction) {
+//     for (let triangleID = 0; triangleID < worldState.delaunay.triangles.length / 3; triangleID++) {
+//         callbackFunction(triangleID, pointsOfTriangle(triangleID).map((point) => [worldState.delaunay.points[point * 2], worldState.delaunay.points[(point * 2) + 1]]));
+//     }
+// }
 
-function triangleOfEdge(edge) {
-    return Math.floor(edge / 3);
-}
+// function triangleOfEdge(edge) {
+//     return Math.floor(edge / 3);
+// }
 
-function trianglesAdjacentToTriangle(triangle) {
-    const adjacentTriangles = [];
-    for (const edge of edgesOfTriangle(triangle)) {
-        const opposite = worldState.delaunay.halfedges[edge];
-        if (opposite >= 0) {
-            adjacentTriangles.push(triangleOfEdge(opposite));
-        }
-    }
-    return adjacentTriangles;
-}
+// function trianglesAdjacentToTriangle(triangle) {
+//     const adjacentTriangles = [];
+//     for (const edge of edgesOfTriangle(triangle)) {
+//         const opposite = worldState.delaunay.halfedges[edge];
+//         if (opposite >= 0) {
+//             adjacentTriangles.push(triangleOfEdge(opposite));
+//         }
+//     }
+//     return adjacentTriangles;
+// }
 
-function edgesAroundPoint(start) {
-    const result = [];
-    let incoming = start;
-    do {
-        result.push(incoming);
-        const outgoing = nextHalfedge(incoming);
-        incoming = worldState.delaunay.halfedges[outgoing];
-    } while (incoming !== -1 && incoming !== start);
-    return result;
-}
+// function edgesAroundPoint(start) {
+//     const result = [];
+//     let incoming = start;
+//     do {
+//         result.push(incoming);
+//         const outgoing = nextHalfedge(incoming);
+//         incoming = worldState.delaunay.halfedges[outgoing];
+//     } while (incoming !== -1 && incoming !== start);
+//     return result;
+// }
 
 function getCommonPoints(polygonID, neighborPolygonID) {
     const polygon = worldState.voronoi.cellPolygon(polygonID);
@@ -280,23 +282,77 @@ function getNeighborsPolygons(polygonID, direction = 'north') {
     let result = polygonID;
 
     switch (direction) {
-        case 'north':
-            result = propagateNorth(neighborsID);
-            break;
-        case 'east':
-            result = propagateEast(neighborsID);
-            break;
-        case 'south':
-            result = propagateSouth(neighborsID);
-            break;
-        case 'west':
-            result = propagateWest(neighborsID);
-            break;
-        default:
-            break;
+    case 'north':
+        result = propagateNorth(neighborsID);
+        break;
+    case 'east':
+        result = propagateEast(neighborsID);
+        break;
+    case 'south':
+        result = propagateSouth(neighborsID);
+        break;
+    case 'west':
+        result = propagateWest(neighborsID);
+        break;
+    default:
+        break;
     }
 
     return result;
 }
 
-export { clicked, moved, getCommonPoints, getNeighborsPolygons, processWorld };
+function getDownhillPolygon(polygonID) {
+    let lowestID = polygonID;
+    let minHeight = worldState.sites[polygonID].height;
+
+    for (const neighborID of worldState.delaunay.neighbors(polygonID)) {
+        if (worldState.sites[neighborID].height < minHeight) {
+            lowestID = neighborID;
+            minHeight = worldState.sites[neighborID].height;
+        }
+    }
+
+    return lowestID;
+}
+
+function getPointInRange(percentageLow, percentageHigh, length) {
+    const min = (percentageLow / 100) || 0;
+    const max = (percentageHigh / 100) || 100;
+    return Math.floor(Math.random() * ((max * length) - (min * length) + 1)) + (min * length);
+}
+
+function getPathPolygon(startID, endID, exploredPolygon) {
+    const result = [ startID ];
+    let currentID = startID;
+
+    exploredPolygon[startID] = 1;
+
+    while (currentID !== endID) {
+        let min = Infinity;
+        for (const neighborID of worldState.delaunay.neighbors(currentID)) {
+            if (exploredPolygon[currentID] === 1) {
+                continue;
+            }
+            let diff = ((worldState.sites[endID][0] - worldState.sites[neighborID][0]) ** 2) + ((worldState.sites[endID][1] - worldState.sites[neighborID][1]) ** 2);
+            if (Math.random() > 0.85) {
+                diff = diff / 2;
+            }
+            if (diff < min) {
+                min = diff;
+                currentID = neighborID;
+            }
+        }
+        if (min === Infinity) {
+            return result;
+        }
+        result.push(currentID);
+        exploredPolygon[currentID] = 1;
+    }
+    return result;
+}
+
+function normalizeValue(value) {
+    return Math.max(Math.min(value, 100), 0);
+}
+
+export { clicked, moved, getCommonPoints, getNeighborsPolygons, getPointInRange, normalizeValue, getPathPolygon, getDownhillPolygon, processWorld };

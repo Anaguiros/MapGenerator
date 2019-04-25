@@ -16,7 +16,7 @@ function colorTriangle(points, color, voronoiBorderVisible = false) {
 function drawElevationPolygons(voronoiBorderVisible) {
     for (let i = 0; i < worldState.sites.length; i++) {
         if (worldState.sites[i].height >= worldState.altitudeOcean) {
-            colorPolygon(i, colorNatural(worldState.altitudeMax - worldState.sites[i].height), voronoiBorderVisible);
+            colorPolygon(i, colorNatural((worldState.altitudeMax - worldState.sites[i].height) / worldState.altitudeMax), voronoiBorderVisible);
         } else if (worldState.sites[i].type === 'Lake') {
             colorPolygon(i, '#3C8CBC', voronoiBorderVisible);
         } else if (worldState.sites[i].type === 'Recif') {
@@ -71,7 +71,7 @@ function drawElevationTriangles(voronoiBorderVisible) {
             typeTriangle.filter((tempTriangle) => tempTriangle === triangleB).length).pop();
 
         if (typeTriangle === 'Island') {
-            colorTriangle(triangle, colorNatural(worldState.altitudeMax - heightAverage), voronoiBorderVisible);
+            colorTriangle(triangle, colorNatural((worldState.altitudeMax - heightAverage) / worldState.altitudeMax), voronoiBorderVisible);
         } else if (typeTriangle === 'Lake') {
             colorTriangle(triangle, '#3C8CBC');
         } else if (typeTriangle === 'Recif') {

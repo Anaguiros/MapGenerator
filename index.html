@@ -15,6 +15,10 @@
             stroke: grey;
         }
 
+        input[type='range'] {
+            vertical-align: middle;
+        }
+
     </style>
 </head>
 <body>
@@ -28,13 +32,14 @@
         Température: <span id="temperature">0</span>°C; Biome: <span id="biome">no</span>; Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River[<span id="riverType"></span>]: <span id="river">no</span>;<br>
         
     </div>
-    <div id="options" style="display:none;">
+    <div id="options" style="display:none; padding-top: 20px">
         <div>
-            <label>Enable RNG<input type="checkbox" id="rngEnabled"></label>
+            <label>Enable RNG <input type="checkbox" id="rngEnabled"></label><br>
             <label>RNG Seed:</label><input id="rngSeed" >
             <button onclick="document.getElementById('rngSeed').value = generator$places$islands()">Generate readable seed</button>
         </div>
-        <div style="width: 50%;float: right;">
+        <fieldset style="width: 50%;float: right;">
+            <legend>Options</legend>
             <label>Winds: </label>
                 <label>Random<input type="checkbox" id="randomWinds" checked></label>|
                 <label>N<input type="checkbox" id="north"></label>
@@ -42,8 +47,8 @@
                 <label>S<input type="checkbox" id="south" ></label>
                 <label>W<input type="checkbox" id="west" ></label>
             <br>
-            <label>Precipitation:</label><input id="precipitationInput" value="10" type="range" min="0" max="20" step="0.1" oninput="precipitationOutput.value = precipitationInput.valueAsNumber;"><output id="precipitationOutput">10</output><br>
-            <label>Température:</label><input id="temperatureInput" value="10" type="range" min="0" max="25" step="1" oninput="temperatureOutput.value = temperatureInput.valueAsNumber"><output id="temperatureOutput">10</output> <label>(random<input type="checkbox" id="randomTemperature" checked>)</label><br>
+            <label>Precipitation</label><input id="precipitationInput" value="10" type="range" min="0" max="20" step="0.1" oninput="precipitationOutput.value = precipitationInput.valueAsNumber;"><output id="precipitationOutput">10</output><br>
+            <label>Température</label><input id="temperatureInput" value="10" type="range" min="0" max="25" step="1" oninput="temperatureOutput.value = temperatureInput.valueAsNumber"><output id="temperatureOutput">10</output> <label>(random<input type="checkbox" id="randomTemperature" checked>)</label><br>
             <label>Map Data
                 <select id="mapData">
                     <option value="elevation">Elevation</option>
@@ -62,14 +67,28 @@
             <label>Show Voronoi
                 <input type="checkbox" id="voronoiBorders">
             </label>
-        </div>
-        <div>
-            <label>Sector Size:</label><input id="sizeInput" value="20" type="range" min="1" max="20" step="1" oninput="sizeOutput.value = sizeInput.valueAsNumber"><output id="sizeOutput">20</output><br>
-            <label>Max High:</label><input id="highInput" value="0.2" type="range" min="0.1" max="1" step="0.1" oninput="highOutput.value = highInput.valueAsNumber"><output id="highOutput">0.2</output><br>
-            <label>Blob Radius:</label><input id="radiusInput" value="0.78" type="range" min="0.75" max="0.99" step="0.001" oninput="radiusOutput.value = radiusInput.valueAsNumber"><output id="radiusOutput">0.78</output><br>
-            <label>Blob Sharpness:</label><input id="sharpnessInput" value="0.2" type="range" min="0" max="0.5" step="0.1" oninput="sharpnessOutput.value = sharpnessInput.valueAsNumber"><output id="sharpnessOutput">0.2</output><br>
-            <label>Downcutting:</label><input id="downcuttingInput" value="0" type="range" min="0" max="0.5" step="0.01" oninput="downcuttingOutput.value = downcuttingInput.valueAsNumber"><output id="downcuttingOutput">0</output><br>
-        </div>
+        </fieldset>
+        <fieldset>
+            <legend>Topography</legend>
+            <label>Template
+                <select id="templateInput">
+                    <option value="volcano">Volcano</option>
+                    <option value="highIsland">High Island</option>
+                    <option value="lowIsland">Low Island</option>
+                    <option value="continents">Continents</option>
+                    <option value="archipelago">Archipelago</option>
+                    <option value="mediterranean">Mediterranean</option>
+                    <option value="peninsula">Peninsula</option>
+                    <option value="pangea">Pangea</option>
+                    <option value="atoll">Atoll</option>
+                </select>
+            </label> <label>Random<input type="checkbox" id="randomTemplate" checked></label>|<br>
+            <label>Sector Size</label><input id="sizeInput" value="20" type="range" min="1" max="20" step="1" oninput="sizeOutput.value = sizeInput.valueAsNumber"><output id="sizeOutput">20</output><br>
+            <label>Max High</label><input id="highInput" value="20" type="range" min="10" max="100" step="10" oninput="highOutput.value = highInput.valueAsNumber"><output id="highOutput">20</output><br>
+            <label>Blob Radius</label><input id="radiusInput" value="0.78" type="range" min="0.75" max="0.99" step="0.001" oninput="radiusOutput.value = radiusInput.valueAsNumber"><output id="radiusOutput">0.78</output><br>
+            <label>Blob Sharpness</label><input id="sharpnessInput" value="0.2" type="range" min="0" max="0.5" step="0.1" oninput="sharpnessOutput.value = sharpnessInput.valueAsNumber"><output id="sharpnessOutput">0.2</output><br>
+            <label>Downcutting</label><input id="downcuttingInput" value="0" type="range" min="0" max="50" step="1" oninput="downcuttingOutput.value = downcuttingInput.valueAsNumber"><output id="downcuttingOutput">0</output><br>
+        </fieldset>
     </div>
 </body>
     <script type="text/javascript" src="seedrandom.js"></script>
