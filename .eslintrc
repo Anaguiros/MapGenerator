@@ -13,5 +13,8 @@
         "prefer-destructuring": 0,
         "quotes": ["error", "single"],
         "semi": ["error", "always"]
+    },
+    "parserOptions": {
+        "ecmaVersion": 2016
     }
 }
