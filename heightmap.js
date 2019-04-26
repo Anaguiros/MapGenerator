@@ -61,13 +61,25 @@ function add(polygonStartID, type) {
     }
 }
 
-function multiply(heightMin, heightMax, factor) {
+function multiplyHeight(heightMin, heightMax, factor) {
     for (let i = 0; i < worldState.sites.length; i++) {
         if (worldState.sites[i].height >= heightMin && worldState.sites[i].height <= heightMax) {
             if (heightMin === worldState.altitudeOcean) {
-                worldState.sites[i].height = ((worldState.sites[i].height - worldState.altitudeOcean) * factor) + worldState.altitudeOcean;
+                worldState.sites[i].height = normalizeValue((worldState.sites[i].height - worldState.altitudeOcean) * factor) + worldState.altitudeOcean;
             } else {
-                worldState.sites[i].height *= factor;
+                worldState.sites[i].height = normalizeValue(worldState.sites[i].height * factor);
+            }
+        }
+    }
+}
+
+function addHeight(heightMin, heightMax, factor) {
+    for (let i = 0; i < worldState.sites.length; i++) {
+        if (worldState.sites[i].height >= heightMin && worldState.sites[i].height <= heightMax) {
+            if (heightMin === worldState.altitudeOcean) {
+                worldState.sites[i].height = normalizeValue(Math.max(worldState.sites[i].height + factor, worldState.altitudeOcean));
+            } else {
+                worldState.sites[i].height = normalizeValue(worldState.sites[i].height + factor);
             }
         }
     }
@@ -80,7 +92,7 @@ function smooth(factor = 2) {
         for (const neighborID of worldState.delaunay.neighbors(polygonCurrentID)) {
             localHeights.push(worldState.sites[neighborID].height);
         }
-        smoothedHeights[polygonCurrentID] = normalizeValue(((worldState.sites[polygonCurrentID].height * (factor-1)) + d3.mean(localHeights)) / factor);
+        smoothedHeights[polygonCurrentID] = normalizeValue(((worldState.sites[polygonCurrentID].height * (factor - 1)) + d3.mean(localHeights)) / factor);
     }
 
     for (let i = 0; i < smoothedHeights.length; i++) {
@@ -132,15 +144,52 @@ function addHill(options) {
 }
 
 function addHills(options) {
-    let countHills = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
-    while (countHills >= 1 || Math.random() < countHills) {
+    let count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    while (count >= 1 || Math.random() < count) {
         addHill(options);
-        countHills--;
+        count--;
+    }
+}
+
+function propagateRangeHeight(options, explorationQueue, exploredPolygon) {
+    let height = normalizeValue(Math.floor(Math.random() * (options.heightMax - options.heightMin + 1)) + options.heightMin);
+    let localQueue = explorationQueue;
+
+    while (localQueue.length > 0) {
+        const frontier = localQueue.slice();
+        localQueue = [];
+
+        for (let index = 0; index < frontier.length; index++) {
+            worldState.sites[frontier[index]].height = normalizeValue((worldState.sites[frontier[index]].height + height) * ((Math.random() * 0.3) + 0.85));
+        }
+        height = (height ** 0.82) - 1;
+        if (height < 2) {
+            break;
+        }
+        for (let index = 0; index < frontier.length; index++) {
+            for (const neighborID of worldState.delaunay.neighbors(frontier[index])) {
+                if (exploredPolygon[neighborID] === 0) {
+                    localQueue.push(neighborID);
+                    exploredPolygon[neighborID] = 1;
+                }
+            }
+        }
+    }
+}
+
+function propagateRangeProminences(range) {
+    for (let index = 0; index < range.length; index++) {
+        // const element = range[index];
+        if (index % 6 === 0) {
+            const min = getDownhillPolygon(range[index]);
+            worldState.sites[min].height = (worldState.sites[range[index]].height * 2) + (worldState.sites[min].height / 3);
+        } else {
+            continue;
+        }
     }
 }
 
 function addRange(options) {
-    const height = normalizeValue(Math.floor(Math.random() * (options.heightMax - options.heightMin + 1)) + options.heightMin);
     const exploredPolygon = new Array(worldState.sites.length);
 
     for (let i = 0; i < exploredPolygon.length; i++) {
@@ -163,67 +212,141 @@ function addRange(options) {
     } while ((distance < worldState.widthCanvas / 8 || distance > worldState.widthCanvas / 3) && limit < 50);
 
     const range = getPathPolygon(worldState.delaunay.find(startX, startY), worldState.delaunay.find(endX, endY), exploredPolygon);
-    const explorationQueue = range.slice();
-    let i = 0;
 
-    while (explorationQueue.length > 0) {
-        const frontier = explorationQueue.slice();
-        const localQueue = [];
-        i++;
-
-        for (let index = 0; index < frontier.length; index++) {
-            worldState.sites[frontier[index]].height = normalizeValue((worldState.sites[frontier[index]].height + height) * ((Math.random() * 0.3) + 0.85));
-        }
-        height = (height ** 0.82) - 1;
-        if (height < 2) {
-            break;
-        }
-        for (let index = 0; index < frontier.length; index++) {
-            for (const neighborID of worldState.delaunay.neighbors(frontier[index])) {
-                if (exploredPolygon[neighborID] === 0) {
-                    localQueue.push(neighborID);
-                    exploredPolygon[neighborID] = 1;
-                }
-            }
-        }
-    }
-/*
-    for (let index = 0; index < range.length; index++) {
-        const element = range[index];
-        if (index%6 !== 0){
-            continue;
-        } else {
-            const min = getDownhillPolygon(range[index]);
-            worldState.sites[min].height = (worldState.sites[range[index]].height * 2) + (worldState.sites[min].height / 3);
-        }
-    }
-*/
+    propagateRangeHeight(options, range.slice(), exploredPolygon);
+    propagateRangeProminences(range);
 }
 
 function addRanges(options) {
-    let countRange = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
-    while (countRange >= 1 || Math.random() < countRange) {
+    let count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    while (count >= 1 || Math.random() < count) {
         addRange(options);
-        countRange--;
+        count--;
+    }
+}
+
+function addTrough(options) {
+    const exploredPolygon = new Array(worldState.sites.length);
+
+    for (let i = 0; i < exploredPolygon.length; i++) {
+        exploredPolygon[i] = 0;
+    }
+
+    let distance = 0;
+    let limit = 0;
+    let startX = 0;
+    let startY = 0;
+    let polygonStartID = -1;
+    let endX = 0;
+    let endY = 0;
+
+    do {
+        startX = getPointInRange(options.rangeXMin, options.rangeXMax, worldState.widthCanvas);
+        startY = getPointInRange(options.rangeYMin, options.rangeYMax, worldState.heightCanvas);
+        polygonStartID = worldState.delaunay.find(startX, startY);
+        limit++;
+    } while (worldState.sites[polygonStartID].height < worldState.altitudeOcean && limit < 50);
+
+    limit = 0;
+    do {
+        endX = (Math.random() * worldState.widthCanvas * 0.8) + (worldState.widthCanvas * 0.1);
+        endY = (Math.random() * worldState.heightCanvas * 0.7) + (worldState.heightCanvas * 0.15);
+        distance = Math.abs(endY - startY) + Math.abs(endX - startX);
+        limit++;
+    } while ((distance < worldState.widthCanvas / 8 || distance > worldState.widthCanvas / 2) && limit < 50);
+
+    const range = getPathPolygon(polygonStartID, worldState.delaunay.find(endX, endY), exploredPolygon);
+
+    propagateRangeHeight(options, range.slice(), exploredPolygon);
+    propagateRangeProminences(range);
+}
+
+function addTroughs(options) {
+    let count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    while (count >= 1 || Math.random() < count) {
+        addTrough(options);
+        count--;
+    }
+}
+
+function addPit(options) {
+    const exploredPolygon = new Array(worldState.sites.length);
+
+    for (let i = 0; i < exploredPolygon.length; i++) {
+        exploredPolygon[i] = 0;
+    }
+
+    let height = normalizeValue(Math.floor(Math.random() * (options.heightMax - options.heightMin + 1)) + options.heightMin);
+    let limit = 0;
+    let polygonStartID = -1;
+
+    do {
+        const pitX = getPointInRange(options.rangeXMin, options.rangeXMax, worldState.widthCanvas);
+        const pitY = getPointInRange(options.rangeYMin, options.rangeYMax, worldState.heightCanvas);
+        polygonStartID = worldState.delaunay.find(pitX, pitY);
+        limit++;
+    } while (worldState.sites[polygonStartID].height < worldState.altitudeOcean && limit < 50);
+
+    const explorationQueue = [ polygonStartID ];
+    while (explorationQueue.length > 0) {
+        const currentID = explorationQueue.shift();
+        height = (height ** 0.98) * ((Math.random() * 0.2) + 0.9);
+        if (height < 1) {
+            return;
+        }
+
+        for (const neighborID of worldState.delaunay.neighbors(currentID)) {
+            if (exploredPolygon[neighborID] === 1) {
+                return;
+            }
+
+            worldState.sites[neighborID].height = normalizeValue(worldState.sites[neighborID].height - (height * ((Math.random() * 0.2) + 0.9)));
+            exploredPolygon[neighborID] = 1;
+            explorationQueue.push(neighborID);
+        }
+    }
+}
+
+function addPits(options) {
+    let count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    while (count >= 1 || Math.random() < count) {
+        addPit(options);
+        count--;
     }
 }
 
 function templateVolcano() {
     addHills(initializeOptions(1, 1, 90, 100, 44, 56, 40, 60));
-    multiply(50, 100, 0.8);
-//    addRanges(initializeOptions(1, 2, 30, 55, 44, 55, 40, 60));
+    multiplyHeight(50, 100, 0.8);
+    addRanges(initializeOptions(1, 2, 30, 55, 44, 55, 40, 60));
     smooth(2);
     addHills(initializeOptions(1, 2, 25, 35, 25, 30, 20, 75));
     addHills(initializeOptions(1, 1, 25, 35, 75, 80, 25, 75));
     addHills(initializeOptions(0, 1, 20, 25, 10, 15, 20, 25));
 }
 
+function templateHighIsland() {
+    addHills(initializeOptions(1, 1, 90, 100, 65, 75, 47, 53));
+    addHeight(0, 100, 5);
+    addHills(initializeOptions(6, 6, 20, 23, 25, 55, 45, 55));
+    addRanges(initializeOptions(1, 1, 40, 50, 45, 55, 45, 55));
+    smooth(2);
+    addTroughs(initializeOptions(2, 3, 20, 30, 20, 30, 20, 30));
+    addTroughs(initializeOptions(2, 3, 20, 30, 60, 80, 70, 80));
+    addHills(initializeOptions(1, 1, 10, 15, 60, 60, 50, 50));
+    addHills(initializeOptions(1, 2, 13, 16, 15, 20, 20, 75));
+    multiplyHeight(20, 100, 0.8);
+    addRanges(initializeOptions(1, 2, 30, 40, 15, 85, 30, 40));
+    addRanges(initializeOptions(1, 2, 30, 40, 15, 85, 60, 70));
+    addPits(initializeOptions(2, 3, 10, 15, 15, 85, 20, 80));
+  }
+
 function templateAtoll() {
     addHills(initializeOptions(1, 1, 75, 80, 50, 60, 45, 55));
     addHills(initializeOptions(1, 2, 30, 50, 25, 75, 30, 70));
     addHills(initializeOptions(0, 1, 30, 50, 25, 35, 30, 70));
     smooth(1);
-    multiply(25, 100, 0.2);
+    multiplyHeight(25, 100, 0.2);
     addHills(initializeOptions(0, 1, 10, 20, 50, 55, 48, 52));
 }
 
@@ -252,7 +375,7 @@ function randomizaTemplate() {
 
 function generateHeights() {
     if (randomTemplate.checked) {
-        randomizaTemplate();    
+        randomizaTemplate();
     }
 
     switch (templateInput.value) {
