@@ -321,7 +321,7 @@ function getPointInRange(percentageLow, percentageHigh, length) {
     return Math.floor(Math.random() * ((max * length) - (min * length) + 1)) + (min * length);
 }
 
-function getPathPolygon(startID, endID, exploredPolygon) {
+function getPathPolygon(startID, endID, exploredPolygon = new Array(worldState.sites.length)) {
     const result = [ startID ];
     let currentID = startID;
 
@@ -335,7 +335,7 @@ function getPathPolygon(startID, endID, exploredPolygon) {
             }
             let diff = ((worldState.sites[endID][0] - worldState.sites[neighborID][0]) ** 2) + ((worldState.sites[endID][1] - worldState.sites[neighborID][1]) ** 2);
             if (Math.random() > 0.85) {
-                diff = diff / 2;
+                diff /= 2;
             }
             if (diff < min) {
                 min = diff;
