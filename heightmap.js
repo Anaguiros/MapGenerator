@@ -8,7 +8,8 @@ function initHeights() {
     }
 }
 
-function initializeOptions(countMin = 0, countMax = 1, heightMin = 0, heightMax = worldState.altitudeMax, rangeXMin = 0, rangeXMax = worldState.widthCanvas, rangeYMin = 0, rangeYMax = worldState.heightCanvas) {
+function initializeOptions(countMin = 0, countMax = 1, heightMin = 0, heightMax = worldState.altitudeMax,
+    rangeXMin = 0, rangeXMax = worldState.widthCanvas, rangeYMin = 0, rangeYMax = worldState.heightCanvas) {
     const options = {
         countMin,
         countMax,
@@ -66,7 +67,8 @@ function multiplyHeight(heightMin, heightMax, factor) {
     for (let i = 0; i < worldState.sites.length; i++) {
         if (worldState.sites[i].height >= heightMin && worldState.sites[i].height <= heightMax) {
             if (heightMin === worldState.altitudeOcean) {
-                worldState.sites[i].height = normalizeValue((worldState.sites[i].height - worldState.altitudeOcean) * factor) + worldState.altitudeOcean;
+                worldState.sites[i].height = normalizeValue((worldState.sites[i].height - worldState.altitudeOcean) * factor) +
+                worldState.altitudeOcean;
             } else {
                 worldState.sites[i].height = normalizeValue(worldState.sites[i].height * factor);
             }
@@ -93,7 +95,8 @@ function smooth(factor = 2) {
         for (const neighborID of worldState.delaunay.neighbors(polygonCurrentID)) {
             localHeights.push(worldState.sites[neighborID].height);
         }
-        smoothedHeights[polygonCurrentID] = normalizeValue(((worldState.sites[polygonCurrentID].height * (factor - 1)) + d3.mean(localHeights)) / factor);
+        smoothedHeights[polygonCurrentID] = normalizeValue(((worldState.sites[polygonCurrentID].height * (factor - 1)) + d3.mean(localHeights)) /
+        factor);
     }
 
     for (let i = 0; i < smoothedHeights.length; i++) {
@@ -139,13 +142,18 @@ function addHill(options) {
 
     for (let index = 0; index < exploredPolygon.length; index++) {
         if (exploredPolygon[index] > 0) {
-            worldState.sites[index].height += exploredPolygon[index];
+            worldState.sites[index].height = normalizeValue(worldState.sites[index].height + exploredPolygon[index]);
         }
     }
 }
 
 function addHills(options) {
-    let count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    let count = 0;
+    if (options.countMax > options.countMin) {
+        count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    } else {
+        count = options.countMax;
+    }
     while (count >= 1 || Math.random() < count) {
         addHill(options);
         count--;
@@ -161,7 +169,8 @@ function propagateRangeHeight(options, explorationQueue, exploredPolygon) {
         localQueue = [];
 
         for (let index = 0; index < frontier.length; index++) {
-            worldState.sites[frontier[index]].height = normalizeValue((worldState.sites[frontier[index]].height + height) * ((Math.random() * 0.3) + 0.85));
+            worldState.sites[frontier[index]].height = normalizeValue((worldState.sites[frontier[index]].height + height) *
+            ((Math.random() * 0.3) + 0.85));
         }
         height = (height ** 0.82) - 1;
         if (height < 2) {
@@ -183,7 +192,7 @@ function propagateRangeProminences(range) {
         // const element = range[index];
         if (index % 6 === 0) {
             const min = getDownhillPolygon(range[index]);
-            worldState.sites[min].height = (worldState.sites[range[index]].height * 2) + (worldState.sites[min].height / 3);
+            worldState.sites[min].height = normalizeValue((worldState.sites[range[index]].height * 2) + (worldState.sites[min].height / 3));
         } else {
             continue;
         }
@@ -219,7 +228,12 @@ function addRange(options) {
 }
 
 function addRanges(options) {
-    let count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    let count = 0;
+    if (options.countMax > options.countMin) {
+        count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    } else {
+        count = options.countMax;
+    }
     while (count >= 1 || Math.random() < count) {
         addRange(options);
         count--;
@@ -263,7 +277,12 @@ function addTrough(options) {
 }
 
 function addTroughs(options) {
-    let count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    let count = 0;
+    if (options.countMax > options.countMin) {
+        count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    } else {
+        count = options.countMax;
+    }
     while (count >= 1 || Math.random() < count) {
         addTrough(options);
         count--;
@@ -309,7 +328,12 @@ function addPit(options) {
 }
 
 function addPits(options) {
-    let count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    let count = 0;
+    if (options.countMax > options.countMin) {
+        count = Math.floor(Math.random() * (options.countMax - options.countMin + 1)) + options.countMin;
+    } else {
+        count = options.countMax;
+    }
     while (count >= 1 || Math.random() < count) {
         addPit(options);
         count--;
@@ -328,8 +352,10 @@ function addStrait(widthMin, widthMax, direction = 'vertical') {
     const startX = verticality ? Math.floor((Math.random() * worldState.widthCanvas * 0.4) + (worldState.widthCanvas * 0.3)) : 5;
     const startY = verticality ? 5 : Math.floor((Math.random() * worldState.heightCanvas * 0.4) + (worldState.heightCanvas * 0.3));
 
-    const endX = verticality ? Math.floor((worldState.widthCanvas - startX) - (worldState.widthCanvas * 0.1) + (Math.random() * worldState.widthCanvas * 0.2)) : worldState.widthCanvas - 5;
-    const endY = verticality ? worldState.heightCanvas - 5 : Math.floor((worldState.heightCanvas - startY) - (worldState.heightCanvas * 0.1) + (Math.random() * worldState.heightCanvas * 0.2));
+    const endX = verticality ? Math.floor((worldState.widthCanvas - startX) - (worldState.widthCanvas * 0.1) +
+    (Math.random() * worldState.widthCanvas * 0.2)) : worldState.widthCanvas - 5;
+    const endY = verticality ? worldState.heightCanvas - 5 : Math.floor((worldState.heightCanvas - startY) - (worldState.heightCanvas * 0.1) +
+    (Math.random() * worldState.heightCanvas * 0.2));
 
     const polygonStartID = worldState.delaunay.find(startX, startY);
     const polygonEndID = worldState.delaunay.find(endX, endY);
@@ -362,38 +388,38 @@ function addStrait(widthMin, widthMax, direction = 'vertical') {
 function templateVolcano() {
     addHills(initializeOptions(1, 1, 90, worldState.altitudeMax, 44, 56, 40, 60));
     multiplyHeight(50, worldState.altitudeMax, 0.8);
-    addRanges(initializeOptions(1, 2, 30, 55, 44, 55, 40, 60));
+    addRanges(initializeOptions(1.5, 1.5, 15, 35, 44, 55, 40, 60));
     smooth(2);
-    addHills(initializeOptions(1, 2, 25, 35, 25, 30, 20, 75));
-    addHills(initializeOptions(1, 1, 25, 35, 75, 80, 25, 75));
-    addHills(initializeOptions(0, 1, worldState.altitudeOcean, 25, 10, 15, 20, 25));
+    addHills(initializeOptions(1.5, 1.5, 20, 30, 25, 30, 20, 75));
+    addHills(initializeOptions(1, 1, 10, 25, 75, 80, 25, 75));
+    addHills(initializeOptions(0.5, 0.5, worldState.altitudeOcean, 25, 10, 15, 20, 25));
 }
 
 function templateHighIsland() {
     addHills(initializeOptions(1, 1, 90, worldState.altitudeMax, 65, 75, 47, 53));
     addHeight(0, worldState.altitudeMax, 5);
-    addHills(initializeOptions(6, 6, worldState.altitudeOcean, 23, 25, 55, 45, 55));
+    addHills(initializeOptions(1, 2, worldState.altitudeOcean, 21, 20, 70, 40, 60));
     addRanges(initializeOptions(1, 1, 40, 50, 45, 55, 45, 55));
     smooth(2);
     addTroughs(initializeOptions(2, 3, worldState.altitudeOcean, 30, 20, 30, 20, 30));
     addTroughs(initializeOptions(2, 3, worldState.altitudeOcean, 30, 60, 80, 70, 80));
-    addHills(initializeOptions(1, 1, 10, 15, 60, 60, 50, 50));
-    addHills(initializeOptions(1, 2, 13, 16, 15, 20, 20, 75));
+    addHills(initializeOptions(1, 1, 4, 8, 60, 60, 50, 50));
+    // addHills(initializeOptions(1, 1, 3, 6, 10, 30, 15, 85));
     multiplyHeight(worldState.altitudeOcean, worldState.altitudeMax, 0.8);
-    addRanges(initializeOptions(1, 2, 30, 40, 15, 85, 30, 40));
-    addRanges(initializeOptions(1, 2, 30, 40, 15, 85, 60, 70));
+    addRanges(initializeOptions(1.5, 1.5, 30, 40, 15, 85, 30, 40));
+    addRanges(initializeOptions(1.5, 1.5, 30, 40, 15, 85, 60, 70));
     addPits(initializeOptions(2, 3, 10, 15, 15, 85, 20, 80));
 }
 
 function templateLowIsland() {
-    addHills(initializeOptions(1, 1, 90, 99, 60, 80, 45, 55));
-    addHills(initializeOptions(4, 5, 25, 35, 20, 65, 40, 60));
+    addHills(initializeOptions(1, 1, 90, worldState.altitudeMax, 60, 80, 45, 55));
+    addHills(initializeOptions(1, 2, worldState.altitudeOcean, 21, 20, 70, 40, 60));
     addRanges(initializeOptions(1, 1, 40, 50, 45, 55, 45, 55));
     smooth(3);
     addTroughs(initializeOptions(1, 2, worldState.altitudeOcean, 30, 15, 85, 20, 30));
     addTroughs(initializeOptions(1, 2, worldState.altitudeOcean, 30, 15, 85, 70, 80));
-    addHills(initializeOptions(1, 2, 10, 15, 5, 15, 20, 80));
-    addHills(initializeOptions(1, 1, 10, 15, 85, 95, 70, 80));
+    addHills(initializeOptions(1, 1, 5, 8, 5, 15, 20, 80));
+    addHills(initializeOptions(1, 1, 10, 15, 80, 90, 70, 80));
     addPits(initializeOptions(3, 5, 10, 15, 15, 85, 20, 80));
     multiplyHeight(worldState.altitudeOcean, worldState.altitudeMax, 0.4);
 }
@@ -415,13 +441,13 @@ function templateContinents() {
 }
 
 function templateArchipelago() {
-    addHeight(0, worldState.altitudeMax, 11);
+    addHeight(0, worldState.altitudeMax, 5);
     addRanges(initializeOptions(2, 3, 40, 60, 20, 80, 20, 80));
-    addHills(initializeOptions(5, 5, 15, worldState.altitudeOcean, 10, 90, 30, 70));
-    addHills(initializeOptions(2, 2, 10, 15, 10, 30, 20, 80));
-    addHills(initializeOptions(2, 2, 10, 15, 60, 90, 20, 80));
+    addHills(initializeOptions(2, 4, 5, 7, 10, 90, 30, 70));
+    addHills(initializeOptions(1, 2, 3, 5, 10, 30, 20, 80));
+    addHills(initializeOptions(1, 2, 3, 5, 60, 90, 20, 80));
     smooth(3);
-    addTroughs(initializeOptions(10, 10, worldState.altitudeOcean, 30, 5, 95, 5, 95));
+    addTroughs(initializeOptions(7, 10, worldState.altitudeOcean, 30, 5, 95, 5, 95));
     addStrait(2, 2, 'vertical');
     addStrait(2, 2, 'horizontal');
 }
@@ -438,11 +464,11 @@ function templateAtoll() {
 function templateMediterranean() {
     addRanges(initializeOptions(3, 4, 30, 50, 0, 100, 0, 10));
     addRanges(initializeOptions(3, 4, 30, 50, 0, 100, 90, 100));
-    addHills(initializeOptions(5, 6, 30, 70, 0, 100, 0, 5));
-    addHills(initializeOptions(5, 6, 30, 70, 0, 100, 95, 100));
+    addHills(initializeOptions(1, 1, 20, 40, 0, 100, 0, 5));
+    addHills(initializeOptions(1, 1, 20, 40, 0, 100, 95, 100));
     smooth(1);
-    addHills(initializeOptions(2, 3, 30, 70, 0, 5, 20, 80));
-    addHills(initializeOptions(2, 3, 30, 70, 95, 100, 20, 80));
+    addHills(initializeOptions(1, 1, 20, 40, 0, 5, 20, 80));
+    addHills(initializeOptions(1, 1, 20, 40, 95, 100, 20, 80));
     multiplyHeight(worldState.altitudeOcean, worldState.altitudeMax, 0.8);
     addTroughs(initializeOptions(3, 5, 40, 50, 0, 100, 0, 10));
     addTroughs(initializeOptions(3, 5, 40, 50, 0, 100, 90, 100));
@@ -452,19 +478,19 @@ function templatePeninsula() {
     addRanges(initializeOptions(2, 3, worldState.altitudeOcean, 35, 40, 50, 0, 15));
     addHeight(0, worldState.altitudeMax, 5);
     addHills(initializeOptions(1, 1, 90, worldState.altitudeMax, 10, 90, 0, 5));
-    addHeight(0, worldState.altitudeMax, 13);
-    addHills(initializeOptions(3, 4, 3, 5, 5, 95, 80, 100));
-    addHills(initializeOptions(1, 2, 3, 5, 5, 95, 40, 60));
-    addTroughs(initializeOptions(5, 6, 10, 25, 5, 95, 5, 95));
+    addHeight(0, worldState.altitudeMax, 2);
+    // addHills(initializeOptions(1, 1, 1, 3, 5, 95, 90, 100));
+    addHills(initializeOptions(1, 1, 1, 3, 5, 95, 45, 55));
+    addTroughs(initializeOptions(2, 3, 10, 25, 5, 95, 5, 95));
     smooth(3);
 }
 
 function templatePangea() {
-    addHills(initializeOptions(1, 2, 25, 40, 15, 50, 0, 10));
-    addHills(initializeOptions(1, 2, 5, 40, 50, 85, 0, 10));
-    addHills(initializeOptions(1, 2, 25, 40, 50, 85, 90, 100));
-    addHills(initializeOptions(1, 2, 5, 40, 15, 50, 90, 100));
-    addHills(initializeOptions(8, 12, worldState.altitudeOcean, 40, 20, 80, 48, 52));
+    addHills(initializeOptions(1, 1, 25, 40, 15, 50, 0, 10));
+    addHills(initializeOptions(1, 1, 5, 40, 50, 85, 0, 10));
+    addHills(initializeOptions(1, 1, 25, 40, 50, 85, 90, 100));
+    addHills(initializeOptions(1, 1, 5, 40, 15, 50, 90, 100));
+    addHills(initializeOptions(1, 2, worldState.altitudeOcean, 40, 20, 80, 48, 52));
     smooth(2);
     multiplyHeight(worldState.altitudeOcean, worldState.altitudeMax, 0.7);
     addTroughs(initializeOptions(3, 4, 25, 35, 5, 95, 10, 20));
@@ -474,25 +500,27 @@ function templatePangea() {
 
 function randomizaTemplate() {
     const randomTemplate = Math.random();
+    let templateType = 'atoll';
     if (randomTemplate < 0.05) {
-        templateInput.value = 'volcano';
+        templateType = 'volcano';
     } else if (randomTemplate < 0.25) {
-        templateInput.value = 'highIsland';
+        templateType = 'highIsland';
     } else if (randomTemplate < 0.35) {
-        templateInput.value = 'lowIsland';
+        templateType = 'lowIsland';
     } else if (randomTemplate < 0.55) {
-        templateInput.value = 'continents';
+        templateType = 'continents';
     } else if (randomTemplate < 0.85) {
-        templateInput.value = 'archipelago';
+        templateType = 'archipelago';
     } else if (randomTemplate < 0.90) {
-        templateInput.value = 'mediterranean';
+        templateType = 'mediterranean';
     } else if (randomTemplate < 0.95) {
-        templateInput.value = 'peninsula';
+        templateType = 'peninsula';
     } else if (randomTemplate < 0.99) {
-        templateInput.value = 'pangea';
+        templateType = 'pangea';
     } else {
-        templateInput.value = 'atoll';
+        templateType = 'atoll';
     }
+    templateInput.value = templateType;
 }
 
 function generateHeights() {
@@ -516,9 +544,6 @@ function generateHeights() {
     case 'archipelago':
         templateArchipelago();
         break;
-    case 'atoll':
-        templateAtoll();
-        break;
     case 'mediterranean':
         templateMediterranean();
         break;
@@ -528,7 +553,9 @@ function generateHeights() {
     case 'pangea':
         templatePangea();
         break;
+    case 'atoll':
     default:
+        templateAtoll();
         break;
     }
 }

@@ -8,6 +8,7 @@ let sample = null;
 const worldState = {
     widthCanvas,
     heightCanvas,
+    sizePolygon: 5,
     sites: [],
     delaunay: null,
     voronoi: null,
@@ -37,17 +38,19 @@ function relax() {
     worldState.voronoi = worldState.delaunay.voronoi([ 0.5, 0.5, worldState.widthCanvas - 0.5, worldState.heightCanvas - 0.5 ]);
 }
 
-function randomWorld(count) {
+function randomWorld() {
     console.time('randomWorld');
     if (document.getElementById('rngEnabled').checked) {
         // on initialise le RNG avec la seed fournie
         Math.seedrandom(document.getElementById('rngSeed').value);
     } else {
         // on affiche la seed pour pouvoir regénérer une map identique si besoin
-        document.getElementById('rngSeed').value = Math.seedrandom();
+        // document.getElementById('rngSeed').value = Math.seedrandom();
+        document.getElementById('rngSeed').value = generator$places$islands();
     }
 
-    const sampler = poissonDiscSampler(worldState.widthCanvas, worldState.heightCanvas, sizeInput.valueAsNumber);
+
+    const sampler = poissonDiscSampler(worldState.widthCanvas, worldState.heightCanvas, worldState.sizePolygon);
     worldState.sites = [];
 
     while (sample = sampler()) {
@@ -61,5 +64,7 @@ function randomWorld(count) {
     showWorld();
     console.timeEnd('randomWorld');
 }
+
+randomWorld();
 
 export { randomWorld, worldState };

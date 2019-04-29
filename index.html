@@ -34,7 +34,7 @@
     </div>
     <div id="options" style="display:none; padding-top: 20px">
         <div>
-            <label>Enable RNG <input type="checkbox" id="rngEnabled"></label><br>
+            <label>Lock RNG Template <input type="checkbox" id="rngEnabled"></label><br>
             <label>RNG Seed:</label><input id="rngSeed" >
             <button onclick="document.getElementById('rngSeed').value = generator$places$islands()">Generate readable seed</button>
         </div>
@@ -113,7 +113,4 @@
     <script type="module" src="renderer/utils.js"></script>
 
     <script type="module" src="world.js"></script>
-
-    <script type="module" src="map.js"></script>
-    
 </html>

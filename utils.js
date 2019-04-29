@@ -330,7 +330,7 @@ function getPathPolygon(startID, endID, exploredPolygon = new Array(worldState.s
     while (currentID !== endID) {
         let min = Infinity;
         for (const neighborID of worldState.delaunay.neighbors(currentID)) {
-            if (exploredPolygon[currentID] === 1) {
+            if (exploredPolygon[neighborID] === 1) {
                 continue;
             }
             let diff = ((worldState.sites[endID][0] - worldState.sites[neighborID][0]) ** 2) + ((worldState.sites[endID][1] - worldState.sites[neighborID][1]) ** 2);
@@ -351,6 +351,10 @@ function getPathPolygon(startID, endID, exploredPolygon = new Array(worldState.s
     return result;
 }
 
+/**
+ * Return a normalized height value between 0 (min) and 100(max).
+ * @param {number} value value to normalize
+ */
 function normalizeValue(value) {
     return Math.max(Math.min(value, 100), 0);
 }

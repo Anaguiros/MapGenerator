@@ -52,7 +52,7 @@ function drawnRiver() {
                         const eY = dataRiver[river + 1].y;
                         const angle = Math.atan2(eY - dY, eX - dX);
                         if (dataRiver[river + 1].type === 'course') {
-                            const mean = (sizeInput.valueAsNumber / 10) + (Math.random() * (sizeInput.valueAsNumber / 10));
+                            const mean = (worldState.sizePolygon / 10) + (Math.random() * (worldState.sizePolygon / 10));
                             let firstThirdX = ((dX * 2) + eX) / 3;
                             let firstThirdY = ((dY * 2) + eY) / 3;
                             let secondThirdX = (dX + (eX * 2)) / 3;
@@ -71,7 +71,7 @@ function drawnRiver() {
                             riverAmended.push({ x: firstThirdX, y: firstThirdY });
                             riverAmended.push({ x: secondThirdX, y: secondThirdY });
                         } else {
-                            const mean = (sizeInput.valueAsNumber / 20) + (Math.random() * (sizeInput.valueAsNumber / 20));
+                            const mean = (worldState.sizePolygon / 20) + (Math.random() * (worldState.sizePolygon / 20));
                             let middleX = (dX + eX) / 2;
                             let middleY = (dY + eY) / 2;
                             middleX += -Math.sin(angle) * mean * side;
@@ -112,7 +112,7 @@ function drawnRiver() {
                     const cellDestinationID = worldState.delaunay.find(end.x, end.y);
                     let xNode = end.x;
                     let yNode = end.y;
-                    // let riverWidth = ((count + width) * 3) / (50 - sizeInput.valueAsNumber * 2);
+                    // let riverWidth = ((count + width) * 3) / (50 - worldState.sizePolygon * 2);
                     let riverWidth = Math.sqrt((count + width));
                     count++;
                     /* if(cellDestinationID){
@@ -131,7 +131,7 @@ function drawnRiver() {
                             }
                             count = 0;
                             width = Math.pow(sites[cellDestinationID].flux, 0.9);
-                            let df = (width * 3 / (50 - sizeInput.valueAsNumber * 2) - riverWidth) /2,
+                            let df = (width * 3 / (50 - worldState.sizePolygon * 2) - riverWidth) /2,
                             cellControle1 = confluenceData[0].start,
                             cellControle2 = confluenceData[1].start,
                             baseX = (sites[cellControle1][0] + sites[cellControle2][0]) / 2,
